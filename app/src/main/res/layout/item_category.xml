@@ -5,12 +5,13 @@
     android:layout_height="wrap_content"
     android:layout_width="wrap_content"
     app:cardCornerRadius="14dp"
-    app:cardElevation="4dp"
+    app:cardElevation="2dp"
     app:strokeWidth="2dp"
     app:strokeColor="#444444"
     android:layout_marginEnd="10dp"
     android:layout_marginTop="6dp"
     android:layout_marginBottom="4dp"
+    app:cardBackgroundColor="@color/white"
     >
     <TextView
         android:id="@+id/tvCategoryName"
