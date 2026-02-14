@@ -85,13 +85,14 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="RAM Desktop Kingston Fury Beast 16G DDR4 3200MHz chính hãng bảo hành 36 tháng"
+                    android:text="RAM Desktop Kingston Fury Beast DDR4 3200MHz chính hãng bảo hành 36 tháng"
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="18dp"
                     android:textSize="16dp"
                     android:textStyle="bold"
                     android:maxLines="2"
-                    android:ellipsize="end"/>
+                    android:ellipsize="end"
+                    />
                 <TextView
                     android:id="@+id/tvDiscountTag"
                     android:layout_width="wrap_content"
@@ -122,7 +123,7 @@
                     android:text="1.152.000đ"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="#FF0000"
+                    android:textColor="@color/red_price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingLeft="10dp"/>
