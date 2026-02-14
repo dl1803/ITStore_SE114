@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@drawable/rounded_box">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="0dp"
+        android:layout_marginRight="4dp"
+        app:cardElevation="0dp"
+        android:layout_gravity="end"
+        app:cardCornerRadius="18dp"
+        app:cardBackgroundColor="@color/orange_light"
+        >
+        <ImageView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:src="@drawable/ic_close"
+            android:padding="2dp"
+            app:tint="#8B8989"
+            >
+        </ImageView>
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Nhập mã giảm giá"
+    android:textSize="18sp"
+    android:textStyle="bold"
+    android:textColor="@color/black"
+    android:layout_marginBottom="16dp"></TextView>
+
+    <EditText
+        android:id="@+id/edtVoucherCode"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="Ví dụ: SALE36K"
+        android:padding="10dp"
+        android:background="#ECECEC"></EditText>
+
+    <Button
+        android:id="@+id/btnApplyVoucher"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Áp dụng"
+        android:textSize="18dp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/orange_primary"></Button>
+</LinearLayout>
