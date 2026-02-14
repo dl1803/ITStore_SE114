@@ -29,7 +29,7 @@
             android:layout_marginLeft="20dp"
             >
             <ImageView
-                android:layout_width="42dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="10dp"
                 android:src="@drawable/ic_back"
@@ -50,8 +50,8 @@
             </TextView>
         <androidx.cardview.widget.CardView
             android:id="@+id/btnSupport"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
             android:layout_marginRight="16dp"
             app:cardBackgroundColor="@color/orange_light"
             app:cardCornerRadius="20dp"
@@ -131,7 +131,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="Chọn hoặc nhập mã"
+                    android:text="Nhập mã"
                     android:textColor="#A0A0A0"
                     app:layout_constraintRight_toLeftOf="@id/imgForwardDiscount"
                     app:layout_constraintTop_toTopOf="parent"
