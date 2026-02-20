@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.itstore.R;
+import com.example.itstore.adapter.BannerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.example.itstore.activity;
+package com.example.itstore.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
