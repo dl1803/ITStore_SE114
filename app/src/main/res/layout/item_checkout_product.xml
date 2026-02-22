@@ -15,7 +15,7 @@
         android:padding="8dp"
         android:background="@color/orange_light">
         <ImageView
-            android:id="@+id/img_checkout_product"
+            android:id="@+id/imgCheckoutProduct"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:scaleType="centerInside"
@@ -28,7 +28,7 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintLeft_toRightOf="@id/img_checkout_product"
+            app:layout_constraintLeft_toRightOf="@id/imgCheckoutProduct"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -37,7 +37,7 @@
             >
 
             <TextView
-                android:id="@+id/tv_checkout_product_name"
+                android:id="@+id/tvCheckoutProductName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="RAM Desktop Kingston Fury Beast"
@@ -49,7 +49,7 @@
 
                 ></TextView>
             <TextView
-                android:id="@+id/tv_checkout_product_name"
+                android:id="@+id/tvCheckoutProductType"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="16GB"
@@ -61,7 +61,7 @@
                 android:layout_width="match_parent"
                 android:orientation="horizontal">
                 <TextView
-                    android:id="@+id/tv_checkout_product_sale"
+                    android:id="@+id/tvCheckoutProductSale"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="1.152.000đ"
@@ -80,7 +80,7 @@
                     android:padding="4sp"
                     ></ImageView>
                 <TextView
-                    android:id="@+id/tv_checkout_product_price"
+                    android:id="@+id/tvCheckoutProductPrice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="1.800.000đ"
@@ -93,7 +93,7 @@
                     ></TextView>
 
                 <TextView
-                    android:id="@+id/tv_checkout_product_count"
+                    android:id="@+id/tvCheckoutProductCount"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text="x 1"
