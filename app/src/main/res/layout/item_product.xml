@@ -16,14 +16,37 @@
         android:orientation="vertical"
         >
 
-        <ImageView
-            android:id="@+id/imgProduct"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="140dp"
-            android:src="@drawable/ram1"
-            android:scaleType="fitCenter"
-            android:padding="6dp"
-            android:background="@color/white"/>
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/imgProduct"
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                android:src="@drawable/ram1"
+                android:scaleType="fitCenter"
+                android:padding="6dp"
+                android:background="@color/white"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <ImageView
+                android:id="@+id/imgFavoriteItem"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:padding="5dp"
+                android:background="@drawable/rounded_box"
+                app:tint="#B3B3B3"
+                android:backgroundTint="@color/orange_light"
+                android:src="@drawable/ic_favorite"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
             android:layout_width="match_parent"
