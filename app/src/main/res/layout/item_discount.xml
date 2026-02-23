@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white">
+
+        <LinearLayout
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:background="#FFF3E0"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <ImageView
+                android:id="@+id/imgDiscount"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_discount"
+                app:tint="@color/orange_primary" ></ImageView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="VOUCHER"
+                android:textColor="@color/orange_primary"
+                android:textSize="12sp"
+                android:textStyle="bold" ></TextView>
+        </LinearLayout>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginVertical="8dp"
+            android:background="#E0E0E0"
+            ></View>
+
+        <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/tvDiscount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Giảm 20.000đ"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold" ></TextView>
+
+        <TextView
+            android:id="@+id/tvDiscountCondition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Đơn tối thiểu 150k"
+            android:textColor="#666666"
+            android:textSize="14sp" ></TextView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/tvDiscountDate"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="HSD: 31/12/2026"
+                android:textColor="#FF0000"
+                android:textSize="12sp" ></TextView>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnUseDiscount"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:background="@drawable/rounded_box"
+                android:backgroundTint="@color/orange_primary"
+                android:paddingHorizontal="12dp"
+                android:text="DÙNG NGAY"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold" ></androidx.appcompat.widget.AppCompatButton>
+        </LinearLayout>
+    </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

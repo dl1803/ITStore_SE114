@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:padding="20dp"
     android:background="@drawable/rounded_box">
@@ -52,4 +53,22 @@
         android:textSize="18dp"
         android:layout_marginTop="16dp"
         android:backgroundTint="@color/orange_primary"></Button>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="8dp"
+        android:text="Voucher của bạn"
+        android:textSize="18dp"
+        android:textColor="@color/black"
+        android:textStyle="bold" ></TextView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvDiscountList"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:clipToPadding="false"
+        tools:listitem="@layout/item_discount" ></androidx.recyclerview.widget.RecyclerView>
+
 </LinearLayout>

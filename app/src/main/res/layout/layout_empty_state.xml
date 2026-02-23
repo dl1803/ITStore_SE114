@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layoutEmpty"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:visibility="gone"
+    >
+    <ImageView
+    android:id="@+id/imgEmptyIcon"
+    android:layout_width="120dp"
+    android:layout_height="120dp"
+    android:src="@drawable/ic_info"
+    app:tint="#BDBDBD" ></ImageView>
+
+    <TextView
+        android:id="@+id/tvEmptyMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="Hiện tại bạn chưa có dữ liệu nào ở đây!"
+        android:textColor="#757575"
+        android:textSize="14sp" ></TextView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnEmptyAction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:paddingHorizontal="24dp"
+        android:text="Tiếp tục mua sắm"
+        android:textColor="@color/white"
+        app:backgroundTint="@color/orange_primary"
+        app:cornerRadius="8dp"
+        android:visibility="gone" ></com.google.android.material.button.MaterialButton>
+</LinearLayout>

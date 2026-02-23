@@ -83,6 +83,29 @@
                     android:text="Ngày đặt: 22/02/2026 14:30"
                     android:textColor="#888888"
                     android:textSize="13sp" ></TextView>
+
+                <LinearLayout
+                    android:id="@+id/layoutViewTimeline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Xem hành trình đơn hàng"
+                        android:textColor="#2196F3"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_arrow_forward"
+                        app:tint="#2196F3"/>
+                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -233,20 +256,48 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:elevation="8dp"
-        android:orientation="horizontal"
-        android:padding="12dp">
-
+        android:orientation="vertical"
+        android:paddingVertical="16dp"
+        android:paddingHorizontal="9dp"
+        >
         <Button
-            android:id="@+id/btnCancelOrderSubmit"
+            android:id="@+id/btnCancelOrderDetail"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:backgroundTint="@color/orange_primary"
             android:text="Hủy đơn hàng"
             android:textColor="@color/white"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:textSize="16dp"></Button>
+            android:visibility="gone"
+            ></Button>
+
+        <Button
+            android:id="@+id/btnConfirmReceived"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:backgroundTint="@color/orange_primary"
+            android:text="Đã nhận được hàng"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            ></Button>
+
+        <Button
+            android:id="@+id/btnRefundOrderDetail"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:backgroundTint="@color/red_price"
+            android:text="Yêu cầu Trả hàng / Hoàn tiền"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:strokeColor="@color/black"
+            app:strokeWidth="1dp"
+            android:visibility="gone"
+            ></Button>
+
     </LinearLayout>
 
 </LinearLayout>
