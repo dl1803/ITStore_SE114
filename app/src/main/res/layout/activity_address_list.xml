@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:elevation="4dp"
-        android:padding="12dp"
+        android:padding="10dp"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
