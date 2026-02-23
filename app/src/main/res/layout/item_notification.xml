@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="16dp"
+    android:paddingHorizontal="16dp"
+    android:background="@color/white">
+
+    <ImageView
+        android:id="@+id/imgNotiIcon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_notification"
+        android:background="@drawable/rounded_box"
+        android:backgroundTint="@color/orange_light"
+        android:padding="12dp"
+        app:tint="@color/orange_primary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"></ImageView>
+
+    <TextView
+        android:id="@+id/tvNotiTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Đơn hàng đã giao thành công"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        android:textColor="@color/black"
+        android:layout_marginLeft="12dp"
+        app:layout_constraintTop_toTopOf="@id/imgNotiIcon"
+        app:layout_constraintLeft_toRightOf="@id/imgNotiIcon"
+        app:layout_constraintRight_toRightOf="parent"></TextView>
+
+    <TextView
+        android:id="@+id/tvNotiContent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Đơn hàng #DH123456 của bạn đã được giao thành công. Hãy cho chúng tôi biết cảm nhận của bạn về sản phẩm nhé!"
+        android:textSize="13sp"
+        android:textColor="#666666"
+        android:layout_marginTop="4dp"
+        app:layout_constraintTop_toBottomOf="@id/tvNotiTitle"
+        app:layout_constraintStart_toStartOf="@id/tvNotiTitle"
+        app:layout_constraintEnd_toEndOf="parent"></TextView>
+
+    <TextView
+        android:id="@+id/tvNotiTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="10:30 - 23/02/2026"
+        android:textSize="11sp"
+        android:textColor="#999999"
+        android:layout_marginTop="6dp"
+        app:layout_constraintTop_toBottomOf="@id/tvNotiContent"
+        app:layout_constraintStart_toStartOf="@id/tvNotiTitle"></TextView>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E0E0E0"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/tvNotiTime"
+        app:layout_constraintBottom_toBottomOf="parent"></View>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
