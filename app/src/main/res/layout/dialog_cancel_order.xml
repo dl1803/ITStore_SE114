@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_box"
+    android:backgroundTint="@color/white"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="Lý do hủy đơn hàng"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold" ></TextView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="Bạn vui lòng cho chúng tôi biết lý do bạn muốn hủy đơn hàng này:"
+        android:textColor="#666666"
+        android:textSize="14sp" ></TextView>
+
+    <RadioGroup
+        android:id="@+id/rgCancelReasons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+
+        <RadioButton
+            android:id="@+id/rbReason1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/orange_primary"
+            android:paddingVertical="8dp"
+            android:text="Tôi muốn thay đổi địa chỉ nhận hàng"
+            android:textColor="@color/black" ></RadioButton>
+
+        <RadioButton
+            android:id="@+id/rbReason2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/orange_primary"
+            android:paddingVertical="8dp"
+            android:text="Tôi muốn thêm/bớt sản phẩm"
+            android:textColor="@color/black" ></RadioButton>
+
+        <RadioButton
+            android:id="@+id/rbReason3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/orange_primary"
+            android:paddingVertical="8dp"
+            android:text="Tôi tìm thấy chỗ khác giá rẻ hơn"
+            android:textColor="@color/black" ></RadioButton>
+
+        <RadioButton
+            android:id="@+id/rbReason4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/orange_primary"
+            android:paddingVertical="8dp"
+            android:text="Tôi đổi ý, không muốn mua nữa"
+            android:textColor="@color/black" ></RadioButton>
+
+        <RadioButton
+            android:id="@+id/rbReasonOther"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/orange_primary"
+            android:paddingVertical="8dp"
+            android:text="Lý do khác"
+            android:textColor="@color/black" ></RadioButton>
+    </RadioGroup>
+
+    <EditText
+        android:id="@+id/edtOtherReason"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/rounded_box"
+        android:backgroundTint="#F5F5F5"
+        android:hint="Nhập lý do của bạn..."
+        android:padding="12dp"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        android:visibility="gone"
+        ></EditText>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnClose"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_box"
+            android:backgroundTint="#EEEEEE"
+            android:text="ĐÓNG"
+            android:textColor="#555555"
+            android:textStyle="bold" ></androidx.appcompat.widget.AppCompatButton>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnConfirm"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_box"
+            android:backgroundTint="@color/orange_primary"
+            android:text="XÁC NHẬN"
+            android:textColor="@color/white"
+            android:textStyle="bold" ></androidx.appcompat.widget.AppCompatButton>
+    </LinearLayout>
+
+</LinearLayout>

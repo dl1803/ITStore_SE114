@@ -6,4 +6,12 @@
     </style>
 
     <style name="Theme.ITStore" parent="Base.Theme.ITStore" />
+
+    <style name="SwitchTheme" parent="Theme.AppCompat.Light">
+        <item name="colorControlActivated">@color/orange_primary</item>
+
+        <item name="colorSwitchThumbNormal">#FFFFFF</item>
+        <item name="android:colorForeground">#BDBDBD</item>
+    </style>
+
 </resources>

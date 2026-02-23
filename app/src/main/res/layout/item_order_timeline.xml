@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:paddingHorizontal="16dp">
+    <View
+        android:id="@+id/viewTopOrderTimeline"
+        android:layout_width="2dp"
+        android:layout_height="24dp"
+        android:background="#E0E0E0"
+        app:layout_constraintRight_toRightOf="@id/imgDotOrderTimeline"
+        app:layout_constraintLeft_toLeftOf="@id/imgDotOrderTimeline"
+        app:layout_constraintTop_toTopOf="parent" ></View>
+
+    <ImageView
+        android:id="@+id/imgDotOrderTimeline"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:src="@drawable/ic_dot"
+        app:tint="@color/orange_primary"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/viewTopOrderTimeline" ></ImageView>
+
+    <View
+        android:id="@+id/lineBottomOrderTimeline"
+        android:layout_width="2dp"
+        android:layout_height="0dp"
+        android:background="#E0E0E0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="@id/imgDotOrderTimeline"
+        app:layout_constraintLeft_toLeftOf="@id/imgDotOrderTimeline"
+        app:layout_constraintTop_toBottomOf="@id/imgDotOrderTimeline" ></View>
+
+    <TextView
+        android:id="@+id/tvStatusOrderTimeline"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="Đang giao hàng"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/tvTimeOrderTimeline"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/imgDotOrderTimeline"
+        app:layout_constraintTop_toTopOf="@id/imgDotOrderTimeline" ></TextView>
+
+    <TextView
+        android:id="@+id/tvTimeOrderTimeline"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="16dp"
+        android:text="6:30 - 22/02/2026"
+        android:textColor="#757575"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/imgDotOrderTimeline"
+        app:layout_constraintTop_toBottomOf="@id/tvStatusOrderTimeline" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

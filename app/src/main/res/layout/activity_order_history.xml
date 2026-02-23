@@ -78,5 +78,14 @@
         android:id="@+id/viewListOrders"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" ></androidx.viewpager2.widget.ViewPager2>
+        android:layout_weight="1"
+        >
+    </androidx.viewpager2.widget.ViewPager2>
+    <include
+        android:id="@+id/emptyHisOrderState"
+        layout="@layout/layout_empty_state"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        ></include>
 </LinearLayout>
