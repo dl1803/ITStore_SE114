@@ -62,7 +62,7 @@
             <EditText
                 android:id="@+id/edtReasonRefundRequest"
                 android:layout_width="match_parent"
-                android:layout_height="120dp"
+                android:layout_height="200dp"
                 android:layout_marginTop="8dp"
                 android:background="#FFFFFF"
                 android:gravity="top|start"
@@ -71,43 +71,6 @@
                 android:padding="12dp"
                 android:textColorHint="#9E9E9E"
                 android:textSize="14sp" ></EditText>
-
-            <TextView
-                android:id="@+id/tvProofLabelRefundRequest"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="Ảnh minh chứng (nếu có)"
-                android:textColor="#333333"
-                android:textSize="16sp"
-                android:textStyle="bold" ></TextView>
-
-            <LinearLayout
-                android:id="@+id/layoutUploadImgRefundRequest"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btnUploadRefundRequest"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/orange_light"
-                    android:textColor="#333333"
-                    android:text="Chọn ảnh" ></Button>
-
-                <ImageView
-                    android:id="@+id/imgProofRefundRequest"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_marginStart="16dp"
-                    android:background="#E0E0E0"
-                    android:scaleType="centerInside"
-                    android:visibility="gone"
-                    ></ImageView>
-            </LinearLayout>
 
             <Space
                 android:layout_width="match_parent"

@@ -226,20 +226,6 @@
                     android:text="Ví điện tử Momo"
                     android:layout_marginTop="12dp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-
-                <RadioButton
-                    android:id="@+id/rbZaloPay"
-                    android:text="Ví ZaloPay"
-                    android:layout_marginTop="12dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"></RadioButton>
-
-                <RadioButton
-                    android:id="@+id/rbVnpay"
-                    android:text="Cổng thanh toán VNPay"
-                    android:layout_marginTop="12dp"
-                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"></RadioButton>
 
                 <RadioButton

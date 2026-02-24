@@ -207,6 +207,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     android:paddingVertical="14dp"
+                    android:layout_marginRight="8dp"
                     />
 
                 <LinearLayout
