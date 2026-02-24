@@ -5,7 +5,18 @@
     android:layout_height="wrap_content"
     android:paddingTop="16dp"
     android:paddingHorizontal="16dp"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:id="@+id/layoutNotiContainer"
+    >
+
+    <View
+        android:id="@+id/viewUnreadDot"
+        android:layout_width="8dp"
+        android:layout_height="8dp"
+        android:background="@drawable/ic_dot"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:backgroundTint="@color/red_price"/>
 
     <ImageView
         android:id="@+id/imgNotiIcon"

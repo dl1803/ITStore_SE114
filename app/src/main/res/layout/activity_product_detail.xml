@@ -340,7 +340,7 @@
                     android:background="@color/orange_light"
                     android:padding="16dp"
                     android:layout_margin="10dp"
-                    android:layout_borderRadius="12dp">
+                    >
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -505,15 +505,6 @@
             android:elevation="10dp"
             android:padding="10dp"
             app:layout_constraintBottom_toBottomOf="parent">
-            <ImageView
-            android:src="@drawable/ic_chat"
-            android:padding="12dp"
-            android:background="@drawable/rounded_box"
-            android:backgroundTint="@color/orange_primary"
-            app:tint="@color/white"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-                />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:text="Thêm vào giỏ"

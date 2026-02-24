@@ -42,6 +42,42 @@
             android:layout_marginTop="10dp"
             >
         </TextView>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/rounded_box"
+            app:backgroundTint="#F5F5F5"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="12dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mã đơn hàng: "
+                android:textColor="#666666"
+                android:textSize="14sp"></TextView>
+
+            <TextView
+                android:id="@+id/tvOrder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="#DH123456"
+                android:textColor="@color/orange_primary"
+                android:textSize="16sp"
+                android:textStyle="bold"></TextView>
+
+            <ImageView
+                android:id="@+id/btnCopyOrder"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginLeft="8dp"
+                android:src="@drawable/ic_copy"
+                app:tint="#808080"
+                ></ImageView>
+        </LinearLayout>
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnContinueBuy"
             android:layout_height="70dp"
