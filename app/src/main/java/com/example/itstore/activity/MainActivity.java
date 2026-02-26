@@ -90,7 +90,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         // End of BannerAdapter && Indicators (...)
-
-
     }
 }
