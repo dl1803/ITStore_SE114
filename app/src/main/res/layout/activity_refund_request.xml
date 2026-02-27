@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="#F5F5F5"
     android:orientation="vertical">
 
@@ -51,10 +52,74 @@
             android:padding="16dp">
 
             <TextView
-                android:id="@+id/tvReasonLabelRefundRequest"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Lý do trả hàng (*)"
+                android:text="Yêu cầu Trả hàng"
+                android:textColor="#333333"
+                android:textSize="16sp"
+                android:textStyle="bold" ></TextView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvRefundItems"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:nestedScrollingEnabled="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_product_cart"
+                >
+            </androidx.recyclerview.widget.RecyclerView>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0"
+                android:layout_marginBottom="8dp" ></View>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tình trạng hàng (*)"
+                android:textColor="#333333"
+                android:textSize="16sp"
+                android:textStyle="bold" >
+            </TextView>
+
+            <RadioGroup
+                android:id="@+id/rgCondition"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp"
+                android:orientation="vertical">
+
+                <RadioButton
+                    android:id="@+id/rbGood"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hàng còn nguyên vẹn (Đổi ý)"
+                    android:buttonTint="@color/orange_primary" ></RadioButton>
+
+                <RadioButton
+                    android:id="@+id/rbDamaged"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hàng bị hư hỏng, bể vỡ, lỗi kỹ thuật"
+                    android:buttonTint="@color/orange_primary" ></RadioButton>
+
+                <RadioButton
+                    android:id="@+id/rbWrongItem"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Giao nhầm hàng / Thiếu hàng"
+                    android:buttonTint="@color/orange_primary" ></RadioButton>
+            </RadioGroup>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chi tiết lí do (*)"
                 android:textColor="#333333"
                 android:textSize="16sp"
                 android:textStyle="bold" ></TextView>
@@ -62,7 +127,7 @@
             <EditText
                 android:id="@+id/edtReasonRefundRequest"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="120dp"
                 android:layout_marginTop="8dp"
                 android:background="#FFFFFF"
                 android:gravity="top|start"
@@ -72,10 +137,72 @@
                 android:textColorHint="#9E9E9E"
                 android:textSize="14sp" ></EditText>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hình ảnh bằng chứng (*)"
+                android:textColor="#333333"
+                android:textSize="16sp"
+                android:textStyle="bold" ></TextView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:id="@+id/btnAddImage"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:background="#EEEEEE"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_camera"
+                    app:tint="#888888" ></ImageView>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvRefundImages"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:layout_marginLeft="10dp"
+                    android:orientation="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:clipToPadding="false"
+                    tools:listitem="@layout/item_refund_img"
+                    >
+                </androidx.recyclerview.widget.RecyclerView>
+            </LinearLayout>
+
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1" ></Space>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Số tiền hoàn dự kiến:"
+                    android:textSize="16sp" ></TextView>
+
+                <TextView
+                    android:id="@+id/tvEstimatedRefund"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0đ"
+                    android:textColor="@color/orange_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" ></TextView>
+            </LinearLayout>
 
             <Button
                 android:id="@+id/btnSubmitRefundRequest"
