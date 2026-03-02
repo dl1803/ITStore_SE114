@@ -17,7 +17,6 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_arrow_back"
             app:tint="@color/black"
-            android:padding="8dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent" ></ImageView>
 
