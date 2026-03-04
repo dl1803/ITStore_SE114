@@ -40,7 +40,20 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+
         setupLoginBtn();
+
+        // Chuyển tới trang Quên mật khẩu
+        binding.tvForgotPassword.setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(this, ForgotPasswordActivity.class);
+            startActivity(intent);
+        });
+
+        // Đăng nhập bằng Google
+        binding.btnGoogleLogin.setOnClickListener(v -> {
+            Toast.makeText(this, "Đăng nhập bằng Google đang được phát triển!", Toast.LENGTH_LONG).show();
+        });
+
     }
 
 
