@@ -7,4 +7,5 @@
     <color name="gray_background">#F5F5F5</color>
     <color name="red_price">#F43729</color>
     <color name="text_primary">#333333</color>
+    <color name="dark_gray">#444444</color>
 </resources>
