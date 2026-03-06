@@ -9,16 +9,23 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.itstore.R;
 import com.example.itstore.adapter.BannerAdapter;
+import com.example.itstore.adapter.ProductAdapter;
+import com.example.itstore.viewmodel.HomeViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
+    private HomeViewModel homeViewModel;
+    private RecyclerView rcvProducts;
+    private ProductAdapter productAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,5 +97,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         // End of BannerAdapter && Indicators (...)
+        rcvProducts = findViewById(R.id.recyclerProduct);
+        rcvProducts.setLayoutManager(new GridLayoutManager(this, 2));
+        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        homeViewModel.getProductListLiveData().observe(this, products -> {
+            productAdapter = new ProductAdapter(this, products);
+            rcvProducts.setAdapter(productAdapter);
+        });
     }
 }
