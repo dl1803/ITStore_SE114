@@ -7,11 +7,15 @@ import android.os.Looper;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.itstore.databinding.ActivityForgotPasswordBinding;
+import com.example.itstore.viewmodel.ForgotPasswordViewModel;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
     private ActivityForgotPasswordBinding binding;
+    private ForgotPasswordViewModel forgotPasswordViewModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,45 +27,47 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
         //Chuyển về màn hình đăng nhập
         binding.btnBack.setOnClickListener(view -> {
-            Intent intent = new Intent(ForgotPasswordActivity.this, LoginActivity.class);
-            startActivity(intent);
+            finish();
         });
 
-        setupSendRequestLinkBtn();
-    }
+        // Lắng nghe và xử lí sự kiện khi nhập email
+        forgotPasswordViewModel = new ViewModelProvider(this).get(ForgotPasswordViewModel.class);
 
-    private void setupSendRequestLinkBtn() {
+        setupObservers();
+
         binding.btnSendResetLink.setOnClickListener(v -> {
             String email = binding.edtEmail.getText().toString().trim();
-
-            if (email.isEmpty()) {
-                binding.tilEmail.setError("Vui lòng nhập email");
+            forgotPasswordViewModel.sendResetLink(email);
+        });
+    }
+    private void setupObservers() {
+        forgotPasswordViewModel.getEmailError().observe(this, error -> {
+            if (error != null) {
+                binding.tilEmail.setError(error);
                 binding.tilEmail.requestFocus();
-                return;
-            }
-            else if (!email.matches("[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}")) {
-                binding.tilEmail.setError("Email không hợp lệ!");
-                binding.tilEmail.requestFocus();
-                return;
             } else {
                 binding.tilEmail.setErrorEnabled(false);
             }
-
-            binding.btnSendResetLink.setEnabled(false);
-            binding.btnSendResetLink.setText("Đang gửi liên kết...");
-
-            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(ForgotPasswordActivity.this, "Đã gửi liên kết khôi phục!", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(ForgotPasswordActivity.this, VerifyEmailActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-            }, 2000);
-
-
-
         });
+
+        forgotPasswordViewModel.getIsLoading().observe(this, isLoading -> {
+            if (isLoading) {
+                binding.btnSendResetLink.setEnabled(false);
+                binding.btnSendResetLink.setText("Đang gửi liên kết...");
+            } else {
+                binding.btnSendResetLink.setEnabled(true);
+                binding.btnSendResetLink.setText("Gửi liên kết khôi phục");
+            }
+        });
+
+        forgotPasswordViewModel.getIsSuccess().observe(this, isSuccess -> {
+            if (isSuccess) {
+                Toast.makeText(this, "Đã gửi liên kết khôi phục!", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(this, VerifyEmailActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
     }
 }
