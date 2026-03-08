@@ -11,11 +11,13 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.itstore.R;
 import com.example.itstore.adapter.BannerAdapter;
+import com.example.itstore.adapter.CategoryAdapter;
 import com.example.itstore.adapter.ProductAdapter;
 import com.example.itstore.viewmodel.HomeViewModel;
 
@@ -26,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
     private HomeViewModel homeViewModel;
     private RecyclerView rcvProducts;
     private ProductAdapter productAdapter;
+    private RecyclerView rcvCategories;
+    private CategoryAdapter categoryAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,6 +107,12 @@ public class MainActivity extends AppCompatActivity {
         homeViewModel.getProductListLiveData().observe(this, products -> {
             productAdapter = new ProductAdapter(this, products);
             rcvProducts.setAdapter(productAdapter);
+        });
+        rcvCategories = findViewById(R.id.recyclerCategory);
+        rcvCategories.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
+        homeViewModel.getCategoryListLiveData().observe(this, categories -> {
+            categoryAdapter = new CategoryAdapter(this, categories);
+            rcvCategories.setAdapter(categoryAdapter);
         });
     }
 }
