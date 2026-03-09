@@ -17,6 +17,8 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.itstore.R;
 
 import com.example.itstore.databinding.ActivityLoginBinding;
+import com.example.itstore.utils.SharedPrefsManager;
+import com.example.itstore.utils.SharedPrefsManager;
 import com.example.itstore.viewmodel.LoginViewModel;
 
 public class LoginActivity extends AppCompatActivity {
@@ -98,13 +100,24 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        loginViewModel.getIsLoginSuccess().observe(this, isSucess ->{
-           if (isSucess) {
+        loginViewModel.getApiError().observe(this, errorMessage -> {
+            if (errorMessage != null) {
+                Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        loginViewModel.getLoginSuccessData().observe(this, data -> {
+            if (data != null) {
+                SharedPrefsManager.getInstance(this).saveTokens(
+                        data.getAccessToken(),
+                        data.getRefreshToken()
+                );
+
                 Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
-           }
+            }
         });
     }
 }
