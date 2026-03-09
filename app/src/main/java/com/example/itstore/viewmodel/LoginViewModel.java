@@ -7,24 +7,40 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.itstore.api.RetrofitClient;
+import com.example.itstore.model.LoginRequest;
+import com.example.itstore.model.LoginResponse;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 
 public class LoginViewModel extends ViewModel {
     private MutableLiveData<String> emailError = new MutableLiveData<>();
     private MutableLiveData<String> passwordError = new MutableLiveData<>();
-    private MutableLiveData<Boolean> isLoginSuccess = new MutableLiveData<>();
     private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
+    private MutableLiveData<LoginResponse> loginSuccessData = new MutableLiveData<>();
+    private MutableLiveData<String> apiError = new MutableLiveData<>();
 
 
     public LiveData<String> getEmailError () {return emailError;}
     public LiveData<String> getPasswordError () {return passwordError;}
-    public LiveData<Boolean> getIsLoginSuccess () {return isLoginSuccess;}
     public LiveData<Boolean> getIsLoading () {return isLoading;}
+    public LiveData<LoginResponse> getLoginSuccessData () {return loginSuccessData;}
+    public LiveData<String> getApiError () {return apiError;}
+
+
 
     public void login(String email, String passwd) {
         boolean isValid = true;
 
         emailError.setValue(null);
         passwordError.setValue(null);
+        loginSuccessData.setValue(null);
+        apiError.setValue(null);
+
+
 
         if (passwd.isEmpty()) {
             passwordError.setValue("Vui lòng nhập mật khẩu");
@@ -55,18 +71,28 @@ public class LoginViewModel extends ViewModel {
         }
 
 
+            if (isValid) {
+                isLoading.setValue(true);
 
-        if (isValid) {
-            isLoading.setValue(true);
+                LoginRequest request = new LoginRequest(email, passwd);
 
-            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    isLoading.setValue(false);
-                    isLoginSuccess.setValue(true);
-                }
-            }, 2000);
-        }
+                RetrofitClient.getApiService().login(request).enqueue(new Callback<LoginResponse>() {
+                    @Override
+                    public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                        isLoading.setValue(false);
 
+                        if (response.isSuccessful() && response.body() != null) {
+                            loginSuccessData.setValue(response.body());
+                        } else {
+                            apiError.setValue("Email hoặc mật khẩu không đúng!");
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<LoginResponse> call, Throwable t) {
+                        isLoading.setValue(false);
+                        apiError.setValue("Lỗi kết nối Server! Vui lòng thử lại.");
+                    }
+                });
+            }
     }
 }
