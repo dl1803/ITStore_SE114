@@ -8,6 +8,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.itstore.api.RetrofitClient;
+import com.example.itstore.model.RegisterRequest;
+import com.example.itstore.model.RegisterResponse;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class RegisterViewModel extends ViewModel {
@@ -16,8 +23,10 @@ public class RegisterViewModel extends ViewModel {
     private MutableLiveData <String> phoneError = new MutableLiveData<>();
     private MutableLiveData <String> passwordError = new MutableLiveData<>();
     private MutableLiveData <String> confirmPasswordError = new MutableLiveData<>();
+    private MutableLiveData <String> registerSuccessMessage = new MutableLiveData<>();
+
+    private MutableLiveData <String> apiError =new MutableLiveData<>();
     private MutableLiveData <Boolean> isLoading = new MutableLiveData<>();
-    private MutableLiveData <Boolean> isRegisterSuccess = new MutableLiveData<>();
 
     public LiveData<String> getFullNameError() {
         return fullNameError;
@@ -43,9 +52,12 @@ public class RegisterViewModel extends ViewModel {
         return isLoading;
     }
 
-    public LiveData<Boolean> getIsRegisterSuccess(){
-        return isRegisterSuccess;
+    public LiveData<String> getRegisterSuccessMessage(){
+        return registerSuccessMessage;
+    }
 
+    public LiveData<String> getApiError (){
+        return apiError;
     }
 
     public void register (String fullName, String email, String phone, String passwd, String confirmPasswd){
@@ -56,6 +68,10 @@ public class RegisterViewModel extends ViewModel {
         phoneError.setValue(null);
         passwordError.setValue(null);
         confirmPasswordError.setValue(null);
+        registerSuccessMessage.setValue(null);
+        apiError.setValue(null);
+
+
 
         if (confirmPasswd.isEmpty()) {
             confirmPasswordError.setValue("Vui lòng nhập xác nhận mật khẩu");
@@ -110,15 +126,37 @@ public class RegisterViewModel extends ViewModel {
         if (isValid) {
             isLoading.setValue(true);
 
-            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    isLoading.setValue(false);
-                    isRegisterSuccess.setValue(true);
-                }
-            }, 1000);
-        }
+            RegisterRequest.Address address = new RegisterRequest.Address(
+                    fullName, phone, "Chưa cập nhật", "Chưa cập nhật", "Chưa cập nhật", "Chưa cập nhật", true
+            );
 
+            RegisterRequest request = new RegisterRequest(fullName, email, phone, passwd, address);
+
+            RetrofitClient.getApiService().register(request).enqueue(new Callback<RegisterResponse>() {
+                @Override
+                public void onResponse(Call<RegisterResponse> call, Response<RegisterResponse> response) {
+                    isLoading.setValue(false);
+
+                    if (response.isSuccessful() && response.body() != null) {
+                        registerSuccessMessage.setValue(response.body().getMessage());
+                    } else {
+                        try {
+                            String errorStr = response.errorBody().string();
+                            org.json.JSONObject jsonObject = new org.json.JSONObject(errorStr);
+                            apiError.setValue(jsonObject.getString("error"));
+                        } catch (Exception e) {
+                            apiError.setValue("Đăng ký thất bại! Vui lòng thử lại.");
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<RegisterResponse> call, Throwable t) {
+                    isLoading.setValue(false);
+                    apiError.setValue("Lỗi kết nối Server! Vui lòng thử lại.");
+                }
+            });
+        }
 
     }
 

@@ -118,20 +118,19 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        registerViewModel.getIsRegisterSuccess().observe(this, isSuccess -> {
-            if (isSuccess) {
-                Toast.makeText(this, "Đăng kí thành công! Vui lòng đăng nhập", Toast.LENGTH_SHORT).show();
-
-                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                }, 1000);
+        registerViewModel.getApiError().observe(this, errorMessage -> {
+            if (errorMessage != null) {
+                Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
             }
         });
+
+        registerViewModel.getRegisterSuccessMessage().observe(this, message -> {
+            if (message != null) {
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                finish();
+            }
+        });
+
     }
 }
 
