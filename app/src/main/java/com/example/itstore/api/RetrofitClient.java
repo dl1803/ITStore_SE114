@@ -5,6 +5,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
+
+import com.example.itstore.model.ForgotPasswordRequest;
+import com.example.itstore.model.ForgotPasswordResponse;
 import com.example.itstore.model.LoginRequest;
 import com.example.itstore.model.LoginResponse;
 import com.example.itstore.model.RegisterRequest;
@@ -29,5 +32,8 @@ public class RetrofitClient {
 
         @POST("auth/register")
         Call<RegisterResponse> register(@Body RegisterRequest request);
+
+        @POST("auth/forgot-password")
+        Call<ForgotPasswordResponse> forgotPassword(@Body ForgotPasswordRequest request);
     }
 }

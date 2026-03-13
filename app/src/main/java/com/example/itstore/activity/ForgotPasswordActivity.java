@@ -60,12 +60,16 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             }
         });
 
-        forgotPasswordViewModel.getIsSuccess().observe(this, isSuccess -> {
-            if (isSuccess) {
-                Toast.makeText(this, "Đã gửi liên kết khôi phục!", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(this, VerifyEmailActivity.class);
-                startActivity(intent);
+        forgotPasswordViewModel.getSuccessMessage().observe(this, message -> {
+            if (message != null) {
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
                 finish();
+            }
+        });
+
+        forgotPasswordViewModel.getApiError().observe(this, errorMessage -> {
+            if (errorMessage != null) {
+                Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
             }
         });
 
