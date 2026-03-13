@@ -8,6 +8,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.itstore.ProductDetailActivity;
 import com.example.itstore.R;
 import com.example.itstore.model.Product;
 import java.util.List;
@@ -31,6 +33,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         holder.tvName.setText(product.getName());
         holder.tvPrice.setText(String.format(java.util.Locale.US, "%,.0f VNĐ", product.getPrice()));
         holder.imgProduct.setImageURI(Uri.parse(product.getImageUrl()));
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                android.content.Intent intent = new android.content.Intent(context, ProductDetailActivity.class);
+                intent.putExtra("PRODUCT_INFO", product);
+                context.startActivity(intent);
+            }
+        });
     }
     @Override
     public int getItemCount() {

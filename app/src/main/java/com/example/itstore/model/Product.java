@@ -16,11 +16,12 @@ public class Product implements Serializable {
     private String description;
     @SerializedName("stock")
     private int stock;
-
+    @SerializedName("compare_at_price")
+    private double compareAtPrice;
     public Product() {
     }
 
-    public Product(int id, int categoryId, String name, double price, String imageUrl, String description, int stock) {
+    public Product(int id, int categoryId, String name, double price, String imageUrl, String description, int stock, double compareAtPrice) {
         this.id = id;
         this.categoryId = categoryId;
         this.name = name;
@@ -28,6 +29,7 @@ public class Product implements Serializable {
         this.imageUrl = imageUrl;
         this.description = description;
         this.stock = stock;
+        this.compareAtPrice = compareAtPrice;
     }
 
     public int getId() {
@@ -84,6 +86,14 @@ public class Product implements Serializable {
 
     public void setStock(int stock) {
         this.stock = stock;
+    }
+
+    public double getCompareAtPrice() {
+        return compareAtPrice;
+    }
+
+    public void setCompareAtPrice(double compareAtPrice) {
+        this.compareAtPrice = compareAtPrice;
     }
 }
 
