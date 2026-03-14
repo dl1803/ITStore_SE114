@@ -1,8 +1,10 @@
 package com.example.itstore.viewmodel;
 
+import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
 
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -16,7 +18,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class LoginViewModel extends ViewModel {
+public class LoginViewModel extends AndroidViewModel {
     private MutableLiveData<String> emailError = new MutableLiveData<>();
     private MutableLiveData<String> passwordError = new MutableLiveData<>();
     private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
@@ -31,7 +33,9 @@ public class LoginViewModel extends ViewModel {
     public LiveData<String> getApiError () {return apiError;}
 
 
-
+    public LoginViewModel(Application application){
+        super(application);
+    }
     public void login(String email, String passwd) {
         boolean isValid = true;
 
@@ -76,7 +80,7 @@ public class LoginViewModel extends ViewModel {
 
                 LoginRequest request = new LoginRequest(email, passwd);
 
-                RetrofitClient.getApiService().login(request).enqueue(new Callback<LoginResponse>() {
+                RetrofitClient.getApiService(getApplication()).login(request).enqueue(new Callback<LoginResponse>() {
                     @Override
                     public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                         isLoading.setValue(false);
