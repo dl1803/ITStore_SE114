@@ -1,5 +1,8 @@
 package com.example.itstore.api;
 
+import android.content.Context;
+
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.Call;
@@ -17,9 +20,14 @@ public class RetrofitClient {
     private static final String BASE_URL = "http://10.0.2.2:3000/api/";
     private static Retrofit retrofit = null;
 
-    public static ApiService getApiService() {
+    public static ApiService getApiService(Context context) {
         if (retrofit == null) {
-            retrofit = new Retrofit.Builder().baseUrl(BASE_URL)
+
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .addInterceptor(new AuthInterceptor(context))
+                    .build();
+
+            retrofit = new Retrofit.Builder().baseUrl(BASE_URL).client(client)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
@@ -35,5 +43,8 @@ public class RetrofitClient {
 
         @POST("auth/forgot-password")
         Call<ForgotPasswordResponse> forgotPassword(@Body ForgotPasswordRequest request);
+
+        @POST("auth/logout")
+        Call<Void> logout();
     }
 }
