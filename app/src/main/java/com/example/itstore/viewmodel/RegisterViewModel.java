@@ -1,9 +1,11 @@
 package com.example.itstore.viewmodel;
 
 
+import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
 
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -17,7 +19,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class RegisterViewModel extends ViewModel {
+public class RegisterViewModel extends AndroidViewModel {
     private MutableLiveData <String> fullNameError = new MutableLiveData<>();
     private MutableLiveData <String> emailError = new MutableLiveData<>();
     private MutableLiveData <String> phoneError = new MutableLiveData<>();
@@ -58,6 +60,11 @@ public class RegisterViewModel extends ViewModel {
 
     public LiveData<String> getApiError (){
         return apiError;
+    }
+
+
+    public RegisterViewModel (Application application){
+        super(application);
     }
 
     public void register (String fullName, String email, String phone, String passwd, String confirmPasswd){
@@ -132,7 +139,7 @@ public class RegisterViewModel extends ViewModel {
 
             RegisterRequest request = new RegisterRequest(fullName, email, phone, passwd, address);
 
-            RetrofitClient.getApiService().register(request).enqueue(new Callback<RegisterResponse>() {
+            RetrofitClient.getApiService(getApplication()).register(request).enqueue(new Callback<RegisterResponse>() {
                 @Override
                 public void onResponse(Call<RegisterResponse> call, Response<RegisterResponse> response) {
                     isLoading.setValue(false);
