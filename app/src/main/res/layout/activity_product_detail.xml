@@ -509,6 +509,7 @@
             app:layout_constraintBottom_toBottomOf="parent">
 
             <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnAddToCart"
                 android:text="Thêm vào giỏ"
                 android:background="@drawable/rounded_box"
                 android:backgroundTint="@color/orange_primary"
