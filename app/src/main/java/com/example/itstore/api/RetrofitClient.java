@@ -7,14 +7,19 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 
 import com.example.itstore.model.ForgotPasswordRequest;
 import com.example.itstore.model.ForgotPasswordResponse;
 import com.example.itstore.model.LoginRequest;
 import com.example.itstore.model.LoginResponse;
+import com.example.itstore.model.LogoutRequest;
+import com.example.itstore.model.LogoutResponse;
+import com.example.itstore.model.ProfileResponse;
 import com.example.itstore.model.RegisterRequest;
 import com.example.itstore.model.RegisterResponse;
+import com.example.itstore.model.User;
 
 public class RetrofitClient {
     private static final String BASE_URL = "http://10.0.2.2:3000/api/";
@@ -44,7 +49,9 @@ public class RetrofitClient {
         @POST("auth/forgot-password")
         Call<ForgotPasswordResponse> forgotPassword(@Body ForgotPasswordRequest request);
 
+        @GET("users/me")
+        Call<ProfileResponse> getProfile();
         @POST("auth/logout")
-        Call<Void> logout();
+        Call<LogoutResponse> logout(@Body LogoutRequest request);
     }
 }

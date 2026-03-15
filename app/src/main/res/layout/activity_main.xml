@@ -286,6 +286,7 @@
             app:layout_constraintStart_toStartOf="parent"
             android:weightSum="4">
             <LinearLayout
+                android:id="@+id/layoutMain"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -301,6 +302,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/layoutFavorite"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -315,6 +317,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/layoutCart"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -329,6 +332,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/layoutProfile"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
