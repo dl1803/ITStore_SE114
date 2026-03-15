@@ -15,6 +15,9 @@
         android:theme="@style/Theme.ITStore"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".activity.ProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.VerifyEmailActivity"
             android:exported="false" />
         <activity
@@ -29,6 +32,11 @@
         <activity
             android:name=".activity.SplashActivity"
             android:exported="true">
+
+        </activity>
+        <activity
+            android:name=".activity.MainActivity"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -36,10 +44,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.MainActivity"
+            android:name=".ProductDetailActivity"
             android:exported="false" />
-        <activity android:name=".ProductDetailActivity"
-            android:exported="false"/>
     </application>
 
 </manifest>
