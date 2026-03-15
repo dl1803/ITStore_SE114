@@ -18,9 +18,28 @@
             android:background="#FFFAF0"
             android:gravity="center"
             android:orientation="vertical"
-            android:paddingTop="80dp"
-            android:paddingBottom="80dp">
+            android:paddingTop="40dp"
+            android:paddingBottom="40dp">
 
+            <ImageView
+                android:id="@+id/ivAvatar"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginBottom="12dp"
+                android:src="@android:drawable/ic_menu_camera" ></ImageView>
+
+            <TextView
+                android:id="@+id/tvRoleUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#FFE0B2"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                android:layout_marginBottom="12dp"
+                android:text="Customer"
+                android:textColor="#F57C00"
+                android:textSize="12sp"
+                android:textStyle="bold" ></TextView>
             <TextView
                 android:id="@+id/tvNameUser"
                 android:layout_width="wrap_content"
@@ -36,6 +55,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="usermail@gmail.com"
+                android:textColor="#707070"
+                android:textSize="14sp" ></TextView>
+
+            <TextView
+                android:id="@+id/tvPhoneUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="0123456789"
                 android:textColor="#707070"
                 android:textSize="14sp" ></TextView>
         </LinearLayout>

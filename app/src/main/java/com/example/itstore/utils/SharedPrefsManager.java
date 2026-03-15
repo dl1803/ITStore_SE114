@@ -35,4 +35,6 @@ public class SharedPrefsManager {
     public String getRefreshToken() {
         return sharedPreferences.getString(KEY_REFRESH_TOKEN, null);
     }
+
+    public void clear() { sharedPreferences.edit().clear().apply(); }
 }

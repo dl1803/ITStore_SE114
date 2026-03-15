@@ -1,5 +1,6 @@
 package com.example.itstore.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -19,6 +20,7 @@ import com.example.itstore.R;
 import com.example.itstore.adapter.BannerAdapter;
 import com.example.itstore.adapter.CategoryAdapter;
 import com.example.itstore.adapter.ProductAdapter;
+import com.example.itstore.databinding.ActivityMainBinding;
 import com.example.itstore.viewmodel.HomeViewModel;
 
 import java.util.ArrayList;
@@ -30,19 +32,36 @@ public class MainActivity extends AppCompatActivity {
     private ProductAdapter productAdapter;
     private RecyclerView rcvCategories;
     private CategoryAdapter categoryAdapter;
+
+    private ActivityMainBinding binding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
+
+
+        android.widget.LinearLayout layoutProfile = binding.layoutProfile;
+
+        layoutProfile.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+            startActivity(intent);
+        });
+
+
 //        BannerAdapter && Indicators (...)
-        ViewPager2 viewPager2 =  findViewById(R.id.viewPagerBanner);
+        ViewPager2 viewPager2 =  binding.viewPagerBanner;
 
         List<Integer> listBanner = new ArrayList<>();
         listBanner.add(R.drawable.banner1);
@@ -69,7 +88,8 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
-        android.widget.LinearLayout layoutIndicators = findViewById(R.id.layoutIndicators);
+        android.widget.LinearLayout layoutIndicators = binding.layoutIndicators;
+
 
         viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
@@ -101,14 +121,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         // End of BannerAdapter && Indicators (...)
-        rcvProducts = findViewById(R.id.recyclerProduct);
+        rcvProducts = binding.recyclerProduct;
         rcvProducts.setLayoutManager(new GridLayoutManager(this, 2));
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         homeViewModel.getProductListLiveData().observe(this, products -> {
             productAdapter = new ProductAdapter(this, products);
             rcvProducts.setAdapter(productAdapter);
         });
-        rcvCategories = findViewById(R.id.recyclerCategory);
+        rcvCategories = binding.recyclerCategory;
         rcvCategories.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
         homeViewModel.getCategoryListLiveData().observe(this, categories -> {
             categoryAdapter = new CategoryAdapter(this, categories);
