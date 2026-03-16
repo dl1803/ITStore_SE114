@@ -10,18 +10,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
+import com.example.itstore.databinding.ActivityProductDetailBinding;
 import com.example.itstore.adapter.ImagePagerAdapter;
 import com.example.itstore.model.Product;
 import com.example.itstore.viewmodel.ProductDetailViewModel;
 
 public class ProductDetailActivity extends AppCompatActivity {
+    private ActivityProductDetailBinding binding;
     private Product currentProduct;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_product_detail);
+        binding = ActivityProductDetailBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
         // 1. Hứng dữ liệu từ trang chủ
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("PRODUCT_INFO")) {
@@ -34,64 +36,51 @@ public class ProductDetailActivity extends AppCompatActivity {
         }
         // 2. Khởi tạo ViewModel và biến theo dõi giỏ hàng
         ProductDetailViewModel viewModel = new androidx.lifecycle.ViewModelProvider(this).get(ProductDetailViewModel.class);
+        final int[] selectedVariantId = {1};
         final String[] selectedRam = {"8GB"};
         double basePrice = currentProduct.getPrice();
         double baseOldPrice = currentProduct.getCompareAtPrice();
         final double[] currentFinalPrice = {basePrice};
         // 3. Ánh xạ view và đổ dữ liệu
-        androidx.viewpager2.widget.ViewPager2 viewPagerImages = findViewById(R.id.imgProductDetail);
-        android.widget.TextView tvName = findViewById(R.id.tvProductName);
-        android.widget.TextView tvOldPrice = findViewById(R.id.tvPriceOld);
-        tvOldPrice.setPaintFlags(tvOldPrice.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
-        tvName.setText(currentProduct.getName());
+        binding.tvPriceOld.setPaintFlags(binding.tvPriceOld.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+        binding.tvProductName.setText(currentProduct.getName());
         updatePriceDisplay(currentProduct.getPrice(), currentProduct.getCompareAtPrice());
         // 4. Load hình ảnh mẫu
         java.util.List<Integer> listImages = new java.util.ArrayList<>();
         listImages.add(R.drawable.ram1);
         ImagePagerAdapter imageAdapter = new ImagePagerAdapter(listImages);
-        viewPagerImages.setAdapter(imageAdapter);
+        binding.imgProductDetail.setAdapter(imageAdapter);
         // Nút Back
-        android.view.View btnBack = findViewById(R.id.ivBack);
-        btnBack.setOnClickListener(new android.view.View.OnClickListener(){
-            @Override
-            public void onClick (android.view.View v){
-                finish();
-            }
-        });
+        binding.ivBack.setOnClickListener(v -> finish());
         // 5. Xử lý chọn cấu hình
-        android.widget.TextView cardChoice1 = findViewById(R.id.cardChoice1);
-        android.widget.TextView cardChoice2 = findViewById(R.id.cardChoice2);
-        cardChoice1.setOnClickListener(v -> {
-            cardChoice1.setBackgroundResource(R.color.orange_primary);
-            cardChoice1.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.white));
-            cardChoice2.setBackgroundResource(android.R.color.transparent);
-            cardChoice2.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.dark_gray));
+        binding.cardChoice1.setOnClickListener(v -> {
+            binding.cardChoice1.setBackgroundResource(R.color.orange_primary);
+            binding.cardChoice1.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.white));
+            binding.cardChoice2.setBackgroundResource(android.R.color.transparent);
+            binding.cardChoice2.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.dark_gray));
             updatePriceDisplay(basePrice, baseOldPrice);
+            selectedVariantId[0] = 1;
             selectedRam[0] = "8GB";
             currentFinalPrice[0] = basePrice;
         });
-        cardChoice2.setOnClickListener(v -> {
-            cardChoice2.setBackgroundResource(R.color.orange_primary);
-            cardChoice2.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.white));
-            cardChoice1.setBackgroundResource(android.R.color.transparent);
-            cardChoice1.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.dark_gray));
+        binding.cardChoice2.setOnClickListener(v -> {
+            binding.cardChoice2.setBackgroundResource(R.color.orange_primary);
+            binding.cardChoice2.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.white));
+            binding.cardChoice1.setBackgroundResource(android.R.color.transparent);
+            binding.cardChoice1.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.dark_gray));
             updatePriceDisplay(basePrice + 500000, baseOldPrice + 500000);
+            selectedVariantId[0] = 2;
             selectedRam[0] = "16GB";
             currentFinalPrice[0] = basePrice + 500000;
         });
         // 6. Nút thêm vào giỏ hàng
-        android.widget.Button btnAddToCart = findViewById(R.id.btnAddToCart);
-        if(btnAddToCart != null) {
-            btnAddToCart.setOnClickListener(v -> {
-                viewModel.addToCart(currentProduct, selectedRam[0], currentFinalPrice[0]);
-                Toast.makeText(this, "Đã thêm bản " + selectedRam[0] + " vào giỏ!", Toast.LENGTH_SHORT).show();
-            });
-        }
+        binding.btnAddToCart.setOnClickListener(v -> {
+            viewModel.addToCart(currentProduct, selectedVariantId[0], selectedRam[0], currentFinalPrice[0]);
+            Toast.makeText(this, "Đã thêm bản " + selectedRam[0] + " vào giỏ!", Toast.LENGTH_SHORT).show();
+        });
     }
     private void updatePriceDisplay(double newPrice, double oldPrice) {
-        android.widget.TextView tvPrice = findViewById(R.id.tvPriceNew);
-        tvPrice.setText(String.format(java.util.Locale.US, "%,.0f VNĐ", newPrice));
-        android.widget.TextView tvOldPrice = findViewById(R.id.tvPriceOld);
-        tvOldPrice.setText(String.format(java.util.Locale.US, "%,.0f VNĐ", oldPrice));
+        binding.tvPriceNew.setText(String.format(java.util.Locale.US, "%,.0f VNĐ", newPrice));
+        binding.tvPriceOld.setText(String.format(java.util.Locale.US, "%,.0f VNĐ", oldPrice));
     }
 }
