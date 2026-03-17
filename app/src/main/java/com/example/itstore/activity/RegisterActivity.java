@@ -127,6 +127,8 @@ public class RegisterActivity extends AppCompatActivity {
         registerViewModel.getRegisterSuccessMessage().observe(this, message -> {
             if (message != null) {
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(RegisterActivity.this, VerifyEmailActivity.class);
+                startActivity(intent);
                 finish();
             }
         });

@@ -20,10 +20,12 @@ public class LoginResponse {
         @SerializedName("full_name")
         private String fullName;
         private String email;
+        private String role;
 
         public int getId() { return id; }
         public String getFullName() { return fullName; }
         public String getEmail() { return email; }
+        public String getRole() { return role; }
 
 
 

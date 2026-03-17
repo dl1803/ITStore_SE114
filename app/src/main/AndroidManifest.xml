@@ -19,7 +19,20 @@
             android:exported="false" />
         <activity
             android:name=".activity.VerifyEmailActivity"
-            android:exported="false" />
+            android:exported="true" >
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="http"
+                    android:host="10.0.2.2"
+                    android:port="3000"
+                    android:pathPrefix="/api/auth/verify-email" />
+
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activity.ForgotPasswordActivity"
             android:exported="false" />
@@ -32,16 +45,16 @@
         <activity
             android:name=".activity.SplashActivity"
             android:exported="true">
-
-        </activity>
-        <activity
-            android:name=".activity.MainActivity"
-            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.MainActivity"
+            android:exported="true" >
+
         </activity>
         <activity
             android:name=".ProductDetailActivity"
