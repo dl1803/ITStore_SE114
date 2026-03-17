@@ -22,7 +22,7 @@
             android:paddingBottom="40dp">
 
             <ImageView
-                android:id="@+id/ivAvatar"
+                android:id="@+id/imgAvatar"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:layout_marginBottom="12dp"

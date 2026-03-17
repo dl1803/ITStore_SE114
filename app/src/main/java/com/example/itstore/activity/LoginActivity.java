@@ -122,6 +122,13 @@ public class LoginActivity extends AppCompatActivity {
                         data.getRefreshToken()
                 );
 
+                SharedPrefsManager.getInstance(this).saveUserInfo(
+                        data.getUser().getId(),
+                        data.getUser().getFullName(),
+                        data.getUser().getEmail(),
+                        data.getUser().getRole()
+                );
+
                 Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
