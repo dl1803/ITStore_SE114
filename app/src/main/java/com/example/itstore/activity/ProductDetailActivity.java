@@ -1,15 +1,12 @@
-package com.example.itstore;
+package com.example.itstore.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
+import com.example.itstore.R;
 import com.example.itstore.databinding.ActivityProductDetailBinding;
 import com.example.itstore.adapter.ImagePagerAdapter;
 import com.example.itstore.model.Product;
