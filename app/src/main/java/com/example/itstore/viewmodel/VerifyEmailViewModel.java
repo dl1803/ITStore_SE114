@@ -52,14 +52,14 @@ public class VerifyEmailViewModel extends AndroidViewModel {
         RetrofitClient.getApiService(getApplication()).verifyEmail(token).enqueue(new Callback<VerifyEmailResponse>() {
             @Override
             public void onResponse(Call<VerifyEmailResponse> call, Response<VerifyEmailResponse> response) {
-                isVerifying.setValue(true);
+                isVerifying.setValue(false);
 
                 if (response.isSuccessful() && response.body() != null) {
                     successMessage.setValue(response.body().getMessage());
                 } else {
                     try {
                         String errorStr = response.errorBody().string();
-                        org.json.JSONObject jsonObject = new org.json.JSONObject(errorStr);
+                        org.json.JSONObject jsonObject = new org.   json.JSONObject(errorStr);
                         errorMessage.setValue(jsonObject.getString("error"));
                     } catch (Exception e){
                         errorMessage.setValue("Xác thực thất bại! Vui lòng thử lại.");
