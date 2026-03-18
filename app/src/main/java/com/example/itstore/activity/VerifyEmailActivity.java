@@ -75,8 +75,6 @@ public class VerifyEmailActivity extends AppCompatActivity {
         }
     }
 
-
-
     private void setupObservers() {
         verifyEmailViewModel.getIsResending().observe(this, isResending -> {
             if (isResending) {
