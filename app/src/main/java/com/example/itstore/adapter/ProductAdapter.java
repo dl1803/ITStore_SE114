@@ -3,12 +3,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.itstore.databinding.ItemProductBinding;
-import com.example.itstore.ProductDetailActivity;
+import com.example.itstore.activity.ProductDetailActivity;
 import com.example.itstore.model.Product;
 import java.util.List;
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder>{
