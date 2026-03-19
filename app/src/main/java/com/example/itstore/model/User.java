@@ -32,6 +32,9 @@ public class User {
         return role;
     }
 
+    public User(){
+    }
+
     public User(int id, String full_name, String email, String phone_number, String role) {
         this.id = id;
         this.full_name = full_name;

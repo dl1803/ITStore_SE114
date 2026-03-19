@@ -47,8 +47,11 @@ public class ProfileActivity extends AppCompatActivity {
             String cachedName = SharedPrefsManager.getInstance(this).getUserFullName();
             String cachedEmail = SharedPrefsManager.getInstance(this).getUserEmail();
 
+
             binding.tvNameUser.setText(cachedName);
             binding.tvEmailUser.setText(cachedEmail);
+
+
 
             profileViewModel.fetchProfile();
 
