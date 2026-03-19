@@ -20,6 +20,8 @@ public class LoginResponse {
         @SerializedName("full_name")
         private String fullName;
         private String email;
+
+        private String phone_number;
         private String role;
 
         public int getId() { return id; }

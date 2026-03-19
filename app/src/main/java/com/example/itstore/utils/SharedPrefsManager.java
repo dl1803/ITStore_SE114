@@ -28,7 +28,7 @@ public class SharedPrefsManager {
                 .apply();
     }
 
-    public void saveUserInfo(int id, String fullName, String email, String role) {
+    public void saveUserInfo(int id, String fullName, String email,  String role) {
         sharedPreferences.edit().putInt("user_id", id)
         .putString("user_fullname", fullName)
         .putString("user_email", email)
@@ -47,6 +47,8 @@ public class SharedPrefsManager {
     public String getUserEmail() {
         return sharedPreferences.getString("user_email", "Đang tải...");
     }
+
+
 
     public String getUserRole() {
         return sharedPreferences.getString("user_role", "Guest");
