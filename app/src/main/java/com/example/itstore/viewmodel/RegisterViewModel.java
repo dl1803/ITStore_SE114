@@ -150,7 +150,7 @@ public class RegisterViewModel extends AndroidViewModel {
                         try {
                             String errorStr = response.errorBody().string();
                             org.json.JSONObject jsonObject = new org.json.JSONObject(errorStr);
-                            apiError.setValue(jsonObject.getString("error"));
+                            apiError.setValue(jsonObject.getString("message"));
                         } catch (Exception e) {
                             apiError.setValue("Đăng ký thất bại! Vui lòng thử lại.");
                         }
