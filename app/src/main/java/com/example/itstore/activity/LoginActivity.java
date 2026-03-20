@@ -64,16 +64,6 @@ public class LoginActivity extends AppCompatActivity {
         binding.btnLogin.setOnClickListener(v -> {
             String email = binding.edtEmail.getText().toString().trim();
             String passwd = binding.edtPassword.getText().toString().trim();
-
-            // CHEAT CODE: Đăng nhập bằng quyền Dev
-            if (email.equals("dev") && passwd.equals("123")) {
-                SharedPrefsManager.getInstance(this).saveTokens("token_gia_cua_dev", "refresh_gia");
-                Toast.makeText(this, "Đăng nhập bằng quyền Dev!", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(this, MainActivity.class));
-                finish();
-                return;
-            }
-
             loginViewModel.login(email, passwd);
         });
     }
@@ -120,6 +110,13 @@ public class LoginActivity extends AppCompatActivity {
                 SharedPrefsManager.getInstance(this).saveTokens(
                         data.getAccessToken(),
                         data.getRefreshToken()
+                );
+
+                SharedPrefsManager.getInstance(this).saveUserInfo(
+                        data.getUser().getId(),
+                        data.getUser().getFullName(),
+                        data.getUser().getEmail(),
+                        data.getUser().getRole()
                 );
 
                 Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();

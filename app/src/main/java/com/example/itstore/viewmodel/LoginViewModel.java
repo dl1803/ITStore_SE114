@@ -88,7 +88,14 @@ public class LoginViewModel extends AndroidViewModel {
                         if (response.isSuccessful() && response.body() != null) {
                             loginSuccessData.setValue(response.body());
                         } else {
-                            apiError.setValue("Email hoặc mật khẩu không đúng!");
+                            try {
+                                String errorStr = response.errorBody().string();
+                                org.json.JSONObject jsonObject = new org.json.JSONObject(errorStr);
+                                String serverError = jsonObject.getString("error");
+                                apiError.setValue(serverError);
+                            } catch (Exception e) {
+                                apiError.setValue("Email hoặc mật khẩu không đúng!");
+                            }
                         }
                     }
                     @Override

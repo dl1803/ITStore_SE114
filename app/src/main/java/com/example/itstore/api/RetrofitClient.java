@@ -9,6 +9,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 
 import com.example.itstore.model.ForgotPasswordRequest;
 import com.example.itstore.model.ForgotPasswordResponse;
@@ -17,12 +18,16 @@ import com.example.itstore.model.LoginResponse;
 import com.example.itstore.model.LogoutRequest;
 import com.example.itstore.model.LogoutResponse;
 import com.example.itstore.model.ProfileResponse;
+import com.example.itstore.model.RefreshTokenRequest;
+import com.example.itstore.model.RefreshTokenResponse;
 import com.example.itstore.model.RegisterRequest;
 import com.example.itstore.model.RegisterResponse;
-import com.example.itstore.model.User;
+import com.example.itstore.model.ResetPasswordRequest;
+import com.example.itstore.model.ResetPasswordResponse;
+import com.example.itstore.model.VerifyEmailResponse;
 
 public class RetrofitClient {
-    private static final String BASE_URL = "http://10.0.2.2:3000/api/";
+    private static final String BASE_URL = "http://10.0.2.2:3000/";
     private static Retrofit retrofit = null;
 
     public static ApiService getApiService(Context context) {
@@ -40,18 +45,27 @@ public class RetrofitClient {
     }
 
     public interface ApiService {
-        @POST("auth/login")
+        @POST("api/auth/login")
         Call<LoginResponse> login(@Body LoginRequest request);
 
-        @POST("auth/register")
+        @POST("api/auth/register")
         Call<RegisterResponse> register(@Body RegisterRequest request);
 
-        @POST("auth/forgot-password")
+        @POST("api/auth/forgot-password")
         Call<ForgotPasswordResponse> forgotPassword(@Body ForgotPasswordRequest request);
 
-        @GET("users/me")
+        @GET("api/users/me")
         Call<ProfileResponse> getProfile();
-        @POST("auth/logout")
+        @POST("api/auth/logout")
         Call<LogoutResponse> logout(@Body LogoutRequest request);
+
+        @GET("api/auth/verify-email")
+        Call<VerifyEmailResponse> verifyEmail(@Query("token") String token);
+
+        @POST("api/auth/reset-password")
+        Call<ResetPasswordResponse> resetPassword(@Body ResetPasswordRequest request);
+
+        @POST("api/auth/refresh")
+        Call<RefreshTokenResponse> refreshToken(@Body RefreshTokenRequest request);
     }
 }

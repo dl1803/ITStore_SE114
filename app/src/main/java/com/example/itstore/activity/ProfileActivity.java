@@ -43,6 +43,16 @@ public class ProfileActivity extends AppCompatActivity {
             });
 
         } else {
+
+            String cachedName = SharedPrefsManager.getInstance(this).getUserFullName();
+            String cachedEmail = SharedPrefsManager.getInstance(this).getUserEmail();
+
+
+            binding.tvNameUser.setText(cachedName);
+            binding.tvEmailUser.setText(cachedEmail);
+
+
+
             profileViewModel.fetchProfile();
 
             binding.tvLogout.setOnClickListener(v -> {
@@ -64,7 +74,7 @@ public class ProfileActivity extends AppCompatActivity {
                     Glide.with(this)
                             .load(user.getAvatar_url())
                             .circleCrop()
-                            .into(binding.ivAvatar);
+                            .into(binding.imgAvatar);
                 }
             }
         });

@@ -43,15 +43,6 @@ public class ProfileViewModel extends AndroidViewModel {
 
     public void fetchProfile() {
 
-        // Mock dữ liệu của Dev
-        String token = SharedPrefsManager.getInstance(getApplication()).getAccessToken();
-        if ("token_gia_cua_dev".equals(token)) {
-            User devUser = new User(99, "A Dev So Cool", "dev@itstore.com", "0999999999", "Dev");
-            userProfile.setValue(devUser);
-            return;
-        }
-
-
         RetrofitClient.getApiService(getApplication()).getProfile().enqueue(new Callback<ProfileResponse>() {
             @Override
             public void onResponse(Call<ProfileResponse> call, Response<ProfileResponse> response) {

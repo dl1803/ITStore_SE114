@@ -28,6 +28,32 @@ public class SharedPrefsManager {
                 .apply();
     }
 
+    public void saveUserInfo(int id, String fullName, String email,  String role) {
+        sharedPreferences.edit().putInt("user_id", id)
+        .putString("user_fullname", fullName)
+        .putString("user_email", email)
+        .putString("user_role", role)
+        .apply();
+    }
+
+    public int getUserId() {
+        return sharedPreferences.getInt("user_id", -1);
+    }
+
+    public String getUserFullName() {
+        return sharedPreferences.getString("user_fullname", "Đang tải...");
+    }
+
+    public String getUserEmail() {
+        return sharedPreferences.getString("user_email", "Đang tải...");
+    }
+
+
+
+    public String getUserRole() {
+        return sharedPreferences.getString("user_role", "Guest");
+    }
+
     public String getAccessToken() {
         return sharedPreferences.getString(KEY_ACCESS_TOKEN, null);
     }

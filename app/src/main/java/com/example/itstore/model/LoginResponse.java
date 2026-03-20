@@ -21,9 +21,13 @@ public class LoginResponse {
         private String fullName;
         private String email;
 
+        private String phone_number;
+        private String role;
+
         public int getId() { return id; }
         public String getFullName() { return fullName; }
         public String getEmail() { return email; }
+        public String getRole() { return role; }
 
 
 
