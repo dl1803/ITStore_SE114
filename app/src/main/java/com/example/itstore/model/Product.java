@@ -1,99 +1,67 @@
 package com.example.itstore.model;
-import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
-public class Product implements Serializable {
-    @SerializedName("id")
-    private int id;
-    @SerializedName("category_id")
-    private int categoryId;
-    @SerializedName("name")
-    private String name;
-    @SerializedName("price")
-    private double price;
-    @SerializedName("image_url")
-    private String imageUrl;
-    @SerializedName("description")
-    private String description;
-    @SerializedName("stock")
-    private int stock;
-    @SerializedName("compare_at_price")
-    private double compareAtPrice;
-    public Product() {
-    }
+import java.util.List;
 
-    public Product(int id, int categoryId, String name, double price, String imageUrl, String description, int stock, double compareAtPrice) {
+public class Product implements Serializable {
+    private int id;
+    private int categoryId;
+    private String name;
+    private String description;
+    private List<ProductVariant> variants;
+    private List<ProductImage> images;
+
+    public Product(int id, int categoryId, String name, String description, List<ProductVariant> variants, List<ProductImage> images) {
         this.id = id;
         this.categoryId = categoryId;
         this.name = name;
-        this.price = price;
-        this.imageUrl = imageUrl;
         this.description = description;
-        this.stock = stock;
-        this.compareAtPrice = compareAtPrice;
+        this.variants = variants;
+        this.images = images;
     }
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public int getCategoryId() {
         return categoryId;
-    }
-
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public List<ProductVariant> getVariants() {
+        return variants;
     }
 
-    public int getStock() {
-        return stock;
+    public List<ProductImage> getImages() {
+        return images;
     }
 
-    public void setStock(int stock) {
-        this.stock = stock;
+    public double getPrice() {
+        if (variants != null && !variants.isEmpty()) {
+            return variants.get(0).getPrice();
+        }
+        return 0;
     }
-
     public double getCompareAtPrice() {
-        return compareAtPrice;
+        if (variants != null && !variants.isEmpty()) {
+            return variants.get(0).getCompareAtPrice();
+        }
+        return 0;
     }
-
-    public void setCompareAtPrice(double compareAtPrice) {
-        this.compareAtPrice = compareAtPrice;
+    public String getImageUrl() {
+        if (images != null && !images.isEmpty()) {
+            for (ProductImage img : images) {
+                if (img.isPrimary()) return img.getImageUrl();
+            }
+            return images.get(0).getImageUrl();
+        }
+        return "";
     }
 }
-

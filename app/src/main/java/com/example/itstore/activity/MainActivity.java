@@ -134,5 +134,9 @@ public class MainActivity extends AppCompatActivity {
             categoryAdapter = new CategoryAdapter(this, categories);
             rcvCategories.setAdapter(categoryAdapter);
         });
+        binding.imgCart.setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(MainActivity.this, CartActivity.class);
+            startActivity(intent);
+        });
     }
 }

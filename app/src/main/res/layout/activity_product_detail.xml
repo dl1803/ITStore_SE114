@@ -37,7 +37,9 @@
         android:layout_marginRight="20dp"
         android:layout_marginTop="24dp"
         >
+
         <ImageView
+            android:id="@+id/ivCart"
             android:layout_width="42dp"
             android:layout_height="match_parent"
             android:padding="8dp"

@@ -44,7 +44,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ProductDetailActivity"
+            android:name=".activity.ProductDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.CartActivity"
             android:exported="false" />
     </application>
 

@@ -1,20 +1,16 @@
-package com.example.itstore;
+package com.example.itstore.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
-
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import com.example.itstore.R;
 import com.example.itstore.databinding.ActivityProductDetailBinding;
 import com.example.itstore.adapter.ImagePagerAdapter;
+import com.example.itstore.model.CartItem;
 import com.example.itstore.model.Product;
+import com.example.itstore.utils.CartManager;
 import com.example.itstore.viewmodel.ProductDetailViewModel;
-
 public class ProductDetailActivity extends AppCompatActivity {
     private ActivityProductDetailBinding binding;
     private Product currentProduct;
@@ -76,7 +72,10 @@ public class ProductDetailActivity extends AppCompatActivity {
         // 6. Nút thêm vào giỏ hàng
         binding.btnAddToCart.setOnClickListener(v -> {
             viewModel.addToCart(currentProduct, selectedVariantId[0], selectedRam[0], currentFinalPrice[0]);
-            Toast.makeText(this, "Đã thêm bản " + selectedRam[0] + " vào giỏ!", Toast.LENGTH_SHORT).show();
+        });
+        binding.ivCart.setOnClickListener(v -> {
+            android.content.Intent cartIntent = new android.content.Intent(ProductDetailActivity.this, CartActivity.class);
+            startActivity(cartIntent);
         });
     }
     private void updatePriceDisplay(double newPrice, double oldPrice) {
