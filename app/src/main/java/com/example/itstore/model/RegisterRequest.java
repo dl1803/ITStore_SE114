@@ -13,6 +13,7 @@ public class RegisterRequest {
 
     private String password;
 
+    @SerializedName("address")
     private Address address;
 
     public RegisterRequest(String fullName, String email, String phoneNumber, String password, Address address) {
@@ -23,14 +24,22 @@ public class RegisterRequest {
         this.address = address;
     }
     public static class Address {
+        @SerializedName("recipient")
         private String recipient;
 
         @SerializedName("phone_number")
         private String phoneNumber;
 
+        @SerializedName("province")
         private String province;
+
+        @SerializedName("district")
         private String district;
+
+        @SerializedName("ward")
         private String ward;
+
+        @SerializedName("street")
         private String street;
 
         @SerializedName("is_default")
