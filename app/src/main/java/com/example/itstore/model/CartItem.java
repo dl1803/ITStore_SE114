@@ -9,6 +9,7 @@ public class CartItem {
     private Product product;
     private String variantName;
     private double price;
+    private boolean isSelected = false;
 
     public CartItem(int id, int cartId, int variantId, int quantity, Product product, String variantName, double price) {
         this.id = id;
@@ -74,5 +75,13 @@ public class CartItem {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 }
