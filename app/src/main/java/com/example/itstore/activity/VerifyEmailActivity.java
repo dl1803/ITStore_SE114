@@ -1,6 +1,7 @@
 package com.example.itstore.activity;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,12 +31,6 @@ public class VerifyEmailActivity extends AppCompatActivity {
         binding = ActivityVerifyEmailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Chuyển về màn hình đăng nhập
-        binding.btnLogin.setOnClickListener(v -> {
-            Intent intent = new Intent(VerifyEmailActivity.this, LoginActivity.class);
-            startActivity(intent);
-        });
-
         // Lắng nghe và xử lí sự kiện khi nhấn nút Gửi lại
         verifyEmailViewModel = new ViewModelProvider(this).get(VerifyEmailViewModel.class);
 
@@ -45,6 +40,7 @@ public class VerifyEmailActivity extends AppCompatActivity {
             verifyEmailViewModel.resendEmail();
         });
 
+        // Lắng nghe và xử lí sự kiện khi nhấn nút Đăng nhập
         binding.btnLogin.setOnClickListener(v -> {
             Intent intent = new Intent(VerifyEmailActivity.this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -66,11 +62,45 @@ public class VerifyEmailActivity extends AppCompatActivity {
         Uri data = intent.getData();
 
         if (data != null){
-            String token = data.getQueryParameter("token");
-            if (token != null){
-                verifyEmailViewModel.verifyEmailToken(token);
+            String successParam = data.getQueryParameter("success");
+            String messageParam = data.getQueryParameter("message");
+
+            String displayMessage;
+            if (messageParam != null) {
+                displayMessage = messageParam;
             } else {
-                Toast.makeText(this, "Xác thực không hợp lệ!", Toast.LENGTH_LONG).show();
+                displayMessage = "Có lỗi xảy ra, vui lòng thử lại!";
+            }
+
+            if (successParam != null && successParam.equals("true")) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Thành công");
+                builder.setMessage(displayMessage);
+                builder.setCancelable(false);
+                builder.setPositiveButton("Đăng nhập ngay", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent loginIntent = new Intent(VerifyEmailActivity.this, LoginActivity.class);
+                        loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(loginIntent);
+                        finish();
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+            } else {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Lỗi xác thực");
+                builder.setMessage(displayMessage);
+
+                builder.setPositiveButton("Đóng", null);
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         }
     }
@@ -89,40 +119,6 @@ public class VerifyEmailActivity extends AppCompatActivity {
         verifyEmailViewModel.getIsResendSuccess().observe(this, isSuccess -> {
             if (isSuccess) {
                 Toast.makeText(this, "Đã gửi lại email xác thực!", Toast.LENGTH_LONG).show();
-            }
-        });
-
-        verifyEmailViewModel.getIsVerifying().observe(this, isVerifying -> {
-            if (isVerifying) {
-                binding.btnLogin.setEnabled(false);
-                binding.btnLogin.setText("Đang xác thực...");
-            }
-        }
-        );
-
-        verifyEmailViewModel.getSuccessMessage().observe(this , message -> {
-            if (message != null) {
-                new AlertDialog.Builder(this)
-                        .setTitle("Thành công")
-                        .setMessage(message)
-                        .setPositiveButton("Đăng nhập ngay", (dialog, which) -> {
-                            Intent intent = new Intent(VerifyEmailActivity.this, LoginActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
-                            finish();
-                        })
-                .setCancelable(false)
-                .show();
-            }
-        });
-
-        verifyEmailViewModel.getErrorMessage().observe(this, error -> {
-            if (error != null) {
-                new AlertDialog.Builder(this)
-                        .setTitle("Lỗi xác thực")
-                        .setMessage(error)
-                        .setPositiveButton("Đóng", null)
-                        .show();
             }
         });
     }
