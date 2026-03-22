@@ -9,7 +9,6 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
-import retrofit2.http.Query;
 
 import com.example.itstore.model.ForgotPasswordRequest;
 import com.example.itstore.model.ForgotPasswordResponse;
@@ -24,7 +23,6 @@ import com.example.itstore.model.RegisterRequest;
 import com.example.itstore.model.RegisterResponse;
 import com.example.itstore.model.ResetPasswordRequest;
 import com.example.itstore.model.ResetPasswordResponse;
-import com.example.itstore.model.VerifyEmailResponse;
 
 public class RetrofitClient {
     private static final String BASE_URL = "http://10.0.2.2:3000/";
@@ -58,9 +56,6 @@ public class RetrofitClient {
         Call<ProfileResponse> getProfile();
         @POST("api/auth/logout")
         Call<LogoutResponse> logout(@Body LogoutRequest request);
-
-        @GET("api/auth/verify-email")
-        Call<VerifyEmailResponse> verifyEmail(@Query("token") String token);
 
         @POST("api/auth/reset-password")
         Call<ResetPasswordResponse> resetPassword(@Body ResetPasswordRequest request);

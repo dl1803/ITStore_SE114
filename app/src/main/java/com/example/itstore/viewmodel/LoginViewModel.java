@@ -91,7 +91,7 @@ public class LoginViewModel extends AndroidViewModel {
                             try {
                                 String errorStr = response.errorBody().string();
                                 org.json.JSONObject jsonObject = new org.json.JSONObject(errorStr);
-                                String serverError = jsonObject.getString("error");
+                                String serverError = jsonObject.getString("message");
                                 apiError.setValue(serverError);
                             } catch (Exception e) {
                                 apiError.setValue("Email hoặc mật khẩu không đúng!");
