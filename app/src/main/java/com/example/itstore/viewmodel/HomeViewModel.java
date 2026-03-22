@@ -13,6 +13,7 @@ import com.example.itstore.model.ProductVariant;
 public class HomeViewModel extends ViewModel{
     private final MutableLiveData<List<Category>> categoryListLiveData = new MutableLiveData<>();
     private final MutableLiveData<List<Product>> productListLiveData = new MutableLiveData<>();
+    private List<Product> allProductsBackup = new ArrayList<>();
     public HomeViewModel () {
         loadMockData();
     }
@@ -24,9 +25,23 @@ public class HomeViewModel extends ViewModel{
     public MutableLiveData<List<Product>> getProductListLiveData() {
         return productListLiveData;
     }
+    public void filterByCategory(int categoryId) {
+        if (categoryId == -1) {
+            productListLiveData.setValue(allProductsBackup);
+            return;
+        }
+        List<Product> filteredList = new ArrayList<>();
+        for (Product item : allProductsBackup) {
+            if (item.getCategoryId() == categoryId) {
+                filteredList.add(item);
+            }
+        }
+        productListLiveData.setValue(filteredList);
+    }
     private void loadMockData() {
         String mockImageUrl = "android.resource://com.example.itstore/" + R.drawable.ram1;
         List<Category> mockCategories = new ArrayList<>();
+        mockCategories.add(new Category(-1, "Tất cả", mockImageUrl));
         mockCategories.add(new Category(1, "CPU", mockImageUrl));
         mockCategories.add(new Category(2, "RAM", mockImageUrl));
         mockCategories.add(new Category(3, "VGA", mockImageUrl));
@@ -49,6 +64,7 @@ public class HomeViewModel extends ViewModel{
         List<ProductVariant> var5 = new ArrayList<>();
         var5.add(new ProductVariant(5, "16GB", 1200000.0, 1500000.0, 200));
         mockProducts.add(new Product(105, 2, "RAM Kingston Fury 16GB", "RAM DDR4 giá rẻ hiệu năng cao.", var5, defaultImages));
+        allProductsBackup = new ArrayList<>(mockProducts);
         productListLiveData.setValue(mockProducts);
     }
 }

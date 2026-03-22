@@ -25,7 +25,7 @@ import com.example.itstore.viewmodel.HomeViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import com.example.itstore.model.Category;
 public class MainActivity extends AppCompatActivity {
     private HomeViewModel homeViewModel;
     private RecyclerView rcvProducts;
@@ -131,7 +131,12 @@ public class MainActivity extends AppCompatActivity {
         rcvCategories = binding.recyclerCategory;
         rcvCategories.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
         homeViewModel.getCategoryListLiveData().observe(this, categories -> {
-            categoryAdapter = new CategoryAdapter(this, categories);
+            categoryAdapter = new CategoryAdapter(this, categories, new CategoryAdapter.OnCategoryClickListener() {
+                @Override
+                public void onCategoryClick(Category category) {
+                    homeViewModel.filterByCategory(category.getId());
+                }
+            });
             rcvCategories.setAdapter(categoryAdapter);
         });
         binding.imgCart.setOnClickListener(v -> {

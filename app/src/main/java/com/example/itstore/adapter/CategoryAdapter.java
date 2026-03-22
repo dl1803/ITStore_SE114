@@ -10,10 +10,17 @@ import java.util.List;
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>{
     private Context context;
     private List<Category> categoryList;
-    public CategoryAdapter(Context context, List<Category> categoryList) {
+    private OnCategoryClickListener listener;
+    public interface OnCategoryClickListener {
+        void onCategoryClick(Category category);
+    }
+
+    public CategoryAdapter(Context context, List<Category> categoryList, OnCategoryClickListener listener) {
         this.context = context;
         this.categoryList = categoryList;
+        this.listener = listener;
     }
+
     @NonNull
     @Override
     public CategoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -25,6 +32,11 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         Category category = categoryList.get(position);
         if (category == null) return;
         holder.binding.tvCategoryName.setText(category.getName());
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onCategoryClick(category);
+            }
+        });
     }
     @Override
     public int getItemCount() {
