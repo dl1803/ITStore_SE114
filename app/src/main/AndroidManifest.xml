@@ -21,7 +21,9 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="itstore" android:host="reset-password" />
+                <data android:scheme="itstore"
+                    android:host="auth"
+                    android:path="/reset-password" />
             </intent-filter>
         </activity>
         <activity
@@ -31,7 +33,9 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="itstore" android:host="verify-email" />
+                <data android:scheme="itstore"
+                    android:host="auth"
+                    android:path="/verify-email" />
             </intent-filter>
         </activity>
         <activity
