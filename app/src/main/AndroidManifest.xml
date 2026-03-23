@@ -17,24 +17,25 @@
         <activity
             android:name=".activity.ResetPasswordActivity"
             android:exported="true" >
-            <intent-filter android:autoVerify="true">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="http" android:host="10.0.2.2" android:port="3000" android:pathPrefix="/auth/reset-password" />
+                <data android:scheme="itstore"
+                    android:host="auth"
+                    android:path="/reset-password" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.ProfileActivity"
-            android:exported="false" />
-        <activity
             android:name=".activity.VerifyEmailActivity"
             android:exported="true" >
-            <intent-filter android:autoVerify="true">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="http" android:host="10.0.2.2" android:port="3000" android:pathPrefix="/auth/verify-email" />
+                <data android:scheme="itstore"
+                    android:host="auth"
+                    android:path="/verify-email" />
             </intent-filter>
         </activity>
         <activity

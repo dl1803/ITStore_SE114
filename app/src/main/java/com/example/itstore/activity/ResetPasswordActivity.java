@@ -1,5 +1,6 @@
 package com.example.itstore.activity;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -38,16 +39,42 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
         binding.btnBack.setOnClickListener(v -> finish());
     }
-
     private void handleLink(Intent intent) {
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             Uri uri = intent.getData();
             if (uri != null) {
+                String errorMsg = uri.getQueryParameter("error");
+
+                if (errorMsg != null) {
+                    new AlertDialog.Builder(this)
+                            .setTitle("Thông báo lỗi")
+                            .setMessage(errorMsg)
+                            .setPositiveButton("Đóng", (dialog, which) -> {
+                                Intent loginIntent = new Intent(ResetPasswordActivity.this, LoginActivity.class);
+                                loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(loginIntent);
+                                finish();
+                            })
+                            .setCancelable(false)
+                            .show();
+
+                    return;
+                }
+
                 resetToken = uri.getQueryParameter("token");
 
                 if (resetToken == null || resetToken.isEmpty()) {
-                    Toast.makeText(this, "Link không hợp lệ hoặc đã hết hạn!", Toast.LENGTH_LONG).show();
-                    finish();
+                    new AlertDialog.Builder(this)
+                            .setTitle("Lỗi đường dẫn")
+                            .setMessage("Link không hợp lệ!")
+                            .setPositiveButton("Đóng", (dialog, which) -> {
+                                Intent loginIntent = new Intent(ResetPasswordActivity.this, LoginActivity.class);
+                                loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(loginIntent);
+                                finish();
+                            })
+                            .setCancelable(false)
+                            .show();
                 }
             }
         }
@@ -70,12 +97,17 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
         viewModel.getSuccessMessage().observe(this, message -> {
             if (message != null) {
-                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-
-                Intent intent = new Intent(this, LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                finish();
+                new AlertDialog.Builder(this)
+                        .setTitle("Thành công")
+                        .setMessage(message)
+                        .setPositiveButton("Đăng nhập ngay", (dialog, which) -> {
+                            Intent intent = new Intent(ResetPasswordActivity.this, LoginActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                            finish();
+                        })
+                        .setCancelable(false)
+                        .show();
             }
         });
 
