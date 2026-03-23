@@ -12,6 +12,7 @@ import retrofit2.http.POST;
 
 import com.example.itstore.model.ForgotPasswordRequest;
 import com.example.itstore.model.ForgotPasswordResponse;
+import com.example.itstore.model.GoogleLoginRequest;
 import com.example.itstore.model.LoginRequest;
 import com.example.itstore.model.LoginResponse;
 import com.example.itstore.model.LogoutRequest;
@@ -62,5 +63,9 @@ public class RetrofitClient {
 
         @POST("api/auth/refresh")
         Call<RefreshTokenResponse> refreshToken(@Body RefreshTokenRequest request);
+
+        @POST("api/auth/google")
+        Call<LoginResponse> googleLogin(@Body GoogleLoginRequest request);
+
     }
 }

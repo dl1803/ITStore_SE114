@@ -10,8 +10,10 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.itstore.api.RetrofitClient;
+import com.example.itstore.model.GoogleLoginRequest;
 import com.example.itstore.model.LoginRequest;
 import com.example.itstore.model.LoginResponse;
+import com.example.itstore.utils.SharedPrefsManager;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -105,5 +107,35 @@ public class LoginViewModel extends AndroidViewModel {
                     }
                 });
             }
+    }
+
+    public void googleLogin(String id_token){
+        isLoading.setValue(true);
+
+        GoogleLoginRequest request = new GoogleLoginRequest(id_token);
+
+        RetrofitClient.getApiService(getApplication()).googleLogin(request).enqueue(new Callback<LoginResponse>() {
+            @Override
+            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                isLoading.setValue(false);
+
+                if (response.isSuccessful() && response.body() != null) {
+                    String accessToken = response.body().getAccessToken();
+                    String refreshToken = response.body().getRefreshToken();
+
+                    SharedPrefsManager.getInstance(getApplication()).saveTokens(accessToken, refreshToken);
+
+                    loginSuccessData.setValue(response.body());
+                } else {
+                    apiError.setValue("Xác thực Google thất bại. Vui lòng thử lại!");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<LoginResponse> call, Throwable t) {
+                isLoading.setValue(false);
+                apiError.setValue("Lỗi kết nối Server! Vui lòng thử lại.");
+            }
+        });
     }
 }
