@@ -107,9 +107,6 @@ public class LoginActivity extends AppCompatActivity {
                     catch (ApiException e) {
                         Toast.makeText(this, "Xác thực Google thất bại. Vui lòng thử lại!", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    android.util.Log.e("GOOGLE_LỖI", "User hủy hoặc Google chặn ngầm!");
-                    Toast.makeText(this, "Đã hủy đăng nhập", Toast.LENGTH_SHORT).show();
                 }
             }
     );
