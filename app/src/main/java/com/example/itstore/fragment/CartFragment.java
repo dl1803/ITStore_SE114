@@ -1,66 +1,115 @@
 package com.example.itstore.fragment;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-import com.example.itstore.R;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link CartFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import com.example.itstore.adapter.CartAdapter;
+import com.example.itstore.databinding.FragmentCartBinding;
+import com.example.itstore.model.CartItem;
+import com.example.itstore.utils.CartManager;
+import com.example.itstore.viewmodel.CartViewModel;
+
+import java.util.ArrayList;
+import java.util.List;
 public class CartFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public CartFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment CartFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static CartFragment newInstance(String param1, String param2) {
-        CartFragment fragment = new CartFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+    private FragmentCartBinding binding;
+    private CartViewModel cartViewModel;
+    private CartAdapter cartAdapter;
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = FragmentCartBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        cartViewModel = new ViewModelProvider(this).get(CartViewModel.class);
+        setupRecyclerView();
+        observeViewModel();
+        binding.ivBack.setOnClickListener(v -> {
+            Navigation.findNavController(v).navigateUp();
+        });
+        binding.btnCheckout.setOnClickListener(v -> {
+            Toast.makeText(requireContext(), "Tính năng Thanh toán đang phát triển!", Toast.LENGTH_SHORT).show();
+        });
+
+        binding.cbBuyAll.setOnClickListener(v -> {
+            boolean isChecked = binding.cbBuyAll.isChecked();
+            cartViewModel.toggleSelectAll(isChecked);
+        });
+
+        cartViewModel.loadCartFromManager();
+        List<CartItem> checkCart = CartManager.getInstance().getCartList();
+        if (checkCart != null) {
+            Toast.makeText(requireContext(), "Trong giỏ đang có: " + checkCart.size() + " món", Toast.LENGTH_SHORT).show();
         }
     }
 
+    private void setupRecyclerView() {
+        List<CartItem> currentList = CartManager.getInstance().getCartList();
+        cartAdapter = new CartAdapter(new ArrayList<>(), new CartAdapter.CartClickListener() {
+            @Override
+            public void onIncrease(CartItem item, int position) {
+                cartViewModel.increaseQuantity(item, position);
+            }
+
+            @Override
+            public void onDecrease(CartItem item, int position) {
+                cartViewModel.decreaseQuantity(item, position);
+            }
+
+            @Override
+            public void onDelete(CartItem item, int position) {
+                cartViewModel.removeItem(position);
+                Toast.makeText(requireContext(), "Đã xóa sản phẩm", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onItemSelected(CartItem item, boolean isChecked) {
+                item.setSelected(isChecked);
+                cartViewModel.checkAllSelectedStatus();
+                cartViewModel.calculateTotal();
+                cartViewModel.getCartItems().setValue(currentList);
+            }
+        });
+        binding.rvCart.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.rvCart.setAdapter(cartAdapter);
+    }
+
+    private void observeViewModel() {
+        cartViewModel.getCartItems().observe(getViewLifecycleOwner(), items -> {
+            if (items != null) {
+                cartAdapter.setCartList(items);
+            }
+            int selectedCount = 0;
+            for (CartItem item : items) {
+                if (item.isSelected()) selectedCount++;
+            }
+            binding.btnCheckout.setText("Mua hàng (" + selectedCount + ")");
+        });
+
+        cartViewModel.getTotalPrice().observe(getViewLifecycleOwner(), total -> {
+            binding.tvTotalPrice.setText(String.format(java.util.Locale.US, "%,.0f đ", total));
+        });
+        cartViewModel.getIsAllSelectedLiveData().observe(getViewLifecycleOwner(), isAllSelected -> {
+            binding.cbBuyAll.setChecked(isAllSelected);
+        });
+    }
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_cart, container, false);
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

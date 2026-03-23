@@ -72,11 +72,17 @@ public class ProductDetailActivity extends AppCompatActivity {
         // 6. Nút thêm vào giỏ hàng
         binding.btnAddToCart.setOnClickListener(v -> {
             viewModel.addToCart(currentProduct, selectedVariantId[0], selectedRam[0], currentFinalPrice[0]);
+            android.widget.Toast.makeText(ProductDetailActivity.this, "Đã thêm vào giỏ hàng!", android.widget.Toast.LENGTH_SHORT).show();
         });
         binding.ivCart.setOnClickListener(v -> {
-            android.content.Intent cartIntent = new android.content.Intent(ProductDetailActivity.this, CartActivity.class);
-            startActivity(cartIntent);
+            goToCartScreen();
         });
+    }
+    private void goToCartScreen() {
+        android.content.Intent intent = new android.content.Intent(ProductDetailActivity.this, MainActivity.class);
+        intent.putExtra("navigate_to", "cart");
+        intent.setFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP | android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
     }
     private void updatePriceDisplay(double newPrice, double oldPrice) {
         binding.tvPriceNew.setText(String.format(java.util.Locale.US, "%,.0f VNĐ", newPrice));

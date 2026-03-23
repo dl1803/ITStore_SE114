@@ -1,5 +1,6 @@
 package com.example.itstore.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -19,10 +20,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.itstore.R;
+import com.example.itstore.activity.CartActivity;
 import com.example.itstore.adapter.BannerAdapter;
 import com.example.itstore.adapter.CategoryAdapter;
 import com.example.itstore.adapter.ProductAdapter;
 import com.example.itstore.databinding.FragmentHomeBinding;
+import com.example.itstore.model.Category;
 import com.example.itstore.viewmodel.HomeViewModel;
 
 import java.util.ArrayList;
@@ -111,11 +114,20 @@ public class HomeFragment extends Fragment {
         rcvCategories = binding.recyclerCategory;
         rcvCategories.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false));
         homeViewModel.getCategoryListLiveData().observe(getViewLifecycleOwner(), categories -> {
-            categoryAdapter = new CategoryAdapter(requireContext(), categories);
+            categoryAdapter = new CategoryAdapter(requireContext(), categories, new CategoryAdapter.OnCategoryClickListener() {
+                @Override
+                public void onCategoryClick(Category category) {
+                    homeViewModel.filterByCategory(category.getId());
+                }
+            });
             rcvCategories.setAdapter(categoryAdapter);
         });
-
+        binding.tvSeeAll.setOnClickListener(v -> {
+            androidx.navigation.Navigation.findNavController(v)
+                    .navigate(R.id.nav_search);
+        });
         return view;
+
     }
 
     @Override

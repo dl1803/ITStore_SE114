@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -50,5 +51,24 @@ public class MainActivity extends AppCompatActivity {
             NavController navController = navHostFragment.getNavController();
 
             NavigationUI.setupWithNavController(binding.bottomNavigation, navController);
+            navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            if (destination.getId() == R.id.nav_search) {
+                binding.bottomNavigation.setVisibility(View.GONE);
+            } else {
+                binding.bottomNavigation.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+    @Override
+    protected void onNewIntent(android.content.Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        if (intent != null && intent.hasExtra("navigate_to")) {
+            String destination = intent.getStringExtra("navigate_to");
+            if ("cart".equals(destination)) {
+                binding.bottomNavigation.setSelectedItemId(R.id.nav_cart);
+            }
         }
     }
+
+}

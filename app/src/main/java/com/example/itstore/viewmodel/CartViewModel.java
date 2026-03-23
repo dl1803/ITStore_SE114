@@ -12,6 +12,11 @@ import java.util.List;
 public class CartViewModel extends ViewModel {
     private MutableLiveData<List<CartItem>> cartItemsLiveData = new MutableLiveData<>(new ArrayList<>());
     private MutableLiveData<Double> totalPriceLiveData = new MutableLiveData<>(0.0);
+    private MutableLiveData<Boolean> isAllSelectedLiveData = new MutableLiveData<>(false);
+
+    public MutableLiveData<Boolean> getIsAllSelectedLiveData() {
+        return isAllSelectedLiveData;
+    }
     public MutableLiveData<List<CartItem>> getCartItems() {
         return cartItemsLiveData;
     }
@@ -64,8 +69,24 @@ public class CartViewModel extends ViewModel {
                 item.setSelected(isSelectAll);
             }
             cartItemsLiveData.setValue(currentList);
+            isAllSelectedLiveData.setValue(isSelectAll);
             calculateTotal();
         }
+    }
+    public void checkAllSelectedStatus() {
+        List<CartItem> currentList = cartItemsLiveData.getValue();
+        if (currentList == null || currentList.isEmpty()) {
+            return;
+        }
+
+        boolean allChecked = true;
+        for (CartItem item : currentList) {
+            if (!item.isSelected()) {
+                allChecked = false;
+                break;
+            }
+        }
+        isAllSelectedLiveData.setValue(allChecked);
     }
     public void loadCartFromManager() {
         List<CartItem> realCart = CartManager.getInstance().getCartList();
