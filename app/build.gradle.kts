@@ -58,4 +58,7 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment:$nav_version")
     implementation("androidx.navigation:navigation-ui:$nav_version")
     implementation("com.google.android.material:material:1.11.0")
+
+    // support google func
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
 }

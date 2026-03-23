@@ -41,9 +41,8 @@ public class TokenAuthenticator implements Authenticator {
             retrofit2.Response<RefreshTokenResponse> tokenResponse = call.execute();
             if (tokenResponse.isSuccessful() && tokenResponse.body() != null) {
                 String newAccessToken = tokenResponse.body().getAccessToken();
-                String newRefreshToken = tokenResponse.body().getRefreshToken();
 
-                SharedPrefsManager.getInstance(context).saveTokens(newAccessToken, newRefreshToken);
+                SharedPrefsManager.getInstance(context).saveTokens(newAccessToken, refreshToken);
 
                 return response.request().newBuilder().header("Authorization", "Bearer " + newAccessToken).build();
             } else {

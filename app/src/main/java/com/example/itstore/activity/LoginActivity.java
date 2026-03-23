@@ -8,6 +8,8 @@ import android.util.Patterns;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -20,11 +22,19 @@ import com.example.itstore.databinding.ActivityLoginBinding;
 import com.example.itstore.utils.SharedPrefsManager;
 import com.example.itstore.utils.SharedPrefsManager;
 import com.example.itstore.viewmodel.LoginViewModel;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 
 public class LoginActivity extends AppCompatActivity {
 
     private ActivityLoginBinding binding;
     private LoginViewModel loginViewModel;
+
+    private GoogleSignInClient mGoogleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +59,6 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Đăng nhập bằng GG
-        binding.btnGoogleLogin.setOnClickListener(v ->
-        {
-            Toast.makeText(this, "Tính năng Đăng nhập Google đang được phát triển!", Toast.LENGTH_SHORT).show();
-        });
-
 
         // Lắng nghe và xử lí sự kiện khi nhập email và mật khẩu
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
@@ -66,7 +70,49 @@ public class LoginActivity extends AppCompatActivity {
             String passwd = binding.edtPassword.getText().toString().trim();
             loginViewModel.login(email, passwd);
         });
+
+
+        // Đăng nhập bằng GG
+        String webClienId = "777572620781-37ul02o28fcbl8acm4l708so3n5q48da.apps.googleusercontent.com";
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(webClienId)
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+
+        binding.btnGoogleLogin.setOnClickListener(v -> {
+            mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
+                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                googleSignInLauncher.launch(signInIntent);
+            });
+        });
     }
+
+    private final ActivityResultLauncher<Intent> googleSignInLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    Intent data = result.getData();
+                    Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                    try {
+                        GoogleSignInAccount account = task.getResult(ApiException.class);
+
+                        String idToken = account.getIdToken();
+
+                        if (idToken != null) {
+                            loginViewModel.googleLogin(idToken);
+                        }
+                    }
+                    catch (ApiException e) {
+                        Toast.makeText(this, "Xác thực Google thất bại. Vui lòng thử lại!", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    android.util.Log.e("GOOGLE_LỖI", "User hủy hoặc Google chặn ngầm!");
+                    Toast.makeText(this, "Đã hủy đăng nhập", Toast.LENGTH_SHORT).show();
+                }
+            }
+    );
 
     private void setupObservers() {
         loginViewModel.getEmailError().observe(this, errorMessage -> {
