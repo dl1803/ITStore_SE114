@@ -1,18 +1,19 @@
 package com.example.itstore.model;
 
-public class RefreshTokenResponse {
-    private String access_token;
-    private String refresh_token;
+import com.google.gson.annotations.SerializedName;
 
+public class RefreshTokenResponse {
+
+    @SerializedName("access_token")
+    private String access_token;
+
+    @SerializedName("message")
     private String message;
 
     public String getAccessToken() {
         return access_token;
     }
 
-    public String getRefreshToken() {
-        return refresh_token;
-    }
 
     public String getMessage() {
         return message;

@@ -9,6 +9,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 
 import com.example.itstore.model.ForgotPasswordRequest;
 import com.example.itstore.model.ForgotPasswordResponse;
@@ -24,6 +25,7 @@ import com.example.itstore.model.RegisterRequest;
 import com.example.itstore.model.RegisterResponse;
 import com.example.itstore.model.ResetPasswordRequest;
 import com.example.itstore.model.ResetPasswordResponse;
+import com.example.itstore.model.UpdateProfileRequest;
 
 public class RetrofitClient {
     private static final String BASE_URL = "http://10.0.2.2:3000/";
@@ -34,6 +36,7 @@ public class RetrofitClient {
 
             OkHttpClient client = new OkHttpClient.Builder()
                     .addInterceptor(new AuthInterceptor(context))
+                    .authenticator(new TokenAuthenticator(context))
                     .build();
 
             retrofit = new Retrofit.Builder().baseUrl(BASE_URL).client(client)
@@ -53,8 +56,6 @@ public class RetrofitClient {
         @POST("api/auth/forgot-password")
         Call<ForgotPasswordResponse> forgotPassword(@Body ForgotPasswordRequest request);
 
-        @GET("api/users/me")
-        Call<ProfileResponse> getProfile();
         @POST("api/auth/logout")
         Call<LogoutResponse> logout(@Body LogoutRequest request);
 
@@ -67,5 +68,10 @@ public class RetrofitClient {
         @POST("api/auth/google")
         Call<LoginResponse> googleLogin(@Body GoogleLoginRequest request);
 
+        @GET("api/users/me")
+        Call<ProfileResponse> getProfile();
+
+        @PUT("api/users/me")
+        Call<ProfileResponse> updateProfile(@Body UpdateProfileRequest request);
     }
 }

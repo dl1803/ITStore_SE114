@@ -11,8 +11,11 @@ import com.example.itstore.api.RetrofitClient;
 import com.example.itstore.model.LogoutRequest;
 import com.example.itstore.model.LogoutResponse;
 import com.example.itstore.model.ProfileResponse;
+import com.example.itstore.model.UpdateProfileRequest;
 import com.example.itstore.model.User;
 import com.example.itstore.utils.SharedPrefsManager;
+
+import org.json.JSONObject;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -23,6 +26,11 @@ public class ProfileViewModel extends AndroidViewModel {
     private final MutableLiveData<User> userProfile = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLogout = new MutableLiveData<>();
+
+    private final MutableLiveData<String> updateSuccessMessage = new MutableLiveData<>();
+    private final MutableLiveData<String> phoneError = new MutableLiveData<>();
+    private final MutableLiveData<String> nameError = new MutableLiveData<>();
+
 
     public LiveData<User> getUserProfile() {
         return userProfile;
@@ -36,6 +44,12 @@ public class ProfileViewModel extends AndroidViewModel {
         return isLogout;
     }
 
+    public LiveData<String> getUpdateSuccessMessage() {
+        return updateSuccessMessage;
+    }
+
+    public LiveData<String> getPhoneError() { return phoneError; }
+    public LiveData<String> getNameError() { return nameError; }
 
     public ProfileViewModel(@NonNull Application application) {
         super(application);
@@ -53,7 +67,7 @@ public class ProfileViewModel extends AndroidViewModel {
                         errorMessage.setValue("Lỗi từ server!");
                     }
                 } else {
-                    errorMessage.setValue("Token hết hạn hoặc chưa đăng nhập!");
+                    errorMessage.setValue("Lỗi! Hãy đăng nhập lại.");
                 }
             }
 
@@ -89,6 +103,59 @@ public class ProfileViewModel extends AndroidViewModel {
             @Override
             public void onFailure(Call<LogoutResponse> call, Throwable t) {
                 isLogout.setValue(true);
+            }
+        });
+    }
+
+    public void updateProfile(String newName, String newPhone){
+
+        boolean isValid = true;
+
+        nameError.setValue(null);
+        phoneError.setValue(null);
+
+        if (newName == null || newName.trim().isEmpty()) {
+            nameError.setValue("Vui lòng nhập họ và tên");
+            isValid = false;
+        } else {
+            nameError.setValue(null);
+        }
+
+        if (newPhone == null || newPhone.trim().isEmpty()) {
+            phoneError.setValue("Vui lòng nhập số điện thoại");
+            isValid = false;
+        } else if (!newPhone.trim().matches("^(03|05|07|08|09)\\d{8}$")) {
+            phoneError.setValue("SĐT không hợp lệ!");
+            isValid = false;
+        } else {
+            phoneError.setValue(null);
+        }
+
+        if (!isValid) {
+            return;
+        }
+
+
+        UpdateProfileRequest request = new UpdateProfileRequest(newName, newPhone);
+        RetrofitClient.getApiService(getApplication()).updateProfile(request).enqueue(new Callback<ProfileResponse>() {
+            @Override
+            public void onResponse(Call<ProfileResponse> call, Response<ProfileResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    if (response.body().isSuccess()) {
+                        userProfile.setValue(response.body().getData());
+                        updateSuccessMessage.setValue("Cập nhật thành công!");
+                    } else {
+                        errorMessage.setValue("Lỗi cập nhật!");
+                    }
+                }
+                else {
+                    errorMessage.setValue("Lỗi xác thực hoặc dữ liệu không hợp lệ!");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ProfileResponse> call, Throwable t) {
+                errorMessage.setValue("Lỗi kết nối mạng!");
             }
         });
     }

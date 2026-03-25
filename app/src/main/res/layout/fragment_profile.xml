@@ -75,7 +75,8 @@
             android:backgroundTint="@color/orange_primary"
             android:orientation="vertical"
             android:paddingTop="30dp"
-            android:paddingBottom="50dp">
+            android:paddingBottom="50dp"
+            >
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

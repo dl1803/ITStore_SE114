@@ -15,27 +15,36 @@
         android:theme="@style/Theme.ITStore"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".activity.EditProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.ResetPasswordActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="itstore"
+
+                <data
                     android:host="auth"
-                    android:path="/reset-password" />
+                    android:path="/reset-password"
+                    android:scheme="itstore" />
             </intent-filter>
         </activity>
         <activity
             android:name=".activity.VerifyEmailActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="itstore"
+
+                <data
                     android:host="auth"
-                    android:path="/verify-email" />
+                    android:path="/verify-email"
+                    android:scheme="itstore" />
             </intent-filter>
         </activity>
         <activity
@@ -49,7 +58,7 @@
             android:exported="false" />
         <activity
             android:name=".activity.SplashActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".activity.MainActivity"
             android:exported="true">

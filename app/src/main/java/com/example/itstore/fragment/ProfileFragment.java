@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
+import com.example.itstore.activity.EditProfileActivity;
 import com.example.itstore.activity.LoginActivity;
 import com.example.itstore.databinding.FragmentProfileBinding;
 import com.example.itstore.utils.SharedPrefsManager;
@@ -39,9 +40,15 @@ public class ProfileFragment extends Fragment {
             binding.tvEmailUser.setText("Vui lòng đăng nhập để xem hồ sơ");
             binding.tvPhoneUser.setText("");
             binding.tvRoleUser.setText("Guest");
-
             binding.tvLogout.setText("Đăng nhập");
             binding.tvLogout.setOnClickListener(v -> {
+                Intent intent = new Intent(requireContext(), LoginActivity.class);
+                startActivity(intent);
+            });
+
+            binding.tvEditProfile.setOnClickListener(v -> {
+                Toast.makeText(requireContext(), "Bạn cần đăng nhập để sử dụng tính năng này!", Toast.LENGTH_SHORT).show();
+
                 Intent intent = new Intent(requireContext(), LoginActivity.class);
                 startActivity(intent);
             });
@@ -57,7 +64,16 @@ public class ProfileFragment extends Fragment {
             binding.tvLogout.setOnClickListener(v -> {
                 profileViewModel.logout();
             });
+
+            binding.tvEditProfile.setOnClickListener(v -> {
+                Intent intent = new Intent(requireContext(), EditProfileActivity.class);
+                intent.putExtra("name", binding.tvNameUser.getText().toString());
+                intent.putExtra("phone", binding.tvPhoneUser.getText().toString());
+                intent.putExtra("email", binding.tvEmailUser.getText().toString());
+                startActivity(intent);
+            });
         }
+
 
         return view;
     }
