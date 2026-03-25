@@ -28,6 +28,7 @@ public class TokenAuthenticator implements Authenticator {
     @Nullable
     @Override
     public Request authenticate(@Nullable Route route, @NonNull Response response) throws IOException {
+
         String refreshToken = SharedPrefsManager.getInstance(context).getRefreshToken();
 
         if (refreshToken == null || refreshToken.isEmpty()) {

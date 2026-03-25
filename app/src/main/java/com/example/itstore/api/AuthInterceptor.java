@@ -24,6 +24,7 @@ public class AuthInterceptor implements Interceptor {
     public Response intercept(@NonNull Chain chain) throws IOException {
         Request originalRequest = chain.request();
 
+
         String token = SharedPrefsManager.getInstance(context).getAccessToken();
 
         if (token == null || token.isEmpty()){
