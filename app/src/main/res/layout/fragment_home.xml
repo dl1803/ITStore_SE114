@@ -50,22 +50,24 @@
                         app:tint="@color/white"></ImageView>
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
+
             <LinearLayout
+                android:id="@+id/layoutSearchBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_marginTop="12dp"
-                >
+                android:orientation="horizontal">
+
                 <androidx.cardview.widget.CardView
                     android:id="@+id/btnMenu"
                     android:layout_width="42dp"
                     android:layout_height="42dp"
-                    app:cardCornerRadius="14dp"
-                    app:cardBackgroundColor="@color/gray_background"
-                    android:layout_marginRight="2dp"
                     android:layout_marginLeft="14dp"
-                    app:cardElevation="1dp"
-                    >
+                    android:layout_marginRight="2dp"
+                    app:cardBackgroundColor="@color/gray_background"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="1dp">
+
                     <ImageView
                         android:layout_width="42dp"
                         android:layout_height="match_parent"
@@ -76,33 +78,32 @@
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
-                    android:layout_weight="1"
                     android:layout_height="match_parent"
-                    app:cardCornerRadius="16dp"
-                    android:layout_marginRight="18dp"
                     android:layout_marginLeft="16dp"
+                    android:layout_marginRight="18dp"
+                    android:layout_weight="1"
                     app:cardBackgroundColor="#EEEEEE"
-                    >
+                    app:cardCornerRadius="16dp">
 
-                    <TextView android:layout_height="match_parent"
+                    <TextView
                         android:layout_width="match_parent"
-                        android:text="Tìm kiếm sản phẩm ngay tại đây"
-                        android:textSize="14dp"
-                        android:textColor="#808080"
-                        android:textStyle="italic"
+                        android:layout_height="match_parent"
                         android:gravity="center_vertical|center"
-                        >
-                    </TextView>
+                        android:text="Tìm kiếm sản phẩm ngay tại đây"
+                        android:textColor="#808080"
+                        android:textSize="14dp"
+                        android:textStyle="italic"></TextView>
                 </androidx.cardview.widget.CardView>
+
                 <androidx.cardview.widget.CardView
                     android:id="@+id/btnFindProduct"
                     android:layout_width="42dp"
                     android:layout_height="42dp"
-                    app:cardCornerRadius="22dp"
-                    app:cardBackgroundColor="@color/gray_background"
                     android:layout_marginRight="14dp"
-                    app:cardElevation="1dp"
-                    >
+                    app:cardBackgroundColor="@color/gray_background"
+                    app:cardCornerRadius="22dp"
+                    app:cardElevation="1dp">
+
                     <ImageView
                         android:layout_width="42dp"
                         android:layout_height="match_parent"

@@ -50,4 +50,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             this.binding = binding;
         }
     }
+    public void updateList(List<Product> newList) {
+        this.productList = newList;
+        notifyDataSetChanged();
+    }
 }

@@ -49,9 +49,9 @@ public class HomeFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
-
         layoutIndicators = binding.layoutIndicators;
 
         ViewPager2 viewPager2 = binding.viewPagerBanner;
@@ -102,7 +102,6 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
         rcvProducts = binding.recyclerProduct;
         rcvProducts.setLayoutManager(new GridLayoutManager(requireContext(), 2));
@@ -123,8 +122,10 @@ public class HomeFragment extends Fragment {
             rcvCategories.setAdapter(categoryAdapter);
         });
         binding.tvSeeAll.setOnClickListener(v -> {
-            androidx.navigation.Navigation.findNavController(v)
-                    .navigate(R.id.nav_search);
+            androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_search);
+        });
+        binding.layoutSearchBar.setOnClickListener(v -> {
+            androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_search);
         });
         return view;
 

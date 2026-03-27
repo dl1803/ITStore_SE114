@@ -31,12 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private HomeViewModel homeViewModel;
-    private RecyclerView rcvProducts;
-    private ProductAdapter productAdapter;
-    private RecyclerView rcvCategories;
-    private CategoryAdapter categoryAdapter;
-
     private ActivityMainBinding binding;
 
     @Override
