@@ -18,8 +18,49 @@
             android:background="#FFFAF0"
             android:gravity="center"
             android:orientation="vertical"
-            android:paddingTop="40dp"
+            android:paddingTop="15dp"
             android:paddingBottom="40dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="end"
+                android:layout_marginRight="20dp"
+                >
+
+                <ImageView
+                    android:id="@+id/btnNotification"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/rounded_box"
+                    android:backgroundTint="@color/orange_light"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_bell"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/orange_primary" />
+
+                <TextView
+                    android:id="@+id/tvNotificationBadge"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:background="@drawable/notification_badge"
+                    android:elevation="4dp"
+                    android:gravity="center"
+                    android:paddingHorizontal="4dp"
+                    android:paddingVertical="2dp"
+                    android:text="3"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="@+id/btnNotification"
+                    app:layout_constraintTop_toTopOf="@+id/btnNotification"
+                    android:layout_marginTop="-4dp"
+                    android:layout_marginRight="-4dp"
+                    />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <ImageView
                 android:id="@+id/imgAvatar"
@@ -168,6 +209,27 @@
                     android:paddingVertical="8dp">
 
                     <TextView
+                        android:id="@+id/tvNotificationSettings"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:drawablePadding="10dp"
+                        android:gravity="center_vertical"
+                        android:padding="16dp"
+                        android:text="Cài đặt thông báo"
+                        android:textColor="#333"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:drawableStartCompat="@drawable/ic_bell_setting"
+                        app:drawableTint="@color/orange_primary" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:background="#F0F0F0" />
+
+                    <TextView
                         android:id="@+id/tvChangePass"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -193,7 +255,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="?attr/selectableItemBackground"
-                        android:drawablePadding="24dp"
+                        android:drawablePadding="18dp"
                         android:gravity="center_vertical"
                         android:padding="16dp"
                         android:text="Đăng xuất"
@@ -201,7 +263,9 @@
                         android:textSize="16sp"
                         android:textStyle="bold"
                         app:drawableStartCompat="@android:drawable/ic_lock_power_off"
-                        app:drawableTint="#FF3B30" ></TextView>
+                        app:drawableTint="#FF3B30"
+                        android:layout_marginLeft="4dp"
+                        ></TextView>
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
