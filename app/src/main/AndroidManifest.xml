@@ -15,6 +15,9 @@
         android:theme="@style/Theme.ITStore"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".activity.ChangePasswordActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.EditProfileActivity"
             android:exported="false" />
         <activity

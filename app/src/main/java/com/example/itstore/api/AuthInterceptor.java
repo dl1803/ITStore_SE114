@@ -25,6 +25,11 @@ public class AuthInterceptor implements Interceptor {
         Request originalRequest = chain.request();
 
 
+        String path = originalRequest.url().encodedPath();
+        if (path.contains("/auth/login") || path.contains("/auth/register") || path.contains("/auth/refresh")) {
+            return chain.proceed(originalRequest);
+        }
+
         String token = SharedPrefsManager.getInstance(context).getAccessToken();
 
         if (token == null || token.isEmpty()){

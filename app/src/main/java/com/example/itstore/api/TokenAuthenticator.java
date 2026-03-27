@@ -29,10 +29,14 @@ public class TokenAuthenticator implements Authenticator {
     @Override
     public Request authenticate(@Nullable Route route, @NonNull Response response) throws IOException {
 
+        if (response.request().url().encodedPath().contains("/auth/refresh")) {
+            return forceLogout();
+        }
+
         String refreshToken = SharedPrefsManager.getInstance(context).getRefreshToken();
 
         if (refreshToken == null || refreshToken.isEmpty()) {
-            return null;
+            return forceLogout();
         }
 
         RefreshTokenRequest requestBody = new RefreshTokenRequest(refreshToken);

@@ -11,6 +11,8 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 
+import com.example.itstore.model.ChangePasswordRequest;
+import com.example.itstore.model.ChangePasswordResponse;
 import com.example.itstore.model.ForgotPasswordRequest;
 import com.example.itstore.model.ForgotPasswordResponse;
 import com.example.itstore.model.GoogleLoginRequest;
@@ -73,5 +75,9 @@ public class RetrofitClient {
 
         @PUT("api/users/me")
         Call<ProfileResponse> updateProfile(@Body UpdateProfileRequest request);
+
+        @PUT("api/users/me/password")
+        Call<ChangePasswordResponse> changePassword(@Body ChangePasswordRequest request);
+
     }
 }
