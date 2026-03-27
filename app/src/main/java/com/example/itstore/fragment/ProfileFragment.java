@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
+import com.example.itstore.activity.ChangePasswordActivity;
 import com.example.itstore.activity.EditProfileActivity;
 import com.example.itstore.activity.LoginActivity;
 import com.example.itstore.databinding.FragmentProfileBinding;
@@ -70,6 +71,11 @@ public class ProfileFragment extends Fragment {
                 intent.putExtra("name", binding.tvNameUser.getText().toString());
                 intent.putExtra("phone", binding.tvPhoneUser.getText().toString());
                 intent.putExtra("email", binding.tvEmailUser.getText().toString());
+                startActivity(intent);
+            });
+
+            binding.tvChangePass.setOnClickListener(v -> {
+                Intent intent = new Intent(requireContext(), ChangePasswordActivity.class);
                 startActivity(intent);
             });
         }

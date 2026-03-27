@@ -8,6 +8,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.itstore.api.RetrofitClient;
+import com.example.itstore.model.ChangePasswordRequest;
+import com.example.itstore.model.ChangePasswordResponse;
 import com.example.itstore.model.LogoutRequest;
 import com.example.itstore.model.LogoutResponse;
 import com.example.itstore.model.ProfileResponse;
@@ -27,9 +29,16 @@ public class ProfileViewModel extends AndroidViewModel {
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLogout = new MutableLiveData<>();
 
+
     private final MutableLiveData<String> updateSuccessMessage = new MutableLiveData<>();
     private final MutableLiveData<String> phoneError = new MutableLiveData<>();
     private final MutableLiveData<String> nameError = new MutableLiveData<>();
+
+
+    private final MutableLiveData<String> changeSuccessMessage = new MutableLiveData<>();
+    private final MutableLiveData<String> changeErrorMessage = new MutableLiveData<>();
+    private final MutableLiveData<String> oldPasswordError = new MutableLiveData<>();
+    private final MutableLiveData<String> newPasswordError = new MutableLiveData<>();
 
 
     public LiveData<User> getUserProfile() {
@@ -44,12 +53,28 @@ public class ProfileViewModel extends AndroidViewModel {
         return isLogout;
     }
 
+
+
     public LiveData<String> getUpdateSuccessMessage() {
         return updateSuccessMessage;
     }
 
     public LiveData<String> getPhoneError() { return phoneError; }
     public LiveData<String> getNameError() { return nameError; }
+
+
+    public LiveData<String> getChangeSuccessMessage() {
+        return changeSuccessMessage;
+    }
+    public LiveData<String> getChangeErrorMessage() {
+        return changeErrorMessage;
+    }
+    public LiveData<String> getOldPasswordError() {
+        return oldPasswordError;
+    }
+    public LiveData<String> getNewPasswordError() {
+        return newPasswordError;
+    }
 
     public ProfileViewModel(@NonNull Application application) {
         super(application);
@@ -156,6 +181,85 @@ public class ProfileViewModel extends AndroidViewModel {
             @Override
             public void onFailure(Call<ProfileResponse> call, Throwable t) {
                 errorMessage.setValue("Lỗi kết nối mạng!");
+            }
+        });
+    }
+
+    public void changePassword(String oldPassword, String newPassword, String confirmPassword) {
+
+        boolean isValid = true;
+
+        oldPasswordError.setValue(null);
+        newPasswordError.setValue(null);
+
+        if (oldPassword == null || oldPassword.trim().isEmpty()) {
+            oldPasswordError.setValue("Vui lòng nhập mật khẩu hiện tại");
+            isValid = false;
+        }
+
+        boolean isNewPassValid = true;
+
+        if (newPassword == null || newPassword.isEmpty()) {
+            newPasswordError.setValue("Vui lòng nhập mật khẩu mới");
+            isNewPassValid = false;
+        } else if (newPassword.length() < 8) {
+            newPasswordError.setValue("Mật khẩu phải có ít nhất 8 ký tự");
+            isNewPassValid = false;
+        } else if (!newPassword.matches(".*[a-z].*")) {
+            newPasswordError.setValue("Mật khẩu phải có ít nhất 1 ký tự thường");
+            isNewPassValid = false;
+        } else if (!newPassword.matches(".*[A-Z].*")) {
+            newPasswordError.setValue("Mật khẩu phải có ít nhất 1 ký tự in hoa");
+            isNewPassValid = false;
+        } else if (!newPassword.matches(".*[0-9].*")) {
+            newPasswordError.setValue("Mật khẩu phải có ít nhất 1 số");
+            isNewPassValid = false;
+        } else if (!newPassword.matches(".*[^a-zA-Z0-9].*")) {
+            newPasswordError.setValue("Mật khẩu phải có ít nhất 1 ký tự đặc biệt");
+            isNewPassValid = false;
+        }
+
+        if (!isNewPassValid) {
+            isValid = false;
+        }
+
+        if (isNewPassValid) {
+            if (confirmPassword == null || !confirmPassword.equals(newPassword)) {
+                newPasswordError.setValue("Mật khẩu xác nhận không khớp!");
+                isValid = false;
+            }
+        }
+
+        if (!isValid) {
+            return;
+        }
+
+        ChangePasswordRequest request = new ChangePasswordRequest(oldPassword, newPassword);
+
+        RetrofitClient.getApiService(getApplication()).changePassword(request).enqueue(new Callback<ChangePasswordResponse>() {
+
+            @Override
+            public void onResponse(Call<ChangePasswordResponse> call, Response<ChangePasswordResponse> response) {
+                if (response.isSuccessful() && response.body() != null){
+                    if (response.body() != null && response.isSuccessful()){
+                        changeSuccessMessage.setValue(response.body().getMessage());
+                }
+            } else {
+                    try {
+                        String errorStr = response.errorBody().string();
+                        JSONObject jsonObject = new JSONObject(errorStr);
+                        String serverError = jsonObject.getString("message");
+                        changeErrorMessage.setValue(serverError);
+                    } catch (Exception e) {
+                        changeErrorMessage.setValue("Lỗi cập nhật mật khẩu!");
+                    }
+                }
+            }
+
+
+            @Override
+            public void onFailure(Call<ChangePasswordResponse> call, Throwable t) {
+                changeErrorMessage.setValue("Lỗi kết nối mạng!");
             }
         });
     }
