@@ -1,12 +1,15 @@
 package com.example.itstore.fragment;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -20,10 +23,32 @@ import com.example.itstore.databinding.FragmentProfileBinding;
 import com.example.itstore.utils.SharedPrefsManager;
 import com.example.itstore.viewmodel.ProfileViewModel;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+
 public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding binding;
     private ProfileViewModel profileViewModel;
+
+
+    // Chọn ảnh từ thư viện
+    private final ActivityResultLauncher<String> pickImgLauncher = registerForActivityResult(
+            new ActivityResultContracts.GetContent(), uri -> {
+        if (uri != null){
+            binding.imgAvatar.setImageURI(uri);
+            File fileToUpload = convertUriToFile(uri);
+
+            if (fileToUpload != null){
+                profileViewModel.uploadAvatar(fileToUpload);
+            } else {
+                Toast.makeText(requireContext(), "Lỗi khi đọc file ảnh!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    });
+
+
 
     @Nullable
     @Override
@@ -78,6 +103,10 @@ public class ProfileFragment extends Fragment {
                 Intent intent = new Intent(requireContext(), ChangePasswordActivity.class);
                 startActivity(intent);
             });
+
+            binding.imgAvatar.setOnClickListener(v -> {
+                pickImgLauncher.launch("image/*");
+            });
         }
 
 
@@ -96,6 +125,8 @@ public class ProfileFragment extends Fragment {
                     Glide.with(requireContext())
                             .load(user.getAvatar_url())
                             .circleCrop()
+                            .placeholder(android.R.drawable.ic_menu_camera)
+                            .error(android.R.drawable.ic_menu_camera)
                             .into(binding.imgAvatar);
                 }
             }
@@ -116,7 +147,41 @@ public class ProfileFragment extends Fragment {
                 requireActivity().finish();
             }
         });
+
+        profileViewModel.getAvatarUpdateStatus().observe(getViewLifecycleOwner(), status ->{
+            if (status != null) {
+                Toast.makeText(requireContext(), status, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
+
+    // Chuyển đổi Uri thành File
+    private File convertUriToFile(Uri uri) {
+        try {
+            InputStream inputStream = requireContext().getContentResolver().openInputStream(uri);
+
+            File tempFile = File.createTempFile("avatar_tmp", ".jpg", requireContext().getCacheDir());
+
+            FileOutputStream outputStream = new FileOutputStream(tempFile);
+
+            byte[] buffer = new byte[4 * 1024];
+            int length;
+
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
+
+            outputStream.close();
+            inputStream.close();
+
+            return tempFile;
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
     @Override
     public void onDestroyView() {
