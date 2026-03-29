@@ -19,6 +19,11 @@ import com.example.itstore.utils.SharedPrefsManager;
 
 import org.json.JSONObject;
 
+import java.io.File;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -41,6 +46,8 @@ public class ProfileViewModel extends AndroidViewModel {
     private final MutableLiveData<String> newPasswordError = new MutableLiveData<>();
 
 
+    private final MutableLiveData<String> avatarUpdateStatus = new MutableLiveData<>();
+
     public LiveData<User> getUserProfile() {
         return userProfile;
     }
@@ -52,7 +59,6 @@ public class ProfileViewModel extends AndroidViewModel {
     public LiveData<Boolean> getIsLogout() {
         return isLogout;
     }
-
 
 
     public LiveData<String> getUpdateSuccessMessage() {
@@ -74,6 +80,10 @@ public class ProfileViewModel extends AndroidViewModel {
     }
     public LiveData<String> getNewPasswordError() {
         return newPasswordError;
+    }
+
+    public LiveData<String> getAvatarUpdateStatus() {
+        return avatarUpdateStatus;
     }
 
     public ProfileViewModel(@NonNull Application application) {
@@ -256,12 +266,39 @@ public class ProfileViewModel extends AndroidViewModel {
                 }
             }
 
-
             @Override
             public void onFailure(Call<ChangePasswordResponse> call, Throwable t) {
                 changeErrorMessage.setValue("Lỗi kết nối mạng!");
             }
         });
+    }
+
+
+    public void uploadAvatar(File imgFile) {
+        if (imgFile == null) {
+            return;
+        }
+
+        RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), imgFile);
+
+        MultipartBody.Part body = MultipartBody.Part.createFormData("avatar", imgFile.getName(), requestFile);
+
+        RetrofitClient.getApiService(getApplication()).updateAvatar(body).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    avatarUpdateStatus.setValue("Cập nhật thành công!");
+                } else {
+                    avatarUpdateStatus.setValue("Cập nhật thất bại!");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                avatarUpdateStatus.setValue("Lỗi kết nối mạng!");
+            }
+        });
+
     }
 
 }
