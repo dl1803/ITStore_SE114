@@ -1,5 +1,6 @@
 package com.example.itstore.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.itstore.R;
 import com.example.itstore.adapter.AddressAdapter;
 import com.example.itstore.databinding.ActivityAddressListBinding;
+import com.example.itstore.model.Address;
 import com.example.itstore.viewmodel.AddressViewModel;
 
 
@@ -60,6 +62,40 @@ public class AddressActivity extends AppCompatActivity {
             }
         });
         binding.btnBack.setOnClickListener(v -> finish());
+
+
+        addressAdapter.setOnItemClickListener(new AddressAdapter.OnItemClickListener() {
+            @Override
+            public void OnEditClick(Address address) {
+                Intent intent = new Intent(AddressActivity.this, AddEditAddressActivity.class);
+                intent.putExtra("ADDRESS_ID", address.getId());
+                intent.putExtra("NAME", address.getRecipient());
+                intent.putExtra("PHONE", address.getPhoneNumber());
+                intent.putExtra("PROVINCE", address.getProvince());
+                intent.putExtra("DISTRICT", address.getDistrict());
+                intent.putExtra("WARD", address.getWard());
+                intent.putExtra("STREET", address.getStreet());
+                intent.putExtra("IS_DEFAULT", address.isDefault());
+                startActivity(intent);
+            }
+
+            @Override
+            public void OnDeleteClick(Address address) {
+                new androidx.appcompat.app.AlertDialog.Builder(AddressActivity.this)
+                        .setTitle("Xóa địa chỉ")
+                        .setMessage("Bạn có chắc chắn muốn xóa địa chỉ này?")
+                        .setPositiveButton("Xóa", (dialog, which) -> {
+                            Toast.makeText(AddressActivity.this, "Xóa ID: " + address.getId(), Toast.LENGTH_SHORT).show();
+                        })
+                        .setNegativeButton("Hủy", null)
+                        .show();
+            }
+        });
+
+        binding.btnAddAddress.setOnClickListener(v -> {
+            Intent intent = new Intent(AddressActivity.this, AddEditAddressActivity.class);
+            startActivity(intent);
+        });
     }
 
     @Override

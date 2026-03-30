@@ -3,6 +3,7 @@ package com.example.itstore.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,17 @@ import java.util.List;
 public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressViewHolder> {
 
     private List<Address> addressList;
+
+    public interface OnItemClickListener{
+        void OnEditClick(Address address);
+        void OnDeleteClick(Address address);
+    }
+
+    private OnItemClickListener listener;
+
+    public void setOnItemClickListener(OnItemClickListener listener){
+        this.listener = listener;
+    }
 
     public void setAddressList(List<Address> addressList) {
         this.addressList = addressList;
@@ -45,6 +57,18 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressV
         } else {
             holder.tvDefault.setVisibility(View.GONE);
         }
+
+        holder.tvEdit.setOnClickListener(v -> {
+            if (listener != null){
+                listener.OnEditClick(address);
+            }
+        });
+
+        holder.tvDelete.setOnClickListener(v -> {
+            if (listener != null){
+                listener.OnDeleteClick(address);
+            }
+        });
     }
 
     @Override
