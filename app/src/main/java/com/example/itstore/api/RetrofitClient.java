@@ -2,15 +2,20 @@ package com.example.itstore.api;
 
 import android.content.Context;
 
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
+import retrofit2.http.Part;
 
+import com.example.itstore.model.AddressResponse;
 import com.example.itstore.model.ChangePasswordRequest;
 import com.example.itstore.model.ChangePasswordResponse;
 import com.example.itstore.model.ForgotPasswordRequest;
@@ -78,6 +83,15 @@ public class RetrofitClient {
 
         @PUT("api/users/me/password")
         Call<ChangePasswordResponse> changePassword(@Body ChangePasswordRequest request);
+
+        @Multipart
+        @PATCH("api/users/me/avatar")
+        Call<Void> updateAvatar(@Part MultipartBody.Part avatar);
+
+        @GET("api/users/me/addresses")
+        Call<AddressResponse> getAddresses();
+
+
 
     }
 }

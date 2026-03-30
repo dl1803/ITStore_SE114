@@ -1,10 +1,15 @@
 package com.example.itstore.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class User {
     private int id;
+
     private String full_name;
     private String email;
     private String phone_number;
+
+    @SerializedName("avatar_url")
     private String avatar_url;
     private String role;
 

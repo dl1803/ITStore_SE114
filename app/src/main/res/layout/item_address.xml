@@ -29,6 +29,29 @@
             app:layout_constraintTop_toTopOf="parent" ></TextView>
 
         <TextView
+            android:id="@+id/tvDivider"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="|"
+            android:textColor="#CCCCCC"
+            android:textSize="14sp"
+            app:layout_constraintLeft_toRightOf="@id/tvDelete"
+            app:layout_constraintRight_toLeftOf="@id/tvEdit"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Xóa"
+            android:textColor="#FF3B30"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginRight="10dp"
+            app:layout_constraintRight_toLeftOf="@id/tvEdit"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
             android:id="@+id/tvEdit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -36,6 +59,7 @@
             android:textColor="@color/orange_primary"
             android:textSize="14sp"
             android:textStyle="bold"
+            android:layout_marginLeft="10dp"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" ></TextView>
 
@@ -64,7 +88,9 @@
             android:textSize="12sp"
             android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvAddressDetail" ></TextView>
+            app:layout_constraintTop_toBottomOf="@id/tvAddressDetail" />
+
+         />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
