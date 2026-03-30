@@ -50,6 +50,16 @@
         app:layout_constraintTop_toBottomOf="@id/layoutHeader"
         tools:listitem="@layout/item_address" ></androidx.recyclerview.widget.RecyclerView>
 
+    <include
+        android:id="@+id/layoutEmptyState"
+        layout="@layout/layout_empty_state"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutHeader"
+        app:layout_constraintBottom_toTopOf="@id/layoutBottomButton" />
+
     <LinearLayout
         android:id="@+id/layoutBottomButton"
         android:layout_width="match_parent"
