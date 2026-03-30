@@ -55,7 +55,6 @@ public class SearchFragment extends Fragment {
         binding.edtSearch.postDelayed(() -> {
             InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             if (imm != null) {
-                // Dùng SHOW_IMPLICIT là an toàn nhất, tự nó sẽ biết bung hay không
                 imm.showSoftInput(binding.edtSearch, InputMethodManager.SHOW_IMPLICIT);
             }
         }, 200);
@@ -70,29 +69,40 @@ public class SearchFragment extends Fragment {
         binding.edtSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String query = s.toString().trim();
-                String categoryName = getSelectedCategoryName();
-                viewModel.filterProducts(query, categoryName);
+                if (s.length() == 0) {
+                    binding.tvResultRecommend.setText("Gợi ý tìm kiếm");
+                }
             }
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void afterTextChanged(Editable s) {}
         });
-        binding.chipGroupFilter.setOnCheckedStateChangeListener((group, checkedIds) -> {
+        binding.ivSearch.setOnClickListener(v -> {
             String query = binding.edtSearch.getText().toString().trim();
-            String categoryName = getSelectedCategoryName();
-            viewModel.filterProducts(query, categoryName);
+            if (!query.isEmpty()) {
+                binding.tvResultRecommend.setText("Kết quả tìm kiếm");
+                viewModel.filterProducts(query, "Tất cả");
+                hideKeyboard(v);
+            }
+        });
+        binding.chipGroupFilter.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            int selectedChipId = group.getCheckedChipId();
+            if (selectedChipId != View.NO_ID) {
+                Chip selectedChip = group.findViewById(selectedChipId);
+                String categoryId = selectedChip.getTag().toString();
+                String categoryName = selectedChip.getText().toString();
+                Bundle bundle = new Bundle();
+                bundle.putString("CATEGORY_ID", categoryId);
+                bundle.putString("CATEGORY_NAME", categoryName);
+                Navigation.findNavController(requireView()).navigate(R.id.action_nav_search_to_nav_category_product, bundle);
+                group.clearCheck();
+            }
         });
     }
-    private String getSelectedCategoryName() {
-        int selectedChipId = binding.chipGroupFilter.getCheckedChipId();
-        if (selectedChipId == View.NO_ID) {
-            return "Tất cả";
+    private void hideKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
-        Chip selectedChip = binding.chipGroupFilter.findViewById(selectedChipId);
-        if (selectedChip != null) {
-            return selectedChip.getText().toString();
-        }
-        return "Tất cả";
     }
     @Override
     public void onDestroyView() {

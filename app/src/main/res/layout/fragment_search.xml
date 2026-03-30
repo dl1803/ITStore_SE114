@@ -55,12 +55,14 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toRightOf="@id/edtSearch">
+
             <ImageView
+                android:id="@+id/ivSearch"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="8dp"
                 android:src="@drawable/ic_search"
-                app:tint="#808080" ></ImageView>
+                app:tint="#808080"></ImageView>
         </androidx.cardview.widget.CardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -102,36 +104,45 @@
                 app:singleLine="true">
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/all"
+                    android:tag="all"
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tất cả"
                     android:checked="true"
-                    ></com.google.android.material.chip.Chip>
+                    android:text="Tất cả"></com.google.android.material.chip.Chip>
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/cat_vga"
+                    android:tag="3"
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="VGA" ></com.google.android.material.chip.Chip>
+                    android:text="VGA"></com.google.android.material.chip.Chip>
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/cat_cpu"
+                    android:tag="1"
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="CPU" ></com.google.android.material.chip.Chip>
+                    android:text="CPU"></com.google.android.material.chip.Chip>
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/cat_ram"
+                    android:tag="2"
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="RAM" ></com.google.android.material.chip.Chip>
+                    android:text="RAM"></com.google.android.material.chip.Chip>
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/cat_main"
+                    android:tag="4"
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Mainboard" ></com.google.android.material.chip.Chip>
+                    android:text="Mainboard"></com.google.android.material.chip.Chip>
             </com.google.android.material.chip.ChipGroup>
         </HorizontalScrollView>
 
