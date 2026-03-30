@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
+import com.example.itstore.activity.AddressActivity;
 import com.example.itstore.activity.ChangePasswordActivity;
 import com.example.itstore.activity.EditProfileActivity;
 import com.example.itstore.activity.LoginActivity;
@@ -107,6 +108,11 @@ public class ProfileFragment extends Fragment {
             binding.imgAvatar.setOnClickListener(v -> {
                 pickImgLauncher.launch("image/*");
             });
+
+            binding.tvAddressInfo.setOnClickListener(v -> {
+                Intent intent = new Intent(requireContext(), AddressActivity.class);
+                startActivity(intent);
+            });
         }
 
 
@@ -177,7 +183,6 @@ public class ProfileFragment extends Fragment {
 
             return tempFile;
         } catch (Exception e){
-            e.printStackTrace();
             return null;
         }
     }
