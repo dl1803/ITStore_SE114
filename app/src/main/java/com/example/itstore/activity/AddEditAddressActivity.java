@@ -9,13 +9,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.itstore.R;
 import com.example.itstore.databinding.ActivityAddressInfoBinding;
+import com.example.itstore.model.AddressRequest;
+import com.example.itstore.viewmodel.AddEditAddressViewModel;
 
 public class AddEditAddressActivity extends AppCompatActivity {
 
     private ActivityAddressInfoBinding binding;
+    private AddEditAddressViewModel addEditAddressViewModel;
 
     private boolean isEditMode = false;
     private int curAddressId = -1;
@@ -34,16 +38,38 @@ public class AddEditAddressActivity extends AppCompatActivity {
 
         binding.btnBack.setOnClickListener(v -> finish());
 
+        addEditAddressViewModel = new ViewModelProvider(this).get(AddEditAddressViewModel.class);
+
+        addEditAddressViewModel.getMessage().observe(this, message -> {
+            if (message != null) {
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        addEditAddressViewModel.getAddSuccess().observe(this, isSuccess -> {
+            if (isSuccess != null && isSuccess) {
+                finish();
+            }
+        });
+
+
         setupUI();
 
         handleDropdownClick();
 
         binding.btnSaveAddress.setOnClickListener(v -> {
             if (validateData()){
+                String name = binding.edtName.getText().toString().trim();
+                String phone = binding.edtPhone.getText().toString().trim();
+                String province = binding.edtProvince.getText().toString().trim();
+                String district = binding.edtDistrict.getText().toString().trim();
+                String ward = binding.edtWard.getText().toString().trim();
+                String street = binding.edtStreet.getText().toString().trim();
                 if (isEditMode){
                     Toast.makeText(this, "Api Put Address", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(this, "Api Post Address", Toast.LENGTH_SHORT).show();
+                    AddressRequest request = new AddressRequest(name, phone, province, district, ward, street);
+                    addEditAddressViewModel.addAddress(this, request);
                 }
             }
         });

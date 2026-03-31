@@ -157,8 +157,6 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:padding="16dp">
-
-
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnSaveAddress"
             android:layout_width="match_parent"

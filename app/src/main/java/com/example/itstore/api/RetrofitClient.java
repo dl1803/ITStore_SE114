@@ -15,6 +15,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
 
+import com.example.itstore.model.AddressRequest;
 import com.example.itstore.model.AddressResponse;
 import com.example.itstore.model.ChangePasswordRequest;
 import com.example.itstore.model.ChangePasswordResponse;
@@ -32,6 +33,7 @@ import com.example.itstore.model.RegisterRequest;
 import com.example.itstore.model.RegisterResponse;
 import com.example.itstore.model.ResetPasswordRequest;
 import com.example.itstore.model.ResetPasswordResponse;
+import com.example.itstore.model.SingleAddressResponse;
 import com.example.itstore.model.UpdateProfileRequest;
 
 public class RetrofitClient {
@@ -90,6 +92,9 @@ public class RetrofitClient {
 
         @GET("api/users/me/addresses")
         Call<AddressResponse> getAddresses();
+
+        @POST("api/users/me/addresses")
+        Call<SingleAddressResponse> addAddress(@Body AddressRequest request);
 
 
 

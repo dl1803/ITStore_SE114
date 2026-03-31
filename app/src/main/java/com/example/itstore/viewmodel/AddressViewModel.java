@@ -2,6 +2,7 @@ package com.example.itstore.viewmodel;
 
 import android.content.Context;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -20,11 +21,11 @@ public class AddressViewModel extends ViewModel {
 
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
 
-    public MutableLiveData<List<Address>> getAddressList() {
+    public LiveData<List<Address>> getAddressList() {
         return addressList;
     }
 
-    public MutableLiveData<String> getErrorMessage() {
+    public LiveData<String> getErrorMessage() {
         return errorMessage;
     }
 
