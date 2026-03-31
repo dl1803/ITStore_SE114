@@ -28,9 +28,11 @@ public class CartActivity extends AppCompatActivity{
         binding.btnCheckout.setOnClickListener(v -> {
             Toast.makeText(this, "Tính năng Thanh toán đang phát triển!", Toast.LENGTH_SHORT).show();
         });
+
         binding.cbBuyAll.setOnCheckedChangeListener((buttonView, isChecked) -> {
             cartViewModel.toggleSelectAll(isChecked);
         });
+
         cartViewModel.loadCartFromManager();
         List<CartItem> checkCart = CartManager.getInstance().getCartList();
         if (checkCart != null) {
@@ -48,6 +50,7 @@ public class CartActivity extends AppCompatActivity{
             public void onDecrease(CartItem item, int position) {
                 cartViewModel.decreaseQuantity(item, position);
             }
+
             @Override
             public void onDelete(CartItem item, int position) {
                 cartViewModel.removeItem(position);
