@@ -48,6 +48,22 @@ public class AddEditAddressActivity extends AppCompatActivity {
 
         addEditAddressViewModel.getAddSuccess().observe(this, isSuccess -> {
             if (isSuccess != null && isSuccess) {
+                if (binding.switchDefault.isChecked()){
+                    int targetId;
+                    if (isEditMode){
+                        targetId = curAddressId;
+                    } else {
+                        targetId = addEditAddressViewModel.getNewAddressId().getValue();
+                    }
+                    addEditAddressViewModel.setDefaultAddress(this, targetId);
+                } else {
+                    finish();
+                }
+            }
+        });
+
+        addEditAddressViewModel.getSetDefaultSuccess().observe(this, isSuccess -> {
+            if (isSuccess != null && isSuccess) {
                 finish();
             }
         });
@@ -65,10 +81,11 @@ public class AddEditAddressActivity extends AppCompatActivity {
                 String district = binding.edtDistrict.getText().toString().trim();
                 String ward = binding.edtWard.getText().toString().trim();
                 String street = binding.edtStreet.getText().toString().trim();
+                AddressRequest request = new AddressRequest(name, phone, province, district, ward, street);
+
                 if (isEditMode){
-                    Toast.makeText(this, "Api Put Address", Toast.LENGTH_SHORT).show();
+                    addEditAddressViewModel.updateAddress(this, curAddressId, request);
                 } else {
-                    AddressRequest request = new AddressRequest(name, phone, province, district, ward, street);
                     addEditAddressViewModel.addAddress(this, request);
                 }
             }
