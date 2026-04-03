@@ -61,6 +61,19 @@ public class AddressActivity extends AppCompatActivity {
                 Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
             }
         });
+
+        addressViewModel.getDeleteMessage().observe(this, message -> {
+            if (message != null) {
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        addressViewModel.getDeleteSuccess().observe(this, isSuccess -> {
+            if (isSuccess != null && isSuccess) {
+                addressViewModel.getAddressList();
+            }
+        });
+
         binding.btnBack.setOnClickListener(v -> finish());
 
 
@@ -83,9 +96,11 @@ public class AddressActivity extends AppCompatActivity {
             public void OnDeleteClick(Address address) {
                 new androidx.appcompat.app.AlertDialog.Builder(AddressActivity.this)
                         .setTitle("Xóa địa chỉ")
-                        .setMessage("Bạn có chắc chắn muốn xóa địa chỉ này?")
+                        .setMessage("Bạn có chắc chắn muốn xóa địa chỉ này không?")
                         .setPositiveButton("Xóa", (dialog, which) -> {
-                            Toast.makeText(AddressActivity.this, "Xóa ID: " + address.getId(), Toast.LENGTH_SHORT).show();
+
+                            addressViewModel.deleteAddress(AddressActivity.this, address.getId());
+
                         })
                         .setNegativeButton("Hủy", null)
                         .show();

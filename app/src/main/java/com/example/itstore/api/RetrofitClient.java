@@ -8,12 +8,14 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
+import retrofit2.http.Path;
 
 import com.example.itstore.model.AddressRequest;
 import com.example.itstore.model.AddressResponse;
@@ -96,7 +98,14 @@ public class RetrofitClient {
         @POST("api/users/me/addresses")
         Call<SingleAddressResponse> addAddress(@Body AddressRequest request);
 
+        @PUT("api/users/me/addresses/{id}")
+        Call<SingleAddressResponse> updateAddress(@Path("id") int id, @Body AddressRequest request);
 
+        @PATCH("api/users/me/addresses/{id}/default")
+        Call<SingleAddressResponse> setDefaultAddress(@Path("id") int id);
+
+        @DELETE("api/users/me/addresses/{id}")
+        Call<SingleAddressResponse> deleteAddress(@Path("id") int id);
 
     }
 }
