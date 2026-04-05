@@ -31,7 +31,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Chờ xác nhận"
-            android:textColor="@color/orange_primary"
             android:textSize="14sp"
             android:textStyle="bold"
             app:layout_constraintRight_toRightOf="parent"
@@ -99,18 +98,22 @@
             android:layout_height="1dp"
             android:layout_marginTop="12dp"
             android:background="#EEEEEE"
+            app:layout_constraintBottom_toTopOf="@id/tvTotalPriceOrder"
             app:layout_constraintTop_toBottomOf="@id/imgProductOrder" ></View>
 
         <TextView
             android:id="@+id/tvTotalItems"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginVertical="8dp"
             android:text="Và 2 sản phẩm khác"
             android:textColor="#808080"
             android:textSize="13sp"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/divider2" ></TextView>
+            app:layout_constraintTop_toBottomOf="@id/divider2"
+            app:layout_constraintBottom_toTopOf="@id/divider3"
+
+            ></TextView>
 
         <TextView
             android:id="@+id/tvTotalPriceOrder"
@@ -118,11 +121,12 @@
             android:layout_height="wrap_content"
             android:text="Thành tiền: 3.486.000đ"
             android:textColor="@color/black"
+            android:layout_marginVertical="8dp"
             android:textSize="14sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/tvTotalItems"
+            app:layout_constraintTop_toBottomOf="@id/divider2"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tvTotalItems" ></TextView>
+            app:layout_constraintBottom_toTopOf="@id/divider3" ></TextView>
 
         <View
             android:id="@+id/divider3"
@@ -130,7 +134,7 @@
             android:layout_height="1dp"
             android:layout_marginTop="12dp"
             android:background="#EEEEEE"
-            app:layout_constraintTop_toBottomOf="@id/tvTotalItems" ></View>
+            app:layout_constraintTop_toBottomOf="@id/tvTotalPriceOrder" ></View>
 
         <TextView
             android:id="@+id/btnCancelOrder"

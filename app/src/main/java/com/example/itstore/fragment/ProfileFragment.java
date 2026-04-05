@@ -20,6 +20,9 @@ import com.example.itstore.activity.AddressActivity;
 import com.example.itstore.activity.ChangePasswordActivity;
 import com.example.itstore.activity.EditProfileActivity;
 import com.example.itstore.activity.LoginActivity;
+import com.example.itstore.activity.NotificationActivity;
+import com.example.itstore.activity.NotificationSettingsActivity;
+import com.example.itstore.activity.OrderHistoryActivity;
 import com.example.itstore.databinding.FragmentProfileBinding;
 import com.example.itstore.utils.SharedPrefsManager;
 import com.example.itstore.viewmodel.ProfileViewModel;
@@ -111,6 +114,21 @@ public class ProfileFragment extends Fragment {
 
             binding.tvAddressInfo.setOnClickListener(v -> {
                 Intent intent = new Intent(requireContext(), AddressActivity.class);
+                startActivity(intent);
+            });
+
+            binding.tvNotificationSettings.setOnClickListener(v -> {
+                Intent intent = new Intent(requireContext(), NotificationSettingsActivity.class);
+                startActivity(intent);
+            });
+
+            binding.tvOrders.setOnClickListener( v -> {
+                Intent intent = new Intent(requireContext(), OrderHistoryActivity.class);
+                startActivity(intent);
+            });
+
+            binding.btnNotification.setOnClickListener(v -> {
+                Intent intent = new Intent(requireContext(), NotificationActivity.class);
                 startActivity(intent);
             });
         }
