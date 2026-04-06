@@ -32,7 +32,7 @@ public class CategoryProductFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        homeViewModel = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
         if (getArguments() != null) {
             selectedCategoryId = getArguments().getString("CATEGORY_ID", "all");
             String categoryName = getArguments().getString("CATEGORY_NAME", "Danh mục");

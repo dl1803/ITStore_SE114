@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
             NavigationUI.setupWithNavController(binding.bottomNavigation, navController);
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            if (destination.getId() == R.id.nav_search) {
+            if (destination.getId() == R.id.nav_search || destination.getId() == R.id.nav_product_detail) {
                 binding.bottomNavigation.setVisibility(View.GONE);
             } else {
                 binding.bottomNavigation.setVisibility(View.VISIBLE);
@@ -61,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
             String destination = intent.getStringExtra("navigate_to");
             if ("cart".equals(destination)) {
                 binding.bottomNavigation.setSelectedItemId(R.id.nav_cart);
+            } else if ("favorite".equals(destination)){
+                binding.bottomNavigation.equals(destination);
             }
         }
     }

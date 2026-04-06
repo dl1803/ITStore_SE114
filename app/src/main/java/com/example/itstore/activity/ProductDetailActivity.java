@@ -4,22 +4,27 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.example.itstore.R;
 import com.example.itstore.databinding.ActivityProductDetailBinding;
 import com.example.itstore.adapter.ImagePagerAdapter;
 import com.example.itstore.model.CartItem;
 import com.example.itstore.model.Product;
 import com.example.itstore.utils.CartManager;
+import com.example.itstore.viewmodel.HomeViewModel;
 import com.example.itstore.viewmodel.ProductDetailViewModel;
 public class ProductDetailActivity extends AppCompatActivity {
     private ActivityProductDetailBinding binding;
     private Product currentProduct;
+    private HomeViewModel homeViewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         binding = ActivityProductDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         // 1. Hứng dữ liệu từ trang chủ
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("PRODUCT_INFO")) {
@@ -76,6 +81,13 @@ public class ProductDetailActivity extends AppCompatActivity {
         });
         binding.ivCart.setOnClickListener(v -> {
             goToCartScreen();
+        });
+        binding.imgFavoriteItem.setOnClickListener(v->{
+            if (currentProduct != null && homeViewModel != null) { // Chốt chặn an toàn
+                currentProduct.setFavorite(true);
+                homeViewModel.updateProduct(currentProduct);
+                Toast.makeText(this, "Đã thêm vào danh sách yêu thích", Toast.LENGTH_SHORT).show();
+            }
         });
     }
     private void goToCartScreen() {

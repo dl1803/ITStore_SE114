@@ -11,36 +11,53 @@ import com.example.itstore.model.Product;
 import com.example.itstore.model.ProductImage;
 import com.example.itstore.model.ProductVariant;
 
-public class HomeViewModel extends ViewModel{
+public class HomeViewModel extends ViewModel {
     private final MutableLiveData<List<Category>> categoryListLiveData = new MutableLiveData<>();
     private final MutableLiveData<List<Product>> productListLiveData = new MutableLiveData<>();
-    private List<Product> allProductsBackup = new ArrayList<>();
-    public HomeViewModel () {
-        allProductsBackup = MockDataRepository.getInstance().getAllProducts();
-        List<Category> allCategories = MockDataRepository.getInstance().getAllCategories();
+    private List<Product> allProducts = new ArrayList<>();
+    public HomeViewModel() {
+        allProducts = MockDataRepository.getInstance().getAllProducts();
         categoryListLiveData.setValue(MockDataRepository.getInstance().getAllCategories());
-        productListLiveData.setValue(MockDataRepository.getInstance().getAllProducts());
+        productListLiveData.setValue(new ArrayList<>(allProducts)); // Gán bản sao vào LiveData
     }
-
     public MutableLiveData<List<Category>> getCategoryListLiveData() {
         return categoryListLiveData;
     }
-
     public MutableLiveData<List<Product>> getProductListLiveData() {
         return productListLiveData;
     }
+    public void updateProduct(Product updatedProduct) {
+        for (int i = 0; i < allProducts.size(); i++) {
+            if (allProducts.get(i).getId() == updatedProduct.getId()) {
+                allProducts.set(i, updatedProduct);
+                break;
+            }
+        }
+        List<Product> currentDisplayList = productListLiveData.getValue();
+        if (currentDisplayList != null) {
+            for (int i = 0; i < currentDisplayList.size(); i++) {
+                if (currentDisplayList.get(i).getId() == updatedProduct.getId()) {
+                    currentDisplayList.set(i, updatedProduct);
+                    break;
+                }
+            }
+            productListLiveData.setValue(new ArrayList<>(currentDisplayList));
+        }
+    }
+
     public void filterByCategory(int categoryId) {
         if (categoryId == -1) {
-            productListLiveData.setValue(allProductsBackup);
+            productListLiveData.setValue(new ArrayList<>(allProducts));
             return;
         }
         List<Product> filteredList = new ArrayList<>();
-        for (Product item : allProductsBackup) {
+        for (Product item : allProducts) {
             if (item.getCategoryId() == categoryId) {
                 filteredList.add(item);
             }
         }
         productListLiveData.setValue(filteredList);
     }
-
 }
+
+

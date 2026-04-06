@@ -9,6 +9,7 @@ public class Product implements Serializable {
     private String description;
     private List<ProductVariant> variants;
     private List<ProductImage> images;
+    private boolean isFavorite = false;
 
     public Product(int id, int categoryId, String name, String description, List<ProductVariant> variants, List<ProductImage> images) {
         this.id = id;
@@ -41,6 +42,14 @@ public class Product implements Serializable {
 
     public List<ProductImage> getImages() {
         return images;
+    }
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
     }
 
     public double getPrice() {

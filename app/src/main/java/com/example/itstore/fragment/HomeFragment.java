@@ -49,7 +49,7 @@ public class HomeFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        homeViewModel = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
         layoutIndicators = binding.layoutIndicators;
@@ -127,6 +127,7 @@ public class HomeFragment extends Fragment {
         binding.layoutSearchBar.setOnClickListener(v -> {
             androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_search);
         });
+
         return view;
 
     }

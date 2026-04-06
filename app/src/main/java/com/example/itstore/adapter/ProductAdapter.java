@@ -2,10 +2,13 @@ package com.example.itstore.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.itstore.R;
 import com.example.itstore.databinding.ItemProductBinding;
 import com.example.itstore.activity.ProductDetailActivity;
 import com.example.itstore.model.Product;
@@ -30,10 +33,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         holder.binding.tvName.setText(product.getName());
         holder.binding.tvPrice.setText(String.format(java.util.Locale.US, "%,.0f VNĐ", product.getPrice()));
         holder.binding.imgProduct.setImageURI(Uri.parse(product.getImageUrl()));
-        holder.binding.getRoot().setOnClickListener(v -> {
-            Intent intent = new Intent(context, ProductDetailActivity.class);
-            intent.putExtra("PRODUCT_INFO", product);
-            context.startActivity(intent);
+        holder.itemView.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("PRODUCT_INFO", product);
+            androidx.navigation.Navigation.findNavController(v)
+                    .navigate(R.id.nav_product_detail, bundle);
         });
     }
     @Override
