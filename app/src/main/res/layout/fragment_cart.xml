@@ -144,7 +144,9 @@
                     android:src="@drawable/ic_forward"
                     app:tint="#A0A0A0"
                     app:layout_constraintRight_toRightOf="parent"
-                    />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                     />
 
                 <TextView
                     android:layout_width="wrap_content"
