@@ -27,6 +27,8 @@ public class OrderHistoryActivity extends AppCompatActivity {
         binding = ActivityOrderHistoryBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        binding.btnBack.setOnClickListener( v -> finish());
+
         OrderPagerAdapter pagerAdapter = new OrderPagerAdapter(this);
         binding.viewListOrders.setAdapter(pagerAdapter);
 
