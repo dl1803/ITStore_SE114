@@ -1,5 +1,6 @@
 package com.example.itstore.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.itstore.activity.CheckoutActivity;
 import com.example.itstore.adapter.CartAdapter;
 import com.example.itstore.databinding.FragmentCartBinding;
 import com.example.itstore.model.CartItem;
@@ -40,8 +42,26 @@ public class CartFragment extends Fragment {
         binding.ivBack.setOnClickListener(v -> {
             Navigation.findNavController(v).navigateUp();
         });
+        // SỬA TRONG FILE: fragment/CartFragment.java
+
         binding.btnCheckout.setOnClickListener(v -> {
-            Toast.makeText(requireContext(), "Tính năng Thanh toán đang phát triển!", Toast.LENGTH_SHORT).show();
+            List<CartItem> itemsToBuy = new ArrayList<>();
+            List<CartItem> currentCart = cartViewModel.getCartItems().getValue();
+
+            if (currentCart != null) {
+                for (CartItem item : currentCart) {
+                    if (item.isSelected()) {
+                        itemsToBuy.add(item);
+                    }
+                }
+            }
+            if (itemsToBuy.isEmpty()) {
+                Toast.makeText(requireContext(), "Bạn chưa chọn sản phẩm nào để mua!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            CartManager.getInstance().setCheckoutList(itemsToBuy);
+            Intent intent = new Intent(requireActivity(), CheckoutActivity.class);
+            startActivity(intent);
         });
 
         binding.cbBuyAll.setOnClickListener(v -> {

@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -40,6 +42,7 @@ public class ProductDetailFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         homeViewModel = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
         detailViewModel = new ViewModelProvider(this).get(ProductDetailViewModel.class);
+
         if (getArguments() != null) {
             currentProduct = (Product) getArguments().getSerializable("PRODUCT_INFO");
         }

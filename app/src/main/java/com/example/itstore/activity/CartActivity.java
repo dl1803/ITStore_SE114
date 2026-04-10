@@ -1,4 +1,5 @@
 package com.example.itstore.activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,12 +22,34 @@ public class CartActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         binding = ActivityCartBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
         cartViewModel = new ViewModelProvider(this).get(CartViewModel.class);
         setupRecyclerView();
         observeViewModel();
+
         binding.ivBack.setOnClickListener(v -> finish());
         binding.btnCheckout.setOnClickListener(v -> {
-            Toast.makeText(this, "Tính năng Thanh toán đang phát triển!", Toast.LENGTH_SHORT).show();
+            List<CartItem> itemsToBuy = new ArrayList<>();
+
+            List<CartItem> currentCart = cartViewModel.getCartItems().getValue();
+
+            if (currentCart != null) {
+                for (CartItem item : currentCart) {
+                    if (item.isSelected()){
+                        itemsToBuy.add(item);
+                    }
+                }
+            }
+
+            if (itemsToBuy.isEmpty()){
+                Toast.makeText(this, "Bạn chưa chọn sản phẩm nào để mua!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            CartManager.getInstance().setCheckoutList(itemsToBuy);
+
+            Intent intent = new Intent(this, CheckoutActivity.class);
+            startActivity(intent);
         });
 
         binding.cbBuyAll.setOnCheckedChangeListener((buttonView, isChecked) -> {

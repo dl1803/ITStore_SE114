@@ -6,8 +6,12 @@ public class CartManager {
     private static CartManager instance;
     private List<CartItem> cartList;
 
+    private List<CartItem> checkoutList;
+
     private CartManager() {
+
         cartList = new ArrayList<>();
+        checkoutList = new ArrayList<>();
     }
 
     public static CartManager getInstance() {
@@ -33,5 +37,13 @@ public class CartManager {
         if (!isExist) {
             cartList.add(newItem);
         }
+    }
+
+    public void setCheckoutList(List<CartItem> items) {
+        this.checkoutList = items;
+    };
+
+    public List<CartItem> getCheckoutList() {
+        return checkoutList;
     }
 }

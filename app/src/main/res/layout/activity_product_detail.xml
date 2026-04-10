@@ -76,6 +76,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/nsvProductDetail"
         android:background="@color/gray_background">
     </androidx.viewpager2.widget.ViewPager2>
 
@@ -94,13 +95,14 @@
     </TextView>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nsvProductDetail"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@drawable/bottom_sheet"
         app:layout_constraintTop_toBottomOf="@id/imgProductDetail"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/layoutBuying"
         >
         <LinearLayout
             android:layout_height="wrap_content"
@@ -500,46 +502,48 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:elevation="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:paddingBottom="20dp"
+        >
 
         <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#808080"/>
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E0E0E0"/>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="70dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:background="@color/white"
-            android:elevation="10dp"
-            android:padding="10dp"
-            app:layout_constraintBottom_toBottomOf="parent">
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp">
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnAddToCart"
-                android:text="Thêm vào giỏ"
-                android:background="@drawable/rounded_box"
-                android:backgroundTint="@color/orange_primary"
-                android:textColor="@color/white"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:layout_marginLeft="10dp"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"/>
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:text="Mua ngay"
-                android:background="@drawable/rounded_box"
-                android:backgroundTint="@color/orange_primary"
-                android:textColor="@color/white"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:layout_marginLeft="10dp"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"/>
-
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnAddToCart"
+            android:text="Thêm vào giỏ"
+            android:background="@drawable/rounded_box"
+            android:backgroundTint="@color/orange_primary"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="48dp"/>
+        <androidx.appcompat.widget.AppCompatButton
+            android:text="Mua ngay"
+            android:background="@drawable/rounded_box"
+            android:backgroundTint="@color/orange_primary"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="48dp"/>
         </LinearLayout>
     </LinearLayout>
 

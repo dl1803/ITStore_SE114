@@ -16,10 +16,13 @@
         android:padding="16dp"
         >
         <ImageView
+            android:id="@+id/btnBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_arrow_back"
-            app:tint="@color/orange_primary">
+            app:tint="@color/orange_primary"
+            android:padding="8dp"
+            >
             </ImageView>
         <TextView
             android:layout_height="wrap_content"
@@ -27,7 +30,9 @@
             android:text="Thanh toán"
             android:textStyle="bold"
             android:textSize="20dp"
-            android:layout_marginLeft="20dp">
+            android:layout_marginLeft="20dp"
+            android:layout_gravity="center_vertical"
+            >
         </TextView>
     </LinearLayout>
 
@@ -93,6 +98,7 @@
 
 
                     <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvCheckoutItems"
                         android:layout_marginTop="8dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
