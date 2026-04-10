@@ -8,11 +8,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.itstore.R;
+import com.example.itstore.adapter.CheckoutAdapter;
 import com.example.itstore.databinding.ActivityCheckoutBinding;
 import com.example.itstore.model.CartItem;
 import com.example.itstore.utils.CartManager;
+import com.example.itstore.viewmodel.CheckoutViewModel;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -20,8 +24,8 @@ import java.util.List;
 public class CheckoutActivity extends AppCompatActivity {
 
     ActivityCheckoutBinding binding;
-    private double totalGoodsPrice = 0;
-    private double shippingFee = 30000;
+    private CheckoutViewModel checkoutViewModel;
+    private CheckoutAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,12 +37,15 @@ public class CheckoutActivity extends AppCompatActivity {
 
         binding.btnBack.setOnClickListener(v -> finish());
 
+        checkoutViewModel = new ViewModelProvider(this).get(CheckoutViewModel.class);
+        binding.rvCheckoutItems.setLayoutManager(new LinearLayoutManager(this));
 
+        observeViewModel();
         
         List<CartItem> receivedItems = CartManager.getInstance().getCheckoutList();
 
         if (receivedItems != null && !receivedItems.isEmpty()) {
-            calculateAndDisplayPrice(receivedItems);
+            checkoutViewModel.loadCheckoutData(receivedItems);
         } else {
             Toast.makeText(this, "Lỗi: Không tìm thấy sản phẩm nào!", Toast.LENGTH_SHORT).show();
             finish();
@@ -49,31 +56,34 @@ public class CheckoutActivity extends AppCompatActivity {
             if (binding.rbMomo.isChecked()) paymentMethod = "MOMO";
             if (binding.rbBankTransfer.isChecked()) paymentMethod = "BANK";
 
-            Toast.makeText(this, "Chốt đơn! Tổng: " + formatMoney(totalGoodsPrice + shippingFee)
-                    + " | Trả bằng: " + paymentMethod, Toast.LENGTH_LONG).show();
+            double finalTotal = checkoutViewModel.getFinalTotalPrice().getValue() != null
+                    ? checkoutViewModel.getFinalTotalPrice().getValue() : 0;
+
+            Toast.makeText(this, "Chốt đơn: " + String.format("%,.0f đ", finalTotal)
+                    + " | Qua: " + paymentMethod, Toast.LENGTH_LONG).show();
         });
     }
 
-    private void calculateAndDisplayPrice(List<CartItem> items) {
-        totalGoodsPrice = 0;
+    private void observeViewModel() {
+        checkoutViewModel.getCheckoutItems().observe(this, items -> {
+            adapter = new CheckoutAdapter(items);
+            binding.rvCheckoutItems.setAdapter(adapter);
+            binding.rvCheckoutItems.setNestedScrollingEnabled(false);
+        });
 
-        for (CartItem item : items) {
-            totalGoodsPrice += (item.getPrice() * item.getQuantity());
-        }
+        checkoutViewModel.getSubtotalPrice().observe(this, price ->
+                binding.tvSubtotalPrice.setText(String.format("%,.0f đ", price)));
 
-        double finalTotal = totalGoodsPrice + shippingFee;
+        checkoutViewModel.getShippingFee().observe(this, fee ->
+                binding.tvShippingPrice.setText(String.format("%,.0f đ", fee)));
 
-        binding.tvSubtotalPrice.setText(formatMoney(totalGoodsPrice));
-        binding.tvShippingPrice.setText(formatMoney(shippingFee));
+        checkoutViewModel.getTotalDiscount().observe(this, discount ->
+                binding.tvDiscount.setText(String.format("%,.0f đ", discount)));
 
-        binding.tvTotalPrice.setText(formatMoney(finalTotal));
-        binding.tvTotal.setText(formatMoney(finalTotal));
-
-        binding.tvDiscount.setText("0 đ");
-    }
-
-    private String formatMoney(double amount) {
-        DecimalFormat formatter = new DecimalFormat("###,###,###");
-        return formatter.format(amount) + " đ";
+        checkoutViewModel.getFinalTotalPrice().observe(this, finalTotal -> {
+            String formattedTotal = String.format("%,.0f đ", finalTotal);
+            binding.tvTotalPrice.setText(formattedTotal);
+            binding.tvTotal.setText(formattedTotal);
+        });
     }
 }
