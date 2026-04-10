@@ -12,24 +12,23 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         >
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="140dp">
 
             <ImageView
                 android:id="@+id/imgProduct"
                 android:layout_width="match_parent"
-                android:layout_height="140dp"
+                android:layout_height="match_parent"
                 android:src="@drawable/ram1"
                 android:scaleType="fitCenter"
                 android:padding="6dp"
                 android:background="@color/white"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
@@ -55,7 +54,8 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:orientation="vertical"
             android:padding="10dp"
             android:background="@color/orange_light">
@@ -69,8 +69,9 @@
                 android:textColor="@color/black"
                 android:textStyle="normal"
                 android:maxLines="2"
+                android:minLines="2"
                 android:ellipsize="end"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="10dp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -86,7 +87,8 @@
                     android:text="1.200.000 đ"
                     android:textSize="15sp"
                     android:textColor="@color/red_price"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold"
+                    />
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/btnAddToCart"
