@@ -18,7 +18,7 @@ public class HomeViewModel extends ViewModel {
     public HomeViewModel() {
         allProducts = MockDataRepository.getInstance().getAllProducts();
         categoryListLiveData.setValue(MockDataRepository.getInstance().getAllCategories());
-        productListLiveData.setValue(new ArrayList<>(allProducts)); // Gán bản sao vào LiveData
+        productListLiveData.setValue(new ArrayList<>(allProducts));
     }
     public MutableLiveData<List<Category>> getCategoryListLiveData() {
         return categoryListLiveData;

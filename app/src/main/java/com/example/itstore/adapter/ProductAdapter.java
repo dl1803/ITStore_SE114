@@ -1,5 +1,6 @@
 package com.example.itstore.adapter;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,10 +15,21 @@ import java.util.List;
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder>{
     private Context context;
     private List<Product> productList;
+    private OnProductClickListener listener;
+    public interface OnProductClickListener {
+        void onProductClick(Product product);
+    }
     public ProductAdapter(Context context, List<Product> productList) {
         this.context = context;
         this.productList = productList;
     }
+
+    public ProductAdapter(Context context, List<Product> productList, OnProductClickListener listener) {
+        this.context = context;
+        this.productList = productList;
+        this.listener = listener;
+    }
+
     @NonNull
     @Override
     public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -32,10 +44,13 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         holder.binding.tvPrice.setText(String.format(java.util.Locale.US, "%,.0f VNĐ", product.getPrice()));
         holder.binding.imgProduct.setImageURI(Uri.parse(product.getImageUrl()));
         holder.itemView.setOnClickListener(v -> {
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("PRODUCT_INFO", product);
-            androidx.navigation.Navigation.findNavController(v)
-                    .navigate(R.id.nav_product_detail, bundle);
+            if (listener != null) {
+                listener.onProductClick(product);
+            } else {
+                Intent intent = new android.content.Intent(context, com.example.itstore.activity.ProductDetailActivity.class);
+                intent.putExtra("PRODUCT_INFO", product);
+                context.startActivity(intent);
+            }
         });
     }
     @Override

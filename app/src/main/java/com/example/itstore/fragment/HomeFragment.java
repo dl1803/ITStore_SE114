@@ -1,5 +1,6 @@
 package com.example.itstore.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -24,6 +25,7 @@ import com.example.itstore.adapter.CategoryAdapter;
 import com.example.itstore.adapter.ProductAdapter;
 import com.example.itstore.databinding.FragmentHomeBinding;
 import com.example.itstore.model.Category;
+import com.example.itstore.model.Product;
 import com.example.itstore.viewmodel.HomeViewModel;
 
 import java.util.ArrayList;
@@ -43,6 +45,18 @@ public class HomeFragment extends Fragment {
     private Runnable runBanner;
 
     private LinearLayout layoutIndicators;
+    private final androidx.activity.result.ActivityResultLauncher<Intent> detailLauncher =
+            registerForActivityResult(
+                    new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == android.app.Activity.RESULT_OK && result.getData() != null) {
+                            Product updatedProduct = (Product) result.getData().getSerializableExtra("UPDATED_PRODUCT");
+                            if (updatedProduct != null && homeViewModel != null) {
+                                homeViewModel.updateProduct(updatedProduct);
+                            }
+                        }
+                    }
+            );
 
     @Nullable
     @Override
@@ -104,7 +118,14 @@ public class HomeFragment extends Fragment {
         rcvProducts = binding.recyclerProduct;
         rcvProducts.setLayoutManager(new GridLayoutManager(requireContext(), 2));
         homeViewModel.getProductListLiveData().observe(getViewLifecycleOwner(), products -> {
-            productAdapter = new ProductAdapter(requireContext(), products);
+            productAdapter = new ProductAdapter(requireContext(), products, new ProductAdapter.OnProductClickListener() {
+                @Override
+                public void onProductClick(Product product) {
+                    Intent intent = new Intent(requireContext(), com.example.itstore.activity.ProductDetailActivity.class);
+                    intent.putExtra("PRODUCT_INFO", product);
+                    detailLauncher.launch(intent);
+                }
+            });
             rcvProducts.setAdapter(productAdapter);
         });
 
