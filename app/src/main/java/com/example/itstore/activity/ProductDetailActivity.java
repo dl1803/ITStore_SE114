@@ -4,100 +4,116 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.core.content.ContextCompat;
 
 import com.example.itstore.R;
 import com.example.itstore.databinding.ActivityProductDetailBinding;
 import com.example.itstore.adapter.ImagePagerAdapter;
-import com.example.itstore.model.CartItem;
 import com.example.itstore.model.Product;
-import com.example.itstore.utils.CartManager;
-import com.example.itstore.viewmodel.HomeViewModel;
 import com.example.itstore.viewmodel.ProductDetailViewModel;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 public class ProductDetailActivity extends AppCompatActivity {
     private ActivityProductDetailBinding binding;
     private Product currentProduct;
-    private HomeViewModel homeViewModel;
+    private ProductDetailViewModel detailViewModel;
+    private int currentVariantId = 1;
+    private String currentRam = "8GB";
+    private double currentFinalPrice;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         binding = ActivityProductDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-        // 1. Hứng dữ liệu từ trang chủ
+        detailViewModel = new androidx.lifecycle.ViewModelProvider(this).get(ProductDetailViewModel.class);
+
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("PRODUCT_INFO")) {
             currentProduct = (Product) intent.getSerializableExtra("PRODUCT_INFO");
         }
+
         if (currentProduct == null) {
-            android.widget.Toast.makeText(this, "Lỗi: Không tải được thông tin sản phẩm!", android.widget.Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Lỗi: Không tải được thông tin sản phẩm!", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
-        // 2. Khởi tạo ViewModel và biến theo dõi giỏ hàng
-        ProductDetailViewModel viewModel = new androidx.lifecycle.ViewModelProvider(this).get(ProductDetailViewModel.class);
-        final int[] selectedVariantId = {1};
-        final String[] selectedRam = {"8GB"};
+
         double basePrice = currentProduct.getPrice();
         double baseOldPrice = currentProduct.getCompareAtPrice();
-        final double[] currentFinalPrice = {basePrice};
-        // 3. Ánh xạ view và đổ dữ liệu
+        currentFinalPrice = basePrice;
+
         binding.tvPriceOld.setPaintFlags(binding.tvPriceOld.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
         binding.tvProductName.setText(currentProduct.getName());
-        updatePriceDisplay(currentProduct.getPrice(), currentProduct.getCompareAtPrice());
-        // 4. Load hình ảnh mẫu
-        java.util.List<Integer> listImages = new java.util.ArrayList<>();
+        updatePriceDisplay(basePrice, baseOldPrice);
+
+        List<Integer> listImages = new ArrayList<>();
         listImages.add(R.drawable.ram1);
         ImagePagerAdapter imageAdapter = new ImagePagerAdapter(listImages);
         binding.imgProductDetail.setAdapter(imageAdapter);
-        // Nút Back
+
+        updateFavoriteIcon(currentProduct.isFavorite());
+
         binding.ivBack.setOnClickListener(v -> finish());
-        // 5. Xử lý chọn cấu hình
+
         binding.cardChoice1.setOnClickListener(v -> {
             binding.cardChoice1.setBackgroundResource(R.color.orange_primary);
-            binding.cardChoice1.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.white));
+            binding.cardChoice1.setTextColor(ContextCompat.getColor(this, R.color.white));
             binding.cardChoice2.setBackgroundResource(android.R.color.transparent);
-            binding.cardChoice2.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.dark_gray));
+            binding.cardChoice2.setTextColor(ContextCompat.getColor(this, R.color.dark_gray));
             updatePriceDisplay(basePrice, baseOldPrice);
-            selectedVariantId[0] = 1;
-            selectedRam[0] = "8GB";
-            currentFinalPrice[0] = basePrice;
+            currentVariantId = 1;
+            currentRam = "8GB";
+            currentFinalPrice = basePrice;
         });
+
         binding.cardChoice2.setOnClickListener(v -> {
             binding.cardChoice2.setBackgroundResource(R.color.orange_primary);
-            binding.cardChoice2.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.white));
+            binding.cardChoice2.setTextColor(ContextCompat.getColor(this, R.color.white));
             binding.cardChoice1.setBackgroundResource(android.R.color.transparent);
-            binding.cardChoice1.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.dark_gray));
+            binding.cardChoice1.setTextColor(ContextCompat.getColor(this, R.color.dark_gray));
             updatePriceDisplay(basePrice + 500000, baseOldPrice + 500000);
-            selectedVariantId[0] = 2;
-            selectedRam[0] = "16GB";
-            currentFinalPrice[0] = basePrice + 500000;
+            currentVariantId = 2;
+            currentRam = "16GB";
+            currentFinalPrice = basePrice + 500000;
         });
-        // 6. Nút thêm vào giỏ hàng
+
         binding.btnAddToCart.setOnClickListener(v -> {
-            viewModel.addToCart(currentProduct, selectedVariantId[0], selectedRam[0], currentFinalPrice[0]);
-            android.widget.Toast.makeText(ProductDetailActivity.this, "Đã thêm vào giỏ hàng!", android.widget.Toast.LENGTH_SHORT).show();
+            detailViewModel.addToCart(currentProduct, currentVariantId, currentRam, currentFinalPrice);
+            Toast.makeText(ProductDetailActivity.this, "Đã thêm bản " + currentRam + " vào giỏ!", Toast.LENGTH_SHORT).show();
         });
-        binding.ivCart.setOnClickListener(v -> {
-            goToCartScreen();
-        });
-        binding.imgFavoriteItem.setOnClickListener(v->{
-            if (currentProduct != null && homeViewModel != null) { // Chốt chặn an toàn
-                currentProduct.setFavorite(true);
-                homeViewModel.updateProduct(currentProduct);
-                Toast.makeText(this, "Đã thêm vào danh sách yêu thích", Toast.LENGTH_SHORT).show();
-            }
+
+        binding.ivCart.setOnClickListener(v -> goToCartScreen());
+
+        binding.imgFavoriteItem.setOnClickListener(v -> {
+            boolean newStatus = !currentProduct.isFavorite();
+            currentProduct.setFavorite(newStatus);
+            updateFavoriteIcon(newStatus);
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("UPDATED_PRODUCT", currentProduct);
+            setResult(RESULT_OK, returnIntent);
+
+            Toast.makeText(this, newStatus ? "Đã thêm vào yêu thích" : "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show();
         });
     }
+
+    private void updateFavoriteIcon(boolean isFav) {
+        int color = isFav ? android.graphics.Color.parseColor("#FF9800") : android.graphics.Color.parseColor("#B3B3B3");
+        binding.imgFavoriteItem.setColorFilter(color);
+    }
+
     private void goToCartScreen() {
-        android.content.Intent intent = new android.content.Intent(ProductDetailActivity.this, MainActivity.class);
+        Intent intent = new Intent(ProductDetailActivity.this, MainActivity.class);
         intent.putExtra("navigate_to", "cart");
-        intent.setFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP | android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
     }
+
     private void updatePriceDisplay(double newPrice, double oldPrice) {
-        binding.tvPriceNew.setText(String.format(java.util.Locale.US, "%,.0f VNĐ", newPrice));
-        binding.tvPriceOld.setText(String.format(java.util.Locale.US, "%,.0f VNĐ", oldPrice));
+        binding.tvPriceNew.setText(String.format(Locale.US, "%,.0f VNĐ", newPrice));
+        binding.tvPriceOld.setText(String.format(Locale.US, "%,.0f VNĐ", oldPrice));
     }
 }

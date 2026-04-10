@@ -9,9 +9,6 @@
     android:name="com.example.itstore.fragment.HomeFragment"
     tools:layout="@layout/fragment_home" >
         <action
-            android:id="@+id/action_nav_home_to_nav_product_detail"
-            app:destination="@id/nav_product_detail" />
-        <action
             android:id="@+id/action_nav_home_to_nav_favorite"
             app:destination="@id/nav_favorite" />
         <action
@@ -32,11 +29,7 @@
     <fragment
         android:id="@+id/nav_cart"
         android:name="com.example.itstore.fragment.CartFragment"
-        tools:layout="@layout/fragment_cart" >
-        <action
-            android:id="@+id/action_nav_cart_to_nav_product_detail"
-            app:destination="@id/nav_product_detail" />
-    </fragment>
+        tools:layout="@layout/fragment_cart" />
     <fragment
         android:id="@+id/nav_search"
         android:name="com.example.itstore.fragment.SearchFragment"
@@ -58,11 +51,6 @@
         tools:layout="@layout/fragment_favorite">
 
     </fragment>
-    <fragment
-        android:id="@+id/nav_product_detail"
-        android:name="com.example.itstore.fragment.ProductDetailFragment"
-        android:label="ProductDetailFragment"
-        tools:layout="@layout/fragment_product_detail"/>
 
 
 </navigation>

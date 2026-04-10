@@ -1,7 +1,6 @@
 package com.example.itstore.fragment;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,10 +18,8 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 
 import com.example.itstore.R;
-import com.example.itstore.activity.ProductDetailActivity;
 import com.example.itstore.adapter.ProductAdapter;
 import com.example.itstore.databinding.FragmentSearchBinding;
-import com.example.itstore.model.Product;
 import com.example.itstore.viewmodel.SearchViewModel;
 import com.google.android.material.chip.Chip;
 
