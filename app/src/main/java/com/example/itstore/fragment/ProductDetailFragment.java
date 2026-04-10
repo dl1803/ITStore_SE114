@@ -5,8 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -27,6 +29,9 @@ public class ProductDetailFragment extends Fragment {
     private Product currentProduct;
     private HomeViewModel homeViewModel;
     private ProductDetailViewModel detailViewModel;
+    private int currentVariantId = 1;
+    private String currentRam = "8GB";
+    private double currentFinalPrice;
 
     @Nullable
     @Override
@@ -34,7 +39,6 @@ public class ProductDetailFragment extends Fragment {
         binding = FragmentProductDetailBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -48,54 +52,56 @@ public class ProductDetailFragment extends Fragment {
             Navigation.findNavController(view).popBackStack();
             return;
         }
-        binding.btnAddToCart.setVisibility(View.VISIBLE);
-        binding.btnBuyNow.setVisibility(View.VISIBLE);
-        setupUI();
-        setupEventListeners();
-    }
-
-    private void setupUI() {
+        double basePrice = currentProduct.getPrice();
+        double baseOldPrice = currentProduct.getCompareAtPrice();
+        currentFinalPrice = basePrice;
         binding.tvPriceOld.setPaintFlags(binding.tvPriceOld.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
         binding.tvProductName.setText(currentProduct.getName());
-        updatePriceDisplay(currentProduct.getPrice(), currentProduct.getCompareAtPrice());
+        updatePriceDisplay(basePrice, baseOldPrice);
         List<Integer> listImages = new ArrayList<>();
         listImages.add(R.drawable.ram1);
         ImagePagerAdapter imageAdapter = new ImagePagerAdapter(listImages);
         binding.imgProductDetail.setAdapter(imageAdapter);
         updateFavoriteIcon(currentProduct.isFavorite());
-    }
 
-    private void setupEventListeners() {
         binding.ivBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
+
+        binding.ivCart.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.nav_cart));
+
         binding.cardChoice1.setOnClickListener(v -> {
-            updateChoiceUI(true);
-            updatePriceDisplay(currentProduct.getPrice(), currentProduct.getCompareAtPrice());
+            binding.cardChoice1.setBackgroundResource(R.color.orange_primary);
+            binding.cardChoice1.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
+            binding.cardChoice2.setBackgroundResource(android.R.color.transparent);
+            binding.cardChoice2.setTextColor(ContextCompat.getColor(requireContext(), R.color.dark_gray));
+            updatePriceDisplay(basePrice, baseOldPrice);
+            currentVariantId = 1;
+            currentRam = "8GB";
+            currentFinalPrice = basePrice;
         });
+
         binding.cardChoice2.setOnClickListener(v -> {
-            updateChoiceUI(false);
-            updatePriceDisplay(currentProduct.getPrice() + 500000, currentProduct.getCompareAtPrice() + 500000);
+            binding.cardChoice2.setBackgroundResource(R.color.orange_primary);
+            binding.cardChoice2.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
+            binding.cardChoice1.setBackgroundResource(android.R.color.transparent);
+            binding.cardChoice1.setTextColor(ContextCompat.getColor(requireContext(), R.color.dark_gray));
+            updatePriceDisplay(basePrice + 500000, baseOldPrice + 500000);
+            currentVariantId = 2;
+            currentRam = "16GB";
+            currentFinalPrice = basePrice + 500000;
         });
+
         binding.btnAddToCart.setOnClickListener(v -> {
-            detailViewModel.addToCart(currentProduct, 1, "8GB", currentProduct.getPrice());
-            Toast.makeText(requireContext(), "Đã thêm vào giỏ hàng!", Toast.LENGTH_SHORT).show();
+            detailViewModel.addToCart(currentProduct, currentVariantId, currentRam, currentFinalPrice);
+            Toast.makeText(requireContext(), "Đã thêm bản " + currentRam + " vào giỏ hàng!", Toast.LENGTH_SHORT).show();
         });
+
         binding.imgFavoriteItem.setOnClickListener(v -> {
             boolean newStatus = !currentProduct.isFavorite();
             currentProduct.setFavorite(newStatus);
             homeViewModel.updateProduct(currentProduct);
             updateFavoriteIcon(newStatus);
-            String msg = newStatus ? "Đã thêm vào yêu thích" : "Đã xóa khỏi yêu thích";
-            Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), newStatus ? "Đã thêm vào danh sách yêu thích" : "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show();
         });
-    }
-    private void updateChoiceUI(boolean isChoice1) {
-        int orange = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.orange_primary);
-        int white = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.white);
-        int gray = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.dark_gray);
-        binding.cardChoice1.setBackgroundResource(isChoice1 ? R.color.orange_primary : android.R.color.transparent);
-        binding.cardChoice1.setTextColor(isChoice1 ? white : gray);
-        binding.cardChoice2.setBackgroundResource(!isChoice1 ? R.color.orange_primary : android.R.color.transparent);
-        binding.cardChoice2.setTextColor(!isChoice1 ? white : gray);
     }
 
     private void updateFavoriteIcon(boolean isFav) {

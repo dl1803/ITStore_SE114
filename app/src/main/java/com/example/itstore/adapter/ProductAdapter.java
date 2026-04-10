@@ -1,6 +1,5 @@
 package com.example.itstore.adapter;
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.itstore.R;
 import com.example.itstore.databinding.ItemProductBinding;
-import com.example.itstore.activity.ProductDetailActivity;
 import com.example.itstore.model.Product;
 import java.util.List;
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder>{

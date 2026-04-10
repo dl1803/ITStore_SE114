@@ -51,6 +51,7 @@ public class CartViewModel extends ViewModel {
             } else {
                 currentList.remove(position);
             }
+            calculateTotal();
             cartItemsLiveData.setValue(currentList);
         }
     }
@@ -68,9 +69,9 @@ public class CartViewModel extends ViewModel {
             for (CartItem item : currentList) {
                 item.setSelected(isSelectAll);
             }
+            calculateTotal();
             cartItemsLiveData.setValue(currentList);
             isAllSelectedLiveData.setValue(isSelectAll);
-            calculateTotal();
         }
     }
     public void checkAllSelectedStatus() {

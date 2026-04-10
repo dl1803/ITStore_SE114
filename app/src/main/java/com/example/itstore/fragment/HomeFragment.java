@@ -1,6 +1,5 @@
 package com.example.itstore.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -20,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.itstore.R;
-import com.example.itstore.activity.CartActivity;
 import com.example.itstore.adapter.BannerAdapter;
 import com.example.itstore.adapter.CategoryAdapter;
 import com.example.itstore.adapter.ProductAdapter;
