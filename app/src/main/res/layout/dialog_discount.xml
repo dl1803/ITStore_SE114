@@ -19,6 +19,7 @@
         app:cardBackgroundColor="@color/orange_light"
         >
         <ImageView
+            android:id="@+id/btnCloseDialog"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:src="@drawable/ic_close"

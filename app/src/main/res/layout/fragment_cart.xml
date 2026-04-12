@@ -111,6 +111,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             >
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutCartDiscount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingVertical="6dp">
@@ -149,6 +150,7 @@
                      />
 
                 <TextView
+                    android:id="@+id/tvCartVoucherCode"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="Nhập mã"
@@ -174,7 +176,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingVertical="12dp"
-                android:layout_marginBottom="20dp"
                 >
                 <CheckBox
                     android:id="@+id/cbBuyAll"
@@ -223,6 +224,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     android:orientation="vertical"
                     android:layout_marginRight="10dp"
+                    android:gravity="end"
                     >
                     <TextView
                         android:layout_width="wrap_content"
@@ -234,7 +236,6 @@
                         android:textSize="16dp"
                         android:layout_marginLeft="8dp">
                     </TextView>
-
                     <TextView
                         android:id="@+id/tvTotalPrice"
                         android:layout_width="wrap_content"
@@ -248,6 +249,16 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintLeft_toRightOf="@id/imgDiscount"
                         app:layout_constraintTop_toTopOf="parent"></TextView>
+
+                    <TextView
+                        android:id="@+id/tvCartDiscount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tiết kiệm: 0đ"
+                        android:textColor="@color/orange_primary"
+                        android:textSize="12sp"
+                        android:visibility="gone">
+                    </TextView>
                 </LinearLayout>
 
 
