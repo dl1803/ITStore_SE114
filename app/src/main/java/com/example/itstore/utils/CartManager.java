@@ -46,4 +46,19 @@ public class CartManager {
     public List<CartItem> getCheckoutList() {
         return checkoutList;
     }
+
+    public void clearPurchasedItems(){
+        if (cartList != null) {
+            for (int i = cartList.size() - 1; i >= 0; i--) {
+                CartItem item = cartList.get(i);
+                if (item.isSelected()) {
+                    cartList.remove(i);
+                }
+            }
+        }
+
+        if (checkoutList != null){
+            checkoutList.clear();
+        }
+    }
 }

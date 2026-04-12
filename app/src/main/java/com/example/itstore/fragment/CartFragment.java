@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -13,13 +16,18 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.itstore.R;
 import com.example.itstore.activity.CheckoutActivity;
 import com.example.itstore.adapter.CartAdapter;
+import com.example.itstore.adapter.DiscountAdapter;
 import com.example.itstore.databinding.FragmentCartBinding;
 import com.example.itstore.model.CartItem;
+import com.example.itstore.model.Discount;
 import com.example.itstore.utils.CartManager;
 import com.example.itstore.viewmodel.CartViewModel;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +35,11 @@ public class CartFragment extends Fragment {
     private FragmentCartBinding binding;
     private CartViewModel cartViewModel;
     private CartAdapter cartAdapter;
+
+    private String selectedVoucherCode = "";
+    private double selectedVoucherAmount = 0;
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -42,7 +55,10 @@ public class CartFragment extends Fragment {
         binding.ivBack.setOnClickListener(v -> {
             Navigation.findNavController(v).navigateUp();
         });
-        // SỬA TRONG FILE: fragment/CartFragment.java
+
+        binding.layoutCartDiscount.setOnClickListener(v -> {
+            showDiscountBottomSheet();
+        });
 
         binding.btnCheckout.setOnClickListener(v -> {
             List<CartItem> itemsToBuy = new ArrayList<>();
@@ -61,6 +77,11 @@ public class CartFragment extends Fragment {
             }
             CartManager.getInstance().setCheckoutList(itemsToBuy);
             Intent intent = new Intent(requireActivity(), CheckoutActivity.class);
+
+            intent.putExtra("VOUCHER_CODE", selectedVoucherCode);
+            intent.putExtra("VOUCHER_AMOUNT", selectedVoucherAmount);
+
+
             startActivity(intent);
         });
 
@@ -119,13 +140,73 @@ public class CartFragment extends Fragment {
             binding.btnCheckout.setText("Mua hàng (" + selectedCount + ")");
         });
 
-        cartViewModel.getTotalPrice().observe(getViewLifecycleOwner(), total -> {
-            binding.tvTotalPrice.setText(String.format(java.util.Locale.US, "%,.0f đ", total));
+        cartViewModel.getTotalPrice().observe(getViewLifecycleOwner(), rawTotal -> {
+            updateTotalPriceUI(rawTotal);
         });
+
         cartViewModel.getIsAllSelectedLiveData().observe(getViewLifecycleOwner(), isAllSelected -> {
             binding.cbBuyAll.setChecked(isAllSelected);
         });
     }
+
+    private void updateTotalPriceUI(double rawTotal) {
+        if (rawTotal == 0) {
+            binding.tvTotalPrice.setText("0 đ");
+            binding.tvCartDiscount.setVisibility(View.GONE);
+            return;
+        }
+
+        double finalTotal = rawTotal - selectedVoucherAmount;
+        if (finalTotal < 0) finalTotal = 0;
+
+        binding.tvTotalPrice.setText(String.format("%,.0f đ", finalTotal));
+
+        if (selectedVoucherAmount > 0) {
+            binding.tvCartDiscount.setVisibility(View.VISIBLE);
+            binding.tvCartDiscount.setText(String.format("Tiết kiệm: -%,.0f đ", selectedVoucherAmount));
+        } else {
+            binding.tvCartDiscount.setVisibility(View.GONE);
+        }
+    }
+
+    private void showDiscountBottomSheet() {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_discount, null);
+        bottomSheetDialog.setContentView(dialogView);
+
+        EditText edtCode = dialogView.findViewById(R.id.edtVoucherCode);
+        Button btnApply = dialogView.findViewById(R.id.btnApplyVoucher);
+        RecyclerView rvDiscounts = dialogView.findViewById(R.id.rvDiscountList);
+        ImageView btnClose = dialogView.findViewById(R.id.btnCloseDialog);
+
+        // Mock Data
+        List<Discount> myVouchers = new ArrayList<>();
+        myVouchers.add(new Discount("UIT_20", "Giảm 20.000đ", "Đơn tối thiểu 150k", "HSD: 31/12/2026", 20000));
+        myVouchers.add(new Discount("UIT_50", "Giảm 50.000đ", "Đơn tối thiểu 500k", "HSD: 31/12/2026", 50000));
+
+        rvDiscounts.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+        DiscountAdapter discountAdapter = new DiscountAdapter(myVouchers, discount -> {
+            selectedVoucherCode = discount.getCode();
+            selectedVoucherAmount = discount.getAmount();
+
+            binding.tvCartVoucherCode.setText(selectedVoucherCode);
+            binding.tvCartVoucherCode.setTextColor(getResources().getColor(R.color.orange_primary));
+
+            double currentTotal = cartViewModel.getTotalPrice().getValue() != null ? cartViewModel.getTotalPrice().getValue() : 0;
+            updateTotalPriceUI(currentTotal);
+
+            Toast.makeText(requireContext(), "Đã lưu mã: " + selectedVoucherCode, Toast.LENGTH_SHORT).show();
+            bottomSheetDialog.dismiss();
+        });
+
+        rvDiscounts.setAdapter(discountAdapter);
+
+        if (btnClose != null) btnClose.setOnClickListener(v -> bottomSheetDialog.dismiss());
+
+        bottomSheetDialog.show();
+    }
+
 
     @Override
     public void onDestroyView() {

@@ -42,4 +42,17 @@ public class CheckoutViewModel extends ViewModel {
         totalDiscount.setValue(discount);
         finalTotalPrice.setValue(finalPrice);
     }
+
+    public void applyDiscount(double discountAmount) {
+        totalDiscount.setValue(discountAmount);
+
+        double subtotal = subtotalPrice.getValue() != null ? subtotalPrice.getValue() : 0;
+        double ship = shippingFee.getValue() != null ? shippingFee.getValue() : 0;
+
+        double finalPrice = (subtotal + ship) - discountAmount;
+
+        if(finalPrice < 0) finalPrice = 0;
+
+        finalTotalPrice.setValue(finalPrice);
+    }
 }
