@@ -1,6 +1,7 @@
 package com.example.itstore.fragment;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +39,8 @@ public class CartFragment extends Fragment {
 
     private String selectedVoucherCode = "";
     private double selectedVoucherAmount = 0;
+
+    private Discount appliedDiscount;
 
 
     @Nullable
@@ -141,12 +144,33 @@ public class CartFragment extends Fragment {
         });
 
         cartViewModel.getTotalPrice().observe(getViewLifecycleOwner(), rawTotal -> {
+
+            validateVoucherWithTotal(rawTotal);
+
             updateTotalPriceUI(rawTotal);
         });
 
         cartViewModel.getIsAllSelectedLiveData().observe(getViewLifecycleOwner(), isAllSelected -> {
             binding.cbBuyAll.setChecked(isAllSelected);
         });
+    }
+
+    // Hàm kiểm tra điều kiện tổng tiền tối thiểu để áp dụng mã giảm giá
+    private void validateVoucherWithTotal(double rawTotal) {
+        if (appliedDiscount != null) {
+
+            if (rawTotal <= 0 || rawTotal < appliedDiscount.getMinOrderValue()) {
+
+                selectedVoucherCode = "";
+                selectedVoucherAmount = 0;
+                appliedDiscount = null;
+
+                binding.tvCartVoucherCode.setText("Chọn hoặc nhập mã");
+                binding.tvCartVoucherCode.setTextColor(Color.parseColor("#888888"));
+
+                Toast.makeText(requireContext(), "Đã gỡ mã do không đủ điều kiện tối thiểu!", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void updateTotalPriceUI(double rawTotal) {
@@ -181,19 +205,33 @@ public class CartFragment extends Fragment {
 
         // Mock Data
         List<Discount> myVouchers = new ArrayList<>();
-        myVouchers.add(new Discount("UIT_20", "Giảm 20.000đ", "Đơn tối thiểu 150k", "HSD: 31/12/2026", 20000));
-        myVouchers.add(new Discount("UIT_50", "Giảm 50.000đ", "Đơn tối thiểu 500k", "HSD: 31/12/2026", 50000));
+        myVouchers.add(new Discount("UIT_20", "Giảm 20.000đ", "Đơn tối thiểu 150k", "HSD: 31/12/2026", 20000, 150000));
+        myVouchers.add(new Discount("UIT_50", "Giảm 50.000đ", "Đơn tối thiểu 500k", "HSD: 31/12/2026", 50000, 500000));
 
         rvDiscounts.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         DiscountAdapter discountAdapter = new DiscountAdapter(myVouchers, discount -> {
+            double currentTotal = cartViewModel.getTotalPrice().getValue() != null ? cartViewModel.getTotalPrice().getValue() : 0;
+
+            if (currentTotal <= 0) {
+                Toast.makeText(requireContext(), "Vui lòng chọn sản phẩm trước khi áp mã!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (currentTotal < discount.getMinOrderValue()) {
+                String requiredAmount = String.format("%,.0f đ", discount.getMinOrderValue());
+                Toast.makeText(requireContext(), "Đơn hàng chưa đạt tối thiểu " + requiredAmount + "!", Toast.LENGTH_LONG).show();
+                return;
+            }
+
             selectedVoucherCode = discount.getCode();
             selectedVoucherAmount = discount.getAmount();
+
+            this.appliedDiscount = discount;
 
             binding.tvCartVoucherCode.setText(selectedVoucherCode);
             binding.tvCartVoucherCode.setTextColor(getResources().getColor(R.color.orange_primary));
 
-            double currentTotal = cartViewModel.getTotalPrice().getValue() != null ? cartViewModel.getTotalPrice().getValue() : 0;
             updateTotalPriceUI(currentTotal);
 
             Toast.makeText(requireContext(), "Đã lưu mã: " + selectedVoucherCode, Toast.LENGTH_SHORT).show();

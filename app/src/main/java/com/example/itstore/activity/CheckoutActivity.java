@@ -82,6 +82,8 @@ public class CheckoutActivity extends AppCompatActivity {
             finish();
         }
 
+        binding.rbCod.setChecked(true);
+
         binding.btnCheckout.setOnClickListener(v -> {
             String paymentMethod = "COD";
             if (binding.rbMomo.isChecked()) paymentMethod = "MOMO";
@@ -165,12 +167,12 @@ public class CheckoutActivity extends AppCompatActivity {
         ImageView btnClose = dialogView.findViewById(R.id.btnCloseDialog);
 
         List<Discount> myVouchers = new ArrayList<>();
-        myVouchers.add(new Discount("UIT_20", "Giảm 20.000đ", "Đơn tối thiểu 150k", "HSD: 31/12/2026", 20000));
-        myVouchers.add(new Discount("UIT_50", "Giảm 50.000đ", "Đơn tối thiểu 500k", "HSD: 31/12/2026", 50000));
+        myVouchers.add(new Discount("UIT_20", "Giảm 20.000đ", "Đơn tối thiểu 150k", "HSD: 31/12/2026", 20000, 150000));
+        myVouchers.add(new Discount("UIT_50", "Giảm 50.000đ", "Đơn tối thiểu 500k", "HSD: 31/12/2026", 50000, 500000));
 
         rvDiscounts.setLayoutManager(new LinearLayoutManager(this));
         DiscountAdapter discountAdapter = new DiscountAdapter(myVouchers, discount -> {
-            applyDiscountToCart(discount.getCode(), discount.getAmount());
+            applyDiscountToCart(discount.getCode(), discount.getAmount(), discount.getMinOrderValue());
             bottomSheetDialog.dismiss();
         });
         rvDiscounts.setAdapter(discountAdapter);
@@ -179,9 +181,21 @@ public class CheckoutActivity extends AppCompatActivity {
             String inputCode = edtCode.getText().toString().trim();
             if (inputCode.isEmpty()) {
                 Toast.makeText(this, "Vui lòng nhập mã!", Toast.LENGTH_SHORT).show();
-            } else {
-                applyDiscountToCart(inputCode, 15000);
+                return;
+            }
+            Discount foundDiscount = null;
+            for (Discount discount : myVouchers) {
+                if (discount.getCode().equalsIgnoreCase(inputCode)) {
+                    foundDiscount = discount;
+                    break;
+                }
+            }
+
+            if (foundDiscount != null) {
+                applyDiscountToCart(foundDiscount.getCode(), foundDiscount.getAmount(), foundDiscount.getMinOrderValue());
                 bottomSheetDialog.dismiss();
+            } else {
+                Toast.makeText(this, "Mã giảm giá không hợp lệ!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -194,7 +208,23 @@ public class CheckoutActivity extends AppCompatActivity {
 
     }
 
-    private void applyDiscountToCart(String code, double amount) {
+    private void applyDiscountToCart(String code, double amount, double minOrderValue) {
+        double currentSubtotal = 0;
+        if (checkoutViewModel.getSubtotalPrice().getValue() != null) {
+            currentSubtotal = checkoutViewModel.getSubtotalPrice().getValue();
+        }
+
+        if (currentSubtotal <= 0) {
+            Toast.makeText(this, "Đơn hàng trống!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (currentSubtotal < minOrderValue) {
+            String requiredAmount = String.format("%,.0f đ", minOrderValue);
+            Toast.makeText(this, "Chưa đạt mức tối thiểu " + requiredAmount + " để dùng mã này!", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         appliedVoucherCode = code;
         Toast.makeText(this, "Đã áp dụng mã: " + code, Toast.LENGTH_SHORT).show();
 
