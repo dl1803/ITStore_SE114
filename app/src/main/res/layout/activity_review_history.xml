@@ -29,7 +29,7 @@
             android:id="@+id/tvReviewTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Đánh giá của tôi"
+            android:text="Đánh giá sản phẩm"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"

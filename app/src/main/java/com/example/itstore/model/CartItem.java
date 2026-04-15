@@ -11,6 +11,9 @@ public class CartItem {
     private double price;
     private boolean isSelected = false;
 
+    public CartItem() {
+    }
+
     public CartItem(int id, int cartId, int variantId, int quantity, Product product, String variantName, double price) {
         this.id = id;
         this.cartId = cartId;
