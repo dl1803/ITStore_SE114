@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat;
 import com.example.itstore.R;
 import com.example.itstore.databinding.ActivityProductDetailBinding;
 import com.example.itstore.adapter.ImagePagerAdapter;
+import com.example.itstore.fragment.SpecsBottomSheet;
 import com.example.itstore.model.Product;
 import com.example.itstore.viewmodel.ProductDetailViewModel;
 
@@ -97,6 +98,12 @@ public class ProductDetailActivity extends AppCompatActivity {
             setResult(RESULT_OK, returnIntent);
 
             Toast.makeText(this, newStatus ? "Đã thêm vào yêu thích" : "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show();
+        });
+        binding.tvXemCauHinhChiTiet.setOnClickListener(v -> {
+            if (currentProduct != null) {
+                SpecsBottomSheet bottomSheet = new SpecsBottomSheet(currentProduct);
+                bottomSheet.show(getSupportFragmentManager(), "SpecsBottomSheet");
+            }
         });
     }
 

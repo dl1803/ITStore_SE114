@@ -400,6 +400,7 @@
                     </LinearLayout>
 
                     <TextView
+                        android:id="@+id/tvXemCauHinhChiTiet"
                         android:text="Xem cấu hình chi tiết >"
                         android:textColor="#009688"
                         android:textStyle="bold"
@@ -433,6 +434,7 @@
                 />
 
             <TextView
+                android:id="@+id/XemThem"
                 android:text="Xem thêm"
                 android:textColor="#009688"
                 android:textSize="12dp"
