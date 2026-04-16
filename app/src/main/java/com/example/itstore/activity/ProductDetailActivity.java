@@ -11,6 +11,7 @@ import com.example.itstore.R;
 import com.example.itstore.adapter.ReviewAdapter;
 import com.example.itstore.databinding.ActivityProductDetailBinding;
 import com.example.itstore.adapter.ImagePagerAdapter;
+import com.example.itstore.fragment.SpecsBottomSheet;
 import com.example.itstore.model.CartItem;
 import com.example.itstore.model.Product;
 import com.example.itstore.model.Review;
@@ -128,7 +129,12 @@ public class ProductDetailActivity extends AppCompatActivity {
 
             Toast.makeText(this, newStatus ? "Đã thêm vào yêu thích" : "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show();
         });
-
+        binding.tvXemCauHinhChiTiet.setOnClickListener(v -> {
+            if (currentProduct != null) {
+                SpecsBottomSheet bottomSheet = new SpecsBottomSheet(currentProduct);
+                bottomSheet.show(getSupportFragmentManager(), "SpecsBottomSheet");
+            }
+        });
         setupReview();
     }
 
