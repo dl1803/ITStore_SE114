@@ -5,15 +5,23 @@ import android.os.Bundle;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.itstore.R;
+import com.example.itstore.adapter.ReviewAdapter;
 import com.example.itstore.databinding.ActivityProductDetailBinding;
 import com.example.itstore.adapter.ImagePagerAdapter;
-import com.example.itstore.fragment.SpecsBottomSheet;
+import com.example.itstore.model.CartItem;
 import com.example.itstore.model.Product;
+import com.example.itstore.model.Review;
+import com.example.itstore.utils.CartManager;
 import com.example.itstore.viewmodel.ProductDetailViewModel;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -87,6 +95,27 @@ public class ProductDetailActivity extends AppCompatActivity {
             Toast.makeText(ProductDetailActivity.this, "Đã thêm bản " + currentRam + " vào giỏ!", Toast.LENGTH_SHORT).show();
         });
 
+        binding.btnBuyNow.setOnClickListener(v -> {
+            CartItem buyNowItem = new CartItem(
+                    0,
+                    0,
+                    currentVariantId,
+                    1,
+                    currentProduct,
+                    currentRam,
+                    currentFinalPrice
+            );
+            buyNowItem.setSelected(true);
+
+            List<CartItem> fastCheckoutList = new ArrayList<>();
+            fastCheckoutList.add(buyNowItem);
+
+            CartManager.getInstance().setCheckoutList(fastCheckoutList);
+
+            Intent intentBuyNow = new Intent(ProductDetailActivity.this, CheckoutActivity.class);
+            startActivity(intentBuyNow);
+        });
+
         binding.ivCart.setOnClickListener(v -> goToCartScreen());
 
         binding.imgFavoriteItem.setOnClickListener(v -> {
@@ -99,14 +128,55 @@ public class ProductDetailActivity extends AppCompatActivity {
 
             Toast.makeText(this, newStatus ? "Đã thêm vào yêu thích" : "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show();
         });
-        binding.tvXemCauHinhChiTiet.setOnClickListener(v -> {
-            if (currentProduct != null) {
-                SpecsBottomSheet bottomSheet = new SpecsBottomSheet(currentProduct);
-                bottomSheet.show(getSupportFragmentManager(), "SpecsBottomSheet");
-            }
-        });
+
+        setupReview();
     }
 
+    private void setupReview(){
+        List<Review> allReviews = getReviews();
+
+        if (allReviews == null && !allReviews.isEmpty()) {
+            binding.tvRatingCount.setText("O bài đánh giá");
+            binding.tvSeeAllReviews.setText("Xem tất cả (0) >");
+            return;
+        }
+
+        Collections.sort(allReviews, new Comparator<Review>(){
+            @Override
+            public int compare(Review o1, Review o2) {
+                return Long.compare(o2.getTimestamp(), o1.getTimestamp());
+            }
+        });
+
+        int totalReviews = allReviews.size();
+        binding.tvSeeAllReviews.setText("Xem tất cả (" + totalReviews + ") >");
+        binding.tvRatingCount.setText(totalReviews + " bài đánh giá");
+
+        int limit = Math.min(3, totalReviews);
+        List<Review> top3Reviews = new ArrayList<>(allReviews.subList(0,limit));
+
+        ReviewAdapter adapter = new ReviewAdapter(top3Reviews);
+        binding.rvProductReviews.setLayoutManager(new LinearLayoutManager(this));
+        binding.rvProductReviews.setAdapter(adapter);
+
+        binding.tvSeeAllReviews.setOnClickListener( v -> {
+            Intent intent = new Intent(ProductDetailActivity.this, ProductReviewsActivity.class);
+            intent.putExtra("REVIEW_LIST", (Serializable) allReviews); // ép kiểu List<Review> thành Serializable để nhấn mạnh dữ liệu có thể được đơn giản hóa qua intent , tránh lỗi
+            startActivity(intent);
+        });
+
+    }
+
+    private List<Review> getReviews() {
+        List<Review> mockReviews = new ArrayList<>();
+        long curTime = System.currentTimeMillis(); // Lấy thời gian hiện tại
+        mockReviews.add(new Review(1, "User 1", 5.0f, "Tuyệt vời", curTime, "22/02/2026"));
+        mockReviews.add(new Review(2, "User 2", 4.0f, "Khá tốt", curTime - 100000, "21/02/2026"));
+        mockReviews.add(new Review(3, "User 3", 5.0f, "Đóng gói đẹp", curTime - 200000, "20/02/2026"));
+        mockReviews.add(new Review(4, "User 4", 3.0f, "Bình thường", curTime - 300000, "19/02/2026"));
+        mockReviews.add(new Review(5, "User 5", 5.0f, "Rất ưng ý", curTime - 400000, "18/02/2026"));
+        return mockReviews;
+    }
     private void updateFavoriteIcon(boolean isFav) {
         int color = isFav ? android.graphics.Color.parseColor("#FF9800") : android.graphics.Color.parseColor("#B3B3B3");
         binding.imgFavoriteItem.setColorFilter(color);
