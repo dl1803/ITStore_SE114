@@ -136,21 +136,21 @@
             android:background="#EEEEEE"
             app:layout_constraintTop_toBottomOf="@id/tvTotalPriceOrder" ></View>
 
+
         <TextView
-            android:id="@+id/btnCancelOrder"
+            android:id="@+id/btnReviewOrder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:layout_marginRight="12dp"
-            android:background="@drawable/btn_outline_gray"
+            android:background="@drawable/btn_outline_orange"
             android:paddingHorizontal="16dp"
             android:paddingVertical="6dp"
-            android:text="Hủy đơn"
-            android:textColor="#555555"
+            android:text="Đánh giá"
+            android:textColor="@color/orange_primary"
             android:textSize="14sp"
-            app:layout_constraintRight_toLeftOf="@id/btnOrderDetail"
-            app:layout_constraintTop_toBottomOf="@id/divider3"
-            ></TextView>
+            android:visibility="gone" app:layout_constraintRight_toLeftOf="@id/btnOrderDetail"
+            app:layout_constraintTop_toBottomOf="@id/divider3" />
 
         <TextView
             android:id="@+id/btnOrderDetail"
