@@ -15,6 +15,9 @@
         android:theme="@style/Theme.ITStore"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".activity.WriteReviewActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.ProductReviewsActivity"
             android:exported="false" />
         <activity
