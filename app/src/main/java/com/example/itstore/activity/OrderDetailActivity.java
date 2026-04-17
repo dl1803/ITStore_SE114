@@ -140,16 +140,16 @@ public class OrderDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Chốt đơn thành công! Hãy đánh giá nhé.", Toast.LENGTH_SHORT).show();
         });
 
-        binding.btnRefundOrderDetail.setOnClickListener(v -> {
-            Intent intent = new Intent(OrderDetailActivity.this, RefundRequestActivity.class);
-            // intent.putExtra("ORDER_ID", currentOrder.getOrderId());
-            startActivity(intent);
-        });
-
-        binding.btnReviewDetail.setOnClickListener(v -> {
-            Intent intent = new Intent(OrderDetailActivity.this, WriteReviewActivity.class);
-            // intent.putExtra("ORDER_ID", currentOrder.getOrderId());
-            startActivity(intent);
-        });
+//        binding.btnRefundOrderDetail.setOnClickListener(v -> {
+//            Intent intent = new Intent(OrderDetailActivity.this, RefundRequestActivity.class);
+//            // intent.putExtra("ORDER_ID", currentOrder.getOrderId());
+//            startActivity(intent);
+//        });
+//
+//        binding.btnReviewDetail.setOnClickListener(v -> {
+//            Intent intent = new Intent(OrderDetailActivity.this, WriteReviewActivity.class);
+//            // intent.putExtra("ORDER_ID", currentOrder.getOrderId());
+//            startActivity(intent);
+//        });
     }
 }
