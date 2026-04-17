@@ -1,5 +1,6 @@
 package com.example.itstore.adapter;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.itstore.R;
+import com.example.itstore.activity.OrderDetailActivity;
 import com.example.itstore.model.Order;
 
 import java.text.DecimalFormat;
@@ -64,7 +66,13 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         } else {
             holder.tvTotalItems.setVisibility(View.GONE);
         }
+        holder.btnOrderDetail.setOnClickListener(v -> {
+            Intent intent = new Intent(holder.itemView.getContext(), OrderDetailActivity.class);
+            intent.putExtra("ORDER_DATA", order);
+            holder.itemView.getContext().startActivity(intent);
+        });
     }
+
 
     @Override
     public int getItemCount() {

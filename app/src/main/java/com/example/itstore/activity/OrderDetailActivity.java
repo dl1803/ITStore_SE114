@@ -47,7 +47,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         DecimalFormat formatter = new DecimalFormat("###,###,###");
 
         binding.tvOrderId.setText("Mã đơn hàng: #" + currentOrder.getOrderId());
-        binding.tvOrderDate.setText("Ngày đặt: 22/02/2026 14:30"); // Sau này thay bằng API thực tế
+        binding.tvOrderDate.setText("Ngày đặt: 22/02/2026 14:30");
 
         String status = currentOrder.getStatus();
         binding.tvOrderStatus.setText("Trạng thái: " + status);
@@ -59,21 +59,17 @@ public class OrderDetailActivity extends AppCompatActivity {
             binding.tvOrderStatus.setTextColor(Color.parseColor("#F57C00"));
         }
 
-        // 2. Gắn thông tin Khách hàng (Tạm thời Hardcode vì model Order của sếp chưa có)
-        // Khi nào model Order cập nhật, sếp thay thành: currentOrder.getCustomerName()
         binding.tvCustomerName.setText("Nguyễn Đại Vương | 0987654321");
         binding.tvAddress.setText("123 Đường Linh Kiện, Phường 10, Quận 1, TPHCM");
 
         List<Product> mockProductList = new ArrayList<>();
-
-        // Truyền null cho Variants và Images để fix lỗi đỏ lúc test UI
         Product dummyProduct = new Product(
                 1,
                 1,
                 currentOrder.getProductName(),
                 "Mô tả sản phẩm",
-                null, // Danh sách Variant (Tạm null)
-                null  // Danh sách Image (Tạm null)
+                null,
+                null
         );
         mockProductList.add(dummyProduct);
 
@@ -81,19 +77,14 @@ public class OrderDetailActivity extends AppCompatActivity {
         binding.rvProducts.setLayoutManager(new LinearLayoutManager(this));
         binding.rvProducts.setAdapter(adapter);
 
-        // 4. Tính toán tiền bạc
-        long subTotal = currentOrder.getTotalPrice(); // Tiền hàng
-        long shippingFee = 30000; // Phí ship (Giả lập)
-        long totalAmount = subTotal + shippingFee; // Tổng cộng
+        long subTotal = currentOrder.getTotalPrice();
+        long shippingFee = 30000;
+        long totalAmount = subTotal + shippingFee;
 
         binding.tvSubTotal.setText(formatter.format(subTotal) + "đ");
         binding.tvShippingFee.setText(formatter.format(shippingFee) + "đ");
         binding.tvTotal.setText(formatter.format(totalAmount) + "đ");
     }
-
-    // ==========================================
-    // HÀM 2: LOGIC ẨN/HIỆN 4 NÚT BOTTOM BAR
-    // ==========================================
     private void updateBottomButtons() {
         binding.btnCancelOrderDetail.setVisibility(View.GONE);
         binding.btnRefundOrderDetail.setVisibility(View.GONE);
@@ -119,10 +110,6 @@ public class OrderDetailActivity extends AppCompatActivity {
                 break;
         }
     }
-
-    // ==========================================
-    // HÀM 3: BẮT SỰ KIỆN CLICK CHO TỪNG NÚT
-    // ==========================================
     private void setupClickListeners() {
         binding.btnCancelOrderDetail.setOnClickListener(v -> {
             currentOrder.setStatus("Đã hủy");

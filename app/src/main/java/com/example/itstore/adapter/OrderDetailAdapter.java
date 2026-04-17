@@ -16,8 +16,6 @@ import java.util.List;
 public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.ViewHolder> {
 
     private List<Product> productList;
-
-    // Khởi tạo chỉ cần truyền List sản phẩm vào, không cần OrderId hay Status nữa
     public OrderDetailAdapter(List<Product> productList) {
         this.productList = productList;
     }
@@ -25,7 +23,6 @@ public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Gọi khuôn đúc item (item_product_order_detail.xml)
         ItemProductOrderDetailBinding binding = ItemProductOrderDetailBinding.inflate(
                 LayoutInflater.from(parent.getContext()), parent, false);
         return new ViewHolder(binding);
