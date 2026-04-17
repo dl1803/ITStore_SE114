@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.itstore.R;
 import com.example.itstore.activity.OrderDetailActivity;
-import com.example.itstore.activity.WriteReviewActivity;
 import com.example.itstore.model.Order;
 
 import java.text.DecimalFormat;
@@ -47,17 +46,6 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         DecimalFormat formatter = new DecimalFormat("###,###,###");
         holder.tvTotalPrice.setText("Thành tiền: " + formatter.format(order.getTotalPrice()) + "đ");
 
-        holder.btnOrderDetail.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), OrderDetailActivity.class);
-            intent.putExtra("ORDER_DATA", order);
-            v.getContext().startActivity(intent);
-        });
-
-        holder.btnReviewOrder.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), WriteReviewActivity.class);
-            v.getContext().startActivity(intent);
-        });
-
         if (order.getStatus().equalsIgnoreCase("Đã hủy")) {
             holder.tvOrderStatus.setTextColor(Color.parseColor("#FF0000"));
         } else if (order.getStatus().equalsIgnoreCase("Đã giao")) {
@@ -78,7 +66,13 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         } else {
             holder.tvTotalItems.setVisibility(View.GONE);
         }
+        holder.btnOrderDetail.setOnClickListener(v -> {
+            Intent intent = new Intent(holder.itemView.getContext(), OrderDetailActivity.class);
+            intent.putExtra("ORDER_DATA", order);
+            holder.itemView.getContext().startActivity(intent);
+        });
     }
+
 
     @Override
     public int getItemCount() {
