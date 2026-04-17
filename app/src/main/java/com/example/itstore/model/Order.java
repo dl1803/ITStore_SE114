@@ -1,6 +1,8 @@
 package com.example.itstore.model;
 
-public class Order {
+import java.io.Serializable;
+
+public class Order implements Serializable {
     private String orderId;
     private String status;
     private String productName;
@@ -45,5 +47,9 @@ public class Order {
 
     public long getTotalPrice(){
         return totalPrice;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

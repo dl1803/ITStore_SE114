@@ -1,5 +1,6 @@
 package com.example.itstore.adapter;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.itstore.R;
+import com.example.itstore.activity.OrderDetailActivity;
 import com.example.itstore.model.Order;
 
 import java.text.DecimalFormat;
@@ -64,6 +66,15 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         } else {
             holder.tvTotalItems.setVisibility(View.GONE);
         }
+        holder.btnOrderDetail.setOnClickListener(v -> {
+            // Tạo chuyến xe chở khách sang trang Chi Tiết
+            Intent intent = new Intent(holder.itemView.getContext(), OrderDetailActivity.class);
+
+            // Quăng nguyên cái object Order qua bển (Đảm bảo class Order của ông đã implements Serializable nhé)
+            intent.putExtra("ORDER_DATA", order);
+
+            holder.itemView.getContext().startActivity(intent);
+        });
     }
 
     @Override
@@ -84,7 +95,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             tvQuantity = itemView.findViewById(R.id.tvProductQuantity);
             tvTotalItems = itemView.findViewById(R.id.tvTotalItems);
             tvTotalPrice = itemView.findViewById(R.id.tvTotalPriceOrder);
-            btnCancelOrder = itemView.findViewById(R.id.btnCancelOrder);
+            //btnCancelOrder = itemView.findViewById(R.id.btnCancelOrder);
             btnOrderDetail = itemView.findViewById(R.id.btnOrderDetail);
         }
     }
