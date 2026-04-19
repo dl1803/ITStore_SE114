@@ -12,7 +12,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.itstore.adapter.OrderDetailAdapter;
 import com.example.itstore.databinding.ActivityOrderDetailBinding;
 import com.example.itstore.model.Order;
+import com.example.itstore.model.OrderItem;
 import com.example.itstore.model.Product;
+import com.example.itstore.model.ProductImage;
+import com.example.itstore.model.ProductVariant;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -62,18 +65,31 @@ public class OrderDetailActivity extends AppCompatActivity {
         binding.tvCustomerName.setText("Nguyễn Đại Vương | 0987654321");
         binding.tvAddress.setText("123 Đường Linh Kiện, Phường 10, Quận 1, TPHCM");
 
-        List<Product> mockProductList = new ArrayList<>();
+        List<OrderItem> mockOrderItemList = new ArrayList<>();
+
+        List<ProductVariant> variants = new ArrayList<>();
+        variants.add(new ProductVariant(1, currentOrder.getProductType(), (double) currentOrder.getTotalPrice(), 0, 100));
+
+        List<ProductImage> listImages = new ArrayList<>();
+        listImages.add(new ProductImage(1, String.valueOf(currentOrder.getImageRes()), true));
+
         Product dummyProduct = new Product(
                 1,
                 1,
                 currentOrder.getProductName(),
-                "Mô tả sản phẩm",
-                null,
-                null
+                currentOrder.getProductType(),
+                variants,
+                listImages
         );
-        mockProductList.add(dummyProduct);
+        OrderItem dummyItem = new OrderItem(
+                dummyProduct,
+                currentOrder.getQuantity(),
+                currentOrder.getTotalPrice()
+        );
 
-        OrderDetailAdapter adapter = new OrderDetailAdapter(mockProductList);
+        mockOrderItemList.add(dummyItem);
+
+        OrderDetailAdapter adapter = new OrderDetailAdapter(mockOrderItemList);
         binding.rvProducts.setLayoutManager(new LinearLayoutManager(this));
         binding.rvProducts.setAdapter(adapter);
 
@@ -98,11 +114,10 @@ public class OrderDetailActivity extends AppCompatActivity {
                 binding.btnCancelOrderDetail.setVisibility(View.VISIBLE);
                 break;
             case "Đang giao":
-                binding.btnRefundOrderDetail.setVisibility(View.VISIBLE);
                 binding.btnConfirmReceived.setVisibility(View.VISIBLE);
                 break;
             case "Đã giao":
-            case "Hoàn thành":
+                binding.btnRefundOrderDetail.setVisibility(View.VISIBLE);
                 binding.btnReviewDetail.setVisibility(View.VISIBLE);
                 break;
             case "Đã hủy":
@@ -120,8 +135,8 @@ public class OrderDetailActivity extends AppCompatActivity {
         });
 
         binding.btnConfirmReceived.setOnClickListener(v -> {
-            currentOrder.setStatus("Hoàn thành");
-            binding.tvOrderStatus.setText("Trạng thái: Hoàn thành");
+            currentOrder.setStatus("Đã giao");
+            binding.tvOrderStatus.setText("Trạng thái: Đã giao");
             binding.tvOrderStatus.setTextColor(Color.parseColor("#4CAF50"));
             updateBottomButtons();
             Toast.makeText(this, "Chốt đơn thành công! Hãy đánh giá nhé.", Toast.LENGTH_SHORT).show();
@@ -129,14 +144,12 @@ public class OrderDetailActivity extends AppCompatActivity {
 
 //        binding.btnRefundOrderDetail.setOnClickListener(v -> {
 //            Intent intent = new Intent(OrderDetailActivity.this, RefundRequestActivity.class);
-//            // intent.putExtra("ORDER_ID", currentOrder.getOrderId());
 //            startActivity(intent);
 //        });
-//
-//        binding.btnReviewDetail.setOnClickListener(v -> {
-//            Intent intent = new Intent(OrderDetailActivity.this, WriteReviewActivity.class);
-//            // intent.putExtra("ORDER_ID", currentOrder.getOrderId());
-//            startActivity(intent);
-//        });
+
+        binding.btnReviewDetail.setOnClickListener(v -> {
+            Intent intent = new Intent(OrderDetailActivity.this, WriteReviewActivity.class);
+            startActivity(intent);
+        });
     }
 }

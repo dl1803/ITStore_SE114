@@ -7,6 +7,8 @@ public class ProductVariant implements Serializable{
     private double compareAtPrice;
     private int stock;
 
+
+
     public ProductVariant(int id, String version, double price, double compareAtPrice, int stock) {
         this.id = id;
         this.version = version;
