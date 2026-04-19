@@ -39,7 +39,6 @@ public class OrderDetailActivity extends AppCompatActivity {
             finish();
             return;
         }
-
         setupOrderInfo();
         updateBottomButtons();
         setupClickListeners();
@@ -93,6 +92,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         binding.rvProducts.setLayoutManager(new LinearLayoutManager(this));
         binding.rvProducts.setAdapter(adapter);
 
+        // Tính tiền tổng
         long subTotal = currentOrder.getTotalPrice();
         long shippingFee = 30000;
         long totalAmount = subTotal + shippingFee;
@@ -101,6 +101,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         binding.tvShippingFee.setText(formatter.format(shippingFee) + "đ");
         binding.tvTotal.setText(formatter.format(totalAmount) + "đ");
     }
+
     private void updateBottomButtons() {
         binding.btnCancelOrderDetail.setVisibility(View.GONE);
         binding.btnRefundOrderDetail.setVisibility(View.GONE);
@@ -125,12 +126,18 @@ public class OrderDetailActivity extends AppCompatActivity {
                 break;
         }
     }
+
     private void setupClickListeners() {
         binding.btnCancelOrderDetail.setOnClickListener(v -> {
             currentOrder.setStatus("Đã hủy");
             binding.tvOrderStatus.setText("Trạng thái: Đã hủy");
             binding.tvOrderStatus.setTextColor(Color.parseColor("#FF3B30"));
             updateBottomButtons();
+
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("UPDATED_ORDER", currentOrder);
+            setResult(RESULT_OK, resultIntent);
+
             Toast.makeText(this, "Đã hủy đơn hàng thành công!", Toast.LENGTH_SHORT).show();
         });
 
@@ -139,13 +146,19 @@ public class OrderDetailActivity extends AppCompatActivity {
             binding.tvOrderStatus.setText("Trạng thái: Đã giao");
             binding.tvOrderStatus.setTextColor(Color.parseColor("#4CAF50"));
             updateBottomButtons();
+
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("UPDATED_ORDER", currentOrder);
+            setResult(RESULT_OK, resultIntent);
+
             Toast.makeText(this, "Chốt đơn thành công! Hãy đánh giá nhé.", Toast.LENGTH_SHORT).show();
         });
 
-//        binding.btnRefundOrderDetail.setOnClickListener(v -> {
-//            Intent intent = new Intent(OrderDetailActivity.this, RefundRequestActivity.class);
-//            startActivity(intent);
-//        });
+        binding.btnRefundOrderDetail.setOnClickListener(v -> {
+            Intent intent = new Intent(OrderDetailActivity.this, RefundRequestActivity.class);
+            intent.putExtra("ORDER_DATA", currentOrder);
+            startActivity(intent);
+        });
 
         binding.btnReviewDetail.setOnClickListener(v -> {
             Intent intent = new Intent(OrderDetailActivity.this, WriteReviewActivity.class);

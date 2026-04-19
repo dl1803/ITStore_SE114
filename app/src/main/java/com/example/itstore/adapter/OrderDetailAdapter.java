@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.itstore.R;
 import com.example.itstore.activity.ProductDetailActivity;
 import com.example.itstore.databinding.ItemProductOrderDetailBinding;
 import com.example.itstore.model.OrderItem;

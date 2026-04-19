@@ -39,7 +39,7 @@ import com.example.itstore.model.SingleAddressResponse;
 import com.example.itstore.model.UpdateProfileRequest;
 
 public class RetrofitClient {
-    private static final String BASE_URL = "http://10.0.2.2:3000/";
+    private static final String BASE_URL = "http://10.0.96.130:3000/";
     private static Retrofit retrofit = null;
 
     public static ApiService getApiService(Context context) {

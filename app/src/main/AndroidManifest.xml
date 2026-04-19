@@ -48,6 +48,12 @@
             android:name=".activity.EditProfileActivity"
             android:exported="false" />
         <activity
+            android:name=".activity.OrderDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.RefundRequestActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.ResetPasswordActivity"
             android:exported="true">
             <intent-filter>
