@@ -13,6 +13,7 @@ import com.example.itstore.adapter.OrderDetailAdapter;
 import com.example.itstore.databinding.ActivityOrderDetailBinding;
 import com.example.itstore.model.Order;
 import com.example.itstore.model.OrderItem;
+import com.example.itstore.model.OrderTimeline;
 import com.example.itstore.model.Product;
 import com.example.itstore.model.ProductImage;
 import com.example.itstore.model.ProductVariant;
@@ -20,6 +21,9 @@ import com.example.itstore.model.ProductVariant;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.example.itstore.adapter.OrderTimelineAdapter;
+import com.example.itstore.databinding.DialogTimelineBinding;
 
 public class OrderDetailActivity extends AppCompatActivity {
 
@@ -140,7 +144,7 @@ public class OrderDetailActivity extends AppCompatActivity {
 
             Toast.makeText(this, "Đã hủy đơn hàng thành công!", Toast.LENGTH_SHORT).show();
         });
-
+        binding.tvViewTimeline.setOnClickListener(v -> showTimelineDialog());
         binding.btnConfirmReceived.setOnClickListener(v -> {
             currentOrder.setStatus("Đã giao");
             binding.tvOrderStatus.setText("Trạng thái: Đã giao");
@@ -164,5 +168,20 @@ public class OrderDetailActivity extends AppCompatActivity {
             Intent intent = new Intent(OrderDetailActivity.this, WriteReviewActivity.class);
             startActivity(intent);
         });
+    }
+    private void showTimelineDialog() {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        com.example.itstore.databinding.DialogTimelineBinding dialogBinding =
+                com.example.itstore.databinding.DialogTimelineBinding.inflate(getLayoutInflater());
+        dialog.setContentView(dialogBinding.getRoot());
+        List<OrderTimeline> mockTimelines = new ArrayList<>();
+        mockTimelines.add(new OrderTimeline("Đang giao hàng", "08:30 - 24/02/2026"));
+        mockTimelines.add(new OrderTimeline("Đã rời kho phân phối", "20:15 - 23/02/2026"));
+        mockTimelines.add(new OrderTimeline("Đang xử lý đơn hàng", "15:00 - 22/02/2026"));
+        mockTimelines.add(new OrderTimeline("Đặt hàng thành công", "14:30 - 22/02/2026"));
+        OrderTimelineAdapter adapter = new OrderTimelineAdapter(mockTimelines);
+        dialogBinding.rvOrderTimeline.setLayoutManager(new LinearLayoutManager(this));
+        dialogBinding.rvOrderTimeline.setAdapter(adapter);
+        dialog.show();
     }
 }
