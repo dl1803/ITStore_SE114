@@ -13,6 +13,7 @@ import com.example.itstore.adapter.OrderDetailAdapter;
 import com.example.itstore.databinding.ActivityOrderDetailBinding;
 import com.example.itstore.model.Order;
 import com.example.itstore.model.Product;
+import com.example.itstore.model.ProductVariant;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -36,7 +37,6 @@ public class OrderDetailActivity extends AppCompatActivity {
             finish();
             return;
         }
-
         setupOrderInfo();
         updateBottomButtons();
         setupClickListeners();
@@ -61,22 +61,27 @@ public class OrderDetailActivity extends AppCompatActivity {
 
         binding.tvCustomerName.setText("Nguyễn Đại Vương | 0987654321");
         binding.tvAddress.setText("123 Đường Linh Kiện, Phường 10, Quận 1, TPHCM");
-
+        double orderPrice = currentOrder.getTotalPrice();
+        ProductVariant dummyVariant = new ProductVariant(1, "Mặc định", orderPrice, orderPrice, 10);
+        List<ProductVariant> mockVariants = new ArrayList<>();
+        mockVariants.add(dummyVariant);
         List<Product> mockProductList = new ArrayList<>();
         Product dummyProduct = new Product(
                 1,
                 1,
-                currentOrder.getProductName(),
-                "Mô tả sản phẩm",
-                null,
+                currentOrder.getProductName() != null ? currentOrder.getProductName() : "Sản phẩm Demo",
+                "Mô tả tạm thời",
+                mockVariants,
                 null
         );
+        dummyProduct.setQuantity(1);
         mockProductList.add(dummyProduct);
 
         OrderDetailAdapter adapter = new OrderDetailAdapter(mockProductList);
         binding.rvProducts.setLayoutManager(new LinearLayoutManager(this));
         binding.rvProducts.setAdapter(adapter);
 
+        // Tính tiền tổng
         long subTotal = currentOrder.getTotalPrice();
         long shippingFee = 30000;
         long totalAmount = subTotal + shippingFee;
@@ -85,6 +90,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         binding.tvShippingFee.setText(formatter.format(shippingFee) + "đ");
         binding.tvTotal.setText(formatter.format(totalAmount) + "đ");
     }
+
     private void updateBottomButtons() {
         binding.btnCancelOrderDetail.setVisibility(View.GONE);
         binding.btnRefundOrderDetail.setVisibility(View.GONE);
@@ -98,10 +104,11 @@ public class OrderDetailActivity extends AppCompatActivity {
                 binding.btnCancelOrderDetail.setVisibility(View.VISIBLE);
                 break;
             case "Đang giao":
-                binding.btnRefundOrderDetail.setVisibility(View.VISIBLE);
                 binding.btnConfirmReceived.setVisibility(View.VISIBLE);
                 break;
             case "Đã giao":
+                binding.btnRefundOrderDetail.setVisibility(View.VISIBLE);
+                break;
             case "Hoàn thành":
                 binding.btnReviewDetail.setVisibility(View.VISIBLE);
                 break;
@@ -110,12 +117,18 @@ public class OrderDetailActivity extends AppCompatActivity {
                 break;
         }
     }
+
     private void setupClickListeners() {
         binding.btnCancelOrderDetail.setOnClickListener(v -> {
             currentOrder.setStatus("Đã hủy");
             binding.tvOrderStatus.setText("Trạng thái: Đã hủy");
             binding.tvOrderStatus.setTextColor(Color.parseColor("#FF3B30"));
             updateBottomButtons();
+
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("UPDATED_ORDER", currentOrder);
+            setResult(RESULT_OK, resultIntent);
+
             Toast.makeText(this, "Đã hủy đơn hàng thành công!", Toast.LENGTH_SHORT).show();
         });
 
@@ -124,18 +137,22 @@ public class OrderDetailActivity extends AppCompatActivity {
             binding.tvOrderStatus.setText("Trạng thái: Hoàn thành");
             binding.tvOrderStatus.setTextColor(Color.parseColor("#4CAF50"));
             updateBottomButtons();
+
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("UPDATED_ORDER", currentOrder);
+            setResult(RESULT_OK, resultIntent);
+
             Toast.makeText(this, "Chốt đơn thành công! Hãy đánh giá nhé.", Toast.LENGTH_SHORT).show();
         });
 
         binding.btnRefundOrderDetail.setOnClickListener(v -> {
             Intent intent = new Intent(OrderDetailActivity.this, RefundRequestActivity.class);
-            // intent.putExtra("ORDER_ID", currentOrder.getOrderId());
+            intent.putExtra("ORDER_DATA", currentOrder);
             startActivity(intent);
         });
 
         binding.btnReviewDetail.setOnClickListener(v -> {
             Intent intent = new Intent(OrderDetailActivity.this, WriteReviewActivity.class);
-            // intent.putExtra("ORDER_ID", currentOrder.getOrderId());
             startActivity(intent);
         });
     }

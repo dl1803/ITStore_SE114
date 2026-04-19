@@ -32,11 +32,12 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
+                android:id="@+id/imgDelete"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="5dp"
                 android:src="@drawable/ic_close"
-                app:tint="@color/white" ></ImageView>
+                app:tint="@color/white"></ImageView>
         </androidx.cardview.widget.CardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

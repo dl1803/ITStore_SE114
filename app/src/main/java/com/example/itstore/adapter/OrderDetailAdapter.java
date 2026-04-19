@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.itstore.R;
 import com.example.itstore.activity.ProductDetailActivity;
 import com.example.itstore.databinding.ItemProductOrderDetailBinding;
 import com.example.itstore.model.Product;
@@ -34,6 +35,7 @@ public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.
 
         holder.binding.tvProductName.setText(product.getName());
         holder.binding.tvProductPrice.setText(String.format("%,.0fđ", product.getPrice()));
+        holder.binding.tvProductCount.setText("x" + product.getQuantity());
         if (product.getVariants() != null && !product.getVariants().isEmpty()) {
 
             holder.binding.tvProductType.setText("Phân loại: " + product.getVariants().get(0).getVersion());
@@ -41,8 +43,9 @@ public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.
             holder.binding.tvProductType.setText("Phân loại: Mặc định");
         }
 
-        String imageUrl = product.getImageUrl();
-        Glide.with(holder.itemView.getContext()).load(imageUrl).into(holder.binding.imgProduct);
+        Glide.with(holder.itemView.getContext())
+                .load(R.drawable.ram1)
+                .into(holder.binding.imgProduct);
 
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(holder.itemView.getContext(), ProductDetailActivity.class);
