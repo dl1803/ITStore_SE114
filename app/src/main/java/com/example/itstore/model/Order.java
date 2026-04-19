@@ -11,7 +11,8 @@ public class Order implements Serializable {
     private int extraItemsCount;
     private long totalPrice;
     private int imageRes;
-    public Order(String orderId, String status, String productName, String productType, int quantity, int extraItemsCount, long totalPrice, int imageRes){
+    private String orderDate;
+    public Order(String orderId, String status, String productName, String productType, int quantity, int extraItemsCount, long totalPrice, int imageRes, String orderDate){
         this.orderId = orderId;
         this.status = status;
         this.productName = productName;
@@ -20,6 +21,7 @@ public class Order implements Serializable {
         this.extraItemsCount = extraItemsCount;
         this.totalPrice = totalPrice;
         this.imageRes = imageRes;
+        this.orderDate = orderDate;
     }
 
     public String getOrderId(){
@@ -56,5 +58,13 @@ public class Order implements Serializable {
 
     public int getImageRes(){
         return imageRes;
+    }
+
+    public String getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(String orderDate) {
+        this.orderDate = orderDate;
     }
 }

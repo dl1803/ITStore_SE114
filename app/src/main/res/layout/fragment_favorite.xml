@@ -79,4 +79,40 @@
             android:textSize="16sp" ></TextView>
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/layoutRequireLogin"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutHeader"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_favorite"
+            app:tint="#FFB74D" />
+        <TextView
+            android:id="@+id/tvRequireLoginMsg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Đăng nhập để xem danh sách yêu thích"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLoginNow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/orange_primary"
+            android:text="Đăng nhập ngay"
+            android:textColor="@color/white"
+            app:cornerRadius="6dp" />
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

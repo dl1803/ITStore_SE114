@@ -174,12 +174,43 @@ public class OrderDetailActivity extends AppCompatActivity {
         com.example.itstore.databinding.DialogTimelineBinding dialogBinding =
                 com.example.itstore.databinding.DialogTimelineBinding.inflate(getLayoutInflater());
         dialog.setContentView(dialogBinding.getRoot());
-        List<OrderTimeline> mockTimelines = new ArrayList<>();
-        mockTimelines.add(new OrderTimeline("Đang giao hàng", "08:30 - 24/02/2026"));
-        mockTimelines.add(new OrderTimeline("Đã rời kho phân phối", "20:15 - 23/02/2026"));
-        mockTimelines.add(new OrderTimeline("Đang xử lý đơn hàng", "15:00 - 22/02/2026"));
-        mockTimelines.add(new OrderTimeline("Đặt hàng thành công", "14:30 - 22/02/2026"));
-        OrderTimelineAdapter adapter = new OrderTimelineAdapter(mockTimelines);
+
+        List<OrderTimeline> realTimelines = new ArrayList<>();
+        String orderTime = currentOrder.getOrderDate();
+        String currentStatus = currentOrder.getStatus();
+        realTimelines.add(new OrderTimeline("Đặt hàng thành công", "Hệ thống đã ghi nhận đơn hàng của bạn.\n" + orderTime));
+
+        if (currentStatus.equalsIgnoreCase("Đã hủy")) {
+            realTimelines.add(0, new OrderTimeline("Đơn hàng đã bị hủy", "Đơn hàng đã bị hủy theo yêu cầu."));
+        } else {
+            if (!currentStatus.equalsIgnoreCase("Chờ xác nhận")) {
+                realTimelines.add(0, new OrderTimeline("Đã xác nhận", "Người bán đã xác nhận đơn hàng và đang chuẩn bị."));
+            }
+
+            if (currentStatus.equalsIgnoreCase("Đang chuẩn bị hàng") ||
+                    currentStatus.equalsIgnoreCase("Đã đóng gói") ||
+                    currentStatus.equalsIgnoreCase("Đang giao") ||
+                    currentStatus.equalsIgnoreCase("Đã giao")) {
+                realTimelines.add(0, new OrderTimeline("Đang chuẩn bị hàng", "Kho đang xuất linh kiện và tiến hành đóng gói."));
+            }
+
+            if (currentStatus.equalsIgnoreCase("Đã đóng gói") ||
+                    currentStatus.equalsIgnoreCase("Đang giao") ||
+                    currentStatus.equalsIgnoreCase("Đã giao")) {
+                realTimelines.add(0, new OrderTimeline("Đã đóng gói", "Đơn hàng đã được bàn giao cho đơn vị vận chuyển (Giao Hàng Tiết Kiệm)."));
+            }
+
+            if (currentStatus.equalsIgnoreCase("Đang giao") ||
+                    currentStatus.equalsIgnoreCase("Đã giao")) {
+                realTimelines.add(0, new OrderTimeline("Đang giao hàng", "Shipper đang trên đường giao hàng đến bạn. Vui lòng chú ý điện thoại."));
+            }
+
+            if (currentStatus.equalsIgnoreCase("Đã giao")) {
+                realTimelines.add(0, new OrderTimeline("Giao hàng thành công", "Kiện hàng đã được giao thành công đến người nhận."));
+            }
+        }
+
+        OrderTimelineAdapter adapter = new OrderTimelineAdapter(realTimelines);
         dialogBinding.rvOrderTimeline.setLayoutManager(new LinearLayoutManager(this));
         dialogBinding.rvOrderTimeline.setAdapter(adapter);
         dialog.show();

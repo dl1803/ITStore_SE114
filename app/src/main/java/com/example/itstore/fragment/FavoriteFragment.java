@@ -1,5 +1,6 @@
 package com.example.itstore.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,9 +16,11 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.itstore.R;
+import com.example.itstore.activity.LoginActivity;
 import com.example.itstore.adapter.FavoriteAdapter;
 import com.example.itstore.databinding.FragmentFavoriteBinding;
 import com.example.itstore.model.Product;
+import com.example.itstore.utils.SharedPrefsManager;
 import com.example.itstore.viewmodel.HomeViewModel;
 
 import java.util.ArrayList;
@@ -32,6 +35,18 @@ public class FavoriteFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentFavoriteBinding.inflate(inflater, container, false);
+        String token = SharedPrefsManager.getInstance(requireContext()).getAccessToken();
+        if (token == null || token.isEmpty()) {
+            binding.rvFavorite.setVisibility(View.GONE);
+            binding.layoutRequireLogin.setVisibility(View.VISIBLE);
+            binding.tvRequireLoginMsg.setText("Đăng nhập để xem danh sách yêu thích của bạn");
+            binding.btnLoginNow.setOnClickListener(v -> {
+                startActivity(new Intent(requireContext(), LoginActivity.class));
+            });
+        } else {
+            binding.layoutRequireLogin.setVisibility(View.GONE);
+            binding.rvFavorite.setVisibility(View.VISIBLE);
+        }
         return binding.getRoot();
     }
 

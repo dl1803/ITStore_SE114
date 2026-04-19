@@ -21,12 +21,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.itstore.R;
 import com.example.itstore.activity.CheckoutActivity;
+import com.example.itstore.activity.LoginActivity;
 import com.example.itstore.adapter.CartAdapter;
 import com.example.itstore.adapter.DiscountAdapter;
 import com.example.itstore.databinding.FragmentCartBinding;
 import com.example.itstore.model.CartItem;
 import com.example.itstore.model.Discount;
 import com.example.itstore.utils.CartManager;
+import com.example.itstore.utils.SharedPrefsManager;
 import com.example.itstore.viewmodel.CartViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
@@ -47,6 +49,21 @@ public class CartFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentCartBinding.inflate(inflater, container, false);
+        String token = SharedPrefsManager.getInstance(requireContext()).getAccessToken();
+        if (token == null || token.isEmpty()) {
+            binding.rvCart.setVisibility(View.GONE);
+            binding.layoutCartDiscount.setVisibility(View.GONE);
+            binding.layoutCheckoutTotal.setVisibility(View.GONE);
+            binding.layoutRequireLogin.setVisibility(View.VISIBLE);
+            binding.btnLoginNow.setOnClickListener(v -> {
+                startActivity(new Intent(requireContext(), LoginActivity.class));
+            });
+        } else {
+            binding.layoutRequireLogin.setVisibility(View.GONE);
+            binding.rvCart.setVisibility(View.VISIBLE);
+            binding.layoutCartDiscount.setVisibility(View.VISIBLE);
+            binding.layoutCheckoutTotal.setVisibility(View.VISIBLE);
+        }
         return binding.getRoot();
     }
     @Override

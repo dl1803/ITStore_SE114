@@ -16,6 +16,7 @@ import com.example.itstore.model.CartItem;
 import com.example.itstore.model.Product;
 import com.example.itstore.model.Review;
 import com.example.itstore.utils.CartManager;
+import com.example.itstore.utils.SharedPrefsManager;
 import com.example.itstore.viewmodel.ProductDetailViewModel;
 
 import java.io.Serializable;
@@ -92,8 +93,15 @@ public class ProductDetailActivity extends AppCompatActivity {
         });
 
         binding.btnAddToCart.setOnClickListener(v -> {
-            detailViewModel.addToCart(currentProduct, currentVariantId, currentRam, currentFinalPrice);
-            Toast.makeText(ProductDetailActivity.this, "Đã thêm bản " + currentRam + " vào giỏ!", Toast.LENGTH_SHORT).show();
+            String token = SharedPrefsManager.getInstance(this).getAccessToken();
+            if (token == null || token.isEmpty()) {
+                Toast.makeText(this, "Vui lòng đăng nhập để thêm vào giỏ hàng!", Toast.LENGTH_SHORT).show();
+                Intent intentLogin = new Intent(this, LoginActivity.class);
+                startActivity(intentLogin);
+            } else {
+                detailViewModel.addToCart(currentProduct, currentVariantId, currentRam, currentFinalPrice);
+                Toast.makeText(ProductDetailActivity.this, "Đã thêm bản " + currentRam + " vào giỏ!", Toast.LENGTH_SHORT).show();
+            }
         });
 
         binding.btnBuyNow.setOnClickListener(v -> {
@@ -117,17 +125,34 @@ public class ProductDetailActivity extends AppCompatActivity {
             startActivity(intentBuyNow);
         });
 
-        binding.ivCart.setOnClickListener(v -> goToCartScreen());
+        binding.ivCart.setOnClickListener(v ->{
+            String token = SharedPrefsManager.getInstance(this).getAccessToken();
+            if (token == null || token.isEmpty()) {
+                Toast.makeText(this, "Vui lòng đăng nhập để thêm vào giỏ hàng!", Toast.LENGTH_SHORT).show();
+                Intent intentLogin = new Intent(this, LoginActivity.class);
+                startActivity(intentLogin);
+            } else {
+                detailViewModel.addToCart(currentProduct, currentVariantId, currentRam, currentFinalPrice);
+                Toast.makeText(ProductDetailActivity.this, "Đã thêm bản " + currentRam + " vào giỏ!", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         binding.imgFavoriteItem.setOnClickListener(v -> {
-            boolean newStatus = !currentProduct.isFavorite();
-            currentProduct.setFavorite(newStatus);
-            updateFavoriteIcon(newStatus);
-            Intent returnIntent = new Intent();
-            returnIntent.putExtra("UPDATED_PRODUCT", currentProduct);
-            setResult(RESULT_OK, returnIntent);
+            String token = SharedPrefsManager.getInstance(this).getAccessToken();
 
-            Toast.makeText(this, newStatus ? "Đã thêm vào yêu thích" : "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show();
+            if (token == null || token.isEmpty()) {
+                Toast.makeText(this, "Vui lòng đăng nhập để lưu sản phẩm yêu thích!", Toast.LENGTH_SHORT).show();
+                Intent intentLogin = new Intent(this, LoginActivity.class);
+                startActivity(intentLogin);
+            } else {
+                boolean newStatus = !currentProduct.isFavorite();
+                currentProduct.setFavorite(newStatus);
+                updateFavoriteIcon(newStatus);
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("UPDATED_PRODUCT", currentProduct);
+                setResult(RESULT_OK, returnIntent);
+                Toast.makeText(this, newStatus ? "Đã thêm vào yêu thích" : "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show();
+            }
         });
         binding.tvXemCauHinhChiTiet.setOnClickListener(v -> {
             if (currentProduct != null) {
