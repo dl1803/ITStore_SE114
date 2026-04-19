@@ -126,8 +126,9 @@ public class CheckoutActivity extends AppCompatActivity {
             Toast.makeText(this, "Đặt hàng thành công! Mã: " + newOrder.getOrderId(), Toast.LENGTH_LONG).show();
 
 
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            Intent intent = new Intent(this, OrderSuccessActivity.class);
+
+            intent.putExtra("ORDER_DATA", newOrder);
             startActivity(intent);
             finish();
         });
