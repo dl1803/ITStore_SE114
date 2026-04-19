@@ -116,7 +116,7 @@ public class CheckoutActivity extends AppCompatActivity {
             }
 
             Order newOrder = new Order(
-                    orderId, status, productName, productType, quantity, extraItemsCount, totalPrice
+                    orderId, status, productName, productType, quantity, extraItemsCount, totalPrice, R.drawable.ram1
             );
 
             System.out.println("Đã tạo đơn hàng: " + newOrder.getOrderId());

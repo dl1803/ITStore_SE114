@@ -48,13 +48,13 @@ public class OrderListFragment extends Fragment {
         List<Order> fakeList = new ArrayList<>();
 
         if (tabStatus.equals("Tất cả") || tabStatus.equals("Chờ xác nhận")) {
-            fakeList.add(new Order("#DH001", "Chờ xác nhận", "RAM Desktop Kingston Fury", "16GB", 1, 2, 3486000));
+            fakeList.add(new Order("#DH001", "Chờ xác nhận", "RAM Desktop Kingston Fury", "16GB", 1, 2, 3486000, R.drawable.ram1));
         }
         if (tabStatus.equals("Tất cả") || tabStatus.equals("Đang giao")) {
-            fakeList.add(new Order("#DH002", "Đang giao", "Laptop Gaming Asus", "Đen", 1, 0, 25000000));
+            fakeList.add(new Order("#DH002", "Đang giao", "Laptop Gaming Asus", "Đen", 1, 0, 25000000, R.drawable.ram1));
         }
         if (tabStatus.equals("Tất cả") || tabStatus.equals("Đã hủy")) {
-            fakeList.add(new Order("#DH003", "Đã hủy", "Chuột Logitech", "Không dây", 2, 0, 450000));
+            fakeList.add(new Order("#DH003", "Đã hủy", "Chuột Logitech", "Không dây", 2, 0, 450000, R.drawable.ram1));
         }
         if (tabStatus.equals("Tất cả") || tabStatus.equals("Đã giao")) {
             fakeList.add(new Order("#DH004", "Đã giao", "Chuột Logitech", "Không dây", 2, 0, 450000));

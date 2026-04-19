@@ -10,15 +10,16 @@ import com.bumptech.glide.Glide;
 import com.example.itstore.R;
 import com.example.itstore.activity.ProductDetailActivity;
 import com.example.itstore.databinding.ItemProductOrderDetailBinding;
+import com.example.itstore.model.OrderItem;
 import com.example.itstore.model.Product;
 
 import java.util.List;
 
 public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.ViewHolder> {
 
-    private List<Product> productList;
-    public OrderDetailAdapter(List<Product> productList) {
-        this.productList = productList;
+    private List<OrderItem> orderItemList;
+    public OrderDetailAdapter(List<OrderItem> orderItemList ) {
+        this.orderItemList = orderItemList;
     }
 
     @NonNull
@@ -31,21 +32,27 @@ public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Product product = productList.get(position);
+        OrderItem item = orderItemList.get(position);
+        Product product = item.getProduct();
 
         holder.binding.tvProductName.setText(product.getName());
-        holder.binding.tvProductPrice.setText(String.format("%,.0fđ", product.getPrice()));
-        holder.binding.tvProductCount.setText("x" + product.getQuantity());
-        if (product.getVariants() != null && !product.getVariants().isEmpty()) {
+        holder.binding.tvProductPrice.setText(String.format("%,.0fđ", item.getPrice()));
+        holder.binding.tvProductCount.setText("Số lượng: " + item.getQuantity());
 
+        if (product.getVariants() != null && !product.getVariants().isEmpty()) {
             holder.binding.tvProductType.setText("Phân loại: " + product.getVariants().get(0).getVersion());
         } else {
             holder.binding.tvProductType.setText("Phân loại: Mặc định");
         }
 
-        Glide.with(holder.itemView.getContext())
-                .load(R.drawable.ram1)
-                .into(holder.binding.imgProduct);
+
+        String imageUrl = product.getImageUrl();
+        try {
+            int imageResId = Integer.parseInt(imageUrl);
+            Glide.with(holder.itemView.getContext()).load(imageResId).into(holder.binding.imgProduct);
+        } catch (NumberFormatException e) {
+            Glide.with(holder.itemView.getContext()).load(imageUrl).into(holder.binding.imgProduct);
+        }
 
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(holder.itemView.getContext(), ProductDetailActivity.class);
@@ -56,11 +63,12 @@ public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.
 
     @Override
     public int getItemCount() {
-        return productList != null ? productList.size() : 0;
+        return orderItemList != null ? orderItemList.size() : 0;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ItemProductOrderDetailBinding binding;
+
         public ViewHolder(ItemProductOrderDetailBinding binding) {
             super(binding.getRoot());
             this.binding = binding;

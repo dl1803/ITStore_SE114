@@ -10,8 +10,8 @@ public class Order implements Serializable {
     private int quantity;
     private int extraItemsCount;
     private long totalPrice;
-
-    public Order(String orderId, String status, String productName, String productType, int quantity, int extraItemsCount, long totalPrice){
+    private int imageRes;
+    public Order(String orderId, String status, String productName, String productType, int quantity, int extraItemsCount, long totalPrice, int imageRes){
         this.orderId = orderId;
         this.status = status;
         this.productName = productName;
@@ -19,6 +19,7 @@ public class Order implements Serializable {
         this.quantity = quantity;
         this.extraItemsCount = extraItemsCount;
         this.totalPrice = totalPrice;
+        this.imageRes = imageRes;
     }
 
     public String getOrderId(){
@@ -51,5 +52,9 @@ public class Order implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public int getImageRes(){
+        return imageRes;
     }
 }
