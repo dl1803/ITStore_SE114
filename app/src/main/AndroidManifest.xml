@@ -15,6 +15,9 @@
         android:theme="@style/Theme.ITStore"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".activity.OrderSuccessActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.WriteReviewActivity"
             android:exported="false" />
         <activity
@@ -33,6 +36,9 @@
             android:name=".activity.OrderDetailActivity"
             android:exported="false" />
         <activity
+            android:name=".activity.OrderDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.NotificationSettingsActivity"
             android:exported="false" />
         <activity
@@ -46,9 +52,6 @@
             android:exported="false" />
         <activity
             android:name=".activity.EditProfileActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.OrderDetailActivity"
             android:exported="false" />
         <activity
             android:name=".activity.RefundRequestActivity"

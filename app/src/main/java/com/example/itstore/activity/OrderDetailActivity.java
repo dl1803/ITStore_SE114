@@ -1,14 +1,21 @@
 package com.example.itstore.activity;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.itstore.R;
 import com.example.itstore.adapter.OrderDetailAdapter;
 import com.example.itstore.databinding.ActivityOrderDetailBinding;
 import com.example.itstore.model.Order;
@@ -129,16 +136,7 @@ public class OrderDetailActivity extends AppCompatActivity {
 
     private void setupClickListeners() {
         binding.btnCancelOrderDetail.setOnClickListener(v -> {
-            currentOrder.setStatus("Đã hủy");
-            binding.tvOrderStatus.setText("Trạng thái: Đã hủy");
-            binding.tvOrderStatus.setTextColor(Color.parseColor("#FF3B30"));
-            updateBottomButtons();
-
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra("UPDATED_ORDER", currentOrder);
-            setResult(RESULT_OK, resultIntent);
-
-            Toast.makeText(this, "Đã hủy đơn hàng thành công!", Toast.LENGTH_SHORT).show();
+            showCancelReasonDialog();
         });
 
         binding.btnConfirmReceived.setOnClickListener(v -> {
@@ -164,5 +162,55 @@ public class OrderDetailActivity extends AppCompatActivity {
             Intent intent = new Intent(OrderDetailActivity.this, WriteReviewActivity.class);
             startActivity(intent);
         });
+    }
+
+
+    private void showCancelReasonDialog(){
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_cancel_order);
+
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+        }
+
+        RadioGroup rgReasons = dialog.findViewById(R.id.rgCancelReasons);
+        EditText edtOtherReason = dialog.findViewById(R.id.edtOtherReason);
+        AppCompatButton btnConfirm = dialog.findViewById(R.id.btnConfirm);
+        AppCompatButton btnClose = dialog.findViewById(R.id.btnClose);
+
+        rgReasons.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.rbReasonOther) {
+                edtOtherReason.setVisibility(View.VISIBLE);
+            } else {
+                edtOtherReason.setVisibility(View.GONE);
+            }
+        });
+
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+
+        btnConfirm.setOnClickListener(v -> {
+            int selectedId = rgReasons.getCheckedRadioButtonId();
+            if (selectedId ==-1) {
+                Toast.makeText(this, "Vui lòng chọn lý do hủy đơn hàng!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            currentOrder.setStatus("Đã hủy");
+            binding.tvOrderStatus.setText("Trạng thái: Đã hủy");
+            binding.tvOrderStatus.setTextColor(Color.parseColor("#FF3B30"));
+            updateBottomButtons();
+
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("UPDATED_ORDER", currentOrder);
+            setResult(RESULT_OK, resultIntent);
+
+            Toast.makeText(this, "Đã hủy đơn hàng thành công!", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        });
+        dialog.show();
     }
 }

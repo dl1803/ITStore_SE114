@@ -57,7 +57,7 @@ public class OrderListFragment extends Fragment {
             fakeList.add(new Order("#DH003", "Đã hủy", "Chuột Logitech", "Không dây", 2, 0, 450000, R.drawable.ram1));
         }
         if (tabStatus.equals("Tất cả") || tabStatus.equals("Đã giao")) {
-            fakeList.add(new Order("#DH004", "Đã giao", "Chuột Logitech", "Không dây", 2, 0, 450000));
+            fakeList.add(new Order("#DH004", "Đã giao", "Chuột Logitech", "Không dây", 2, 0, 450000, R.drawable.ram1));
         }
 
         adapter.setOrderList(fakeList);
