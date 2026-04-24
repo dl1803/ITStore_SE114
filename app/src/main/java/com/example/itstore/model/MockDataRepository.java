@@ -33,7 +33,12 @@ public class MockDataRepository {
         allProducts.add(new Product(101, 1, "CPU Intel Core i9-14900K", "CPU mạnh nhất của Intel, 24 nhân 32 luồng siêu mượt.", var1, defaultImages));
         List<ProductVariant> var2 = new ArrayList<>();
         var2.add(new ProductVariant(2, "32GB", 2500000.0, 2800000.0, 150));
-        allProducts.add(new Product(102, 2, "RAM Corsair Vengeance 32GB", "RAM DDR5 tốc độ cao 6000MHz có LED RGB.", var2, defaultImages));
+        allProducts.add(new Product(102, 2, "RAM Corsair Vengeance 32GB", "RAM Kingston FURY Beast DDR4 16GB 3200MHz là giải pháp nâng cấp hoàn hảo, mang đến hiệu năng cực đỉnh cho dàn PC của bạn. Thiết kế tản nhiệt nhôm nguyên khối màu đen cá tính không chỉ giúp linh kiện hoạt động mát mẻ, ổn định trong thời gian dài mà còn tôn lên vẻ đẹp góc cạnh, đậm chất gaming cho hệ thống.\n\n" +
+                "Được trang bị tính năng Plug N Play tự động ép xung lên tốc độ cao nhất mà hệ thống hỗ trợ, bạn không cần phải vào BIOS tinh chỉnh rườm rà. Sản phẩm tương thích hoàn hảo và đã được kiểm tra nghiêm ngặt trên cả hai nền tảng bo mạch chủ Intel và AMD mới nhất.\n\n" +
+                "Ưu điểm nổi bật:\n" +
+                "- Dung lượng 16GB dư sức xử lý đa nhiệm, thiết kế đồ họa 2D/3D và chiến mượt các tựa game AAA.\n" +
+                "- Tốc độ Bus 3200MHz kết hợp cùng độ trễ thấp CL16 giúp tối ưu thời gian phản hồi, loại bỏ giật lag.\n" +
+                "- Hỗ trợ cấu hình Intel XMP 2.0 giúp việc ép xung trở nên dễ dàng chỉ với một cú click chuột.", var2, defaultImages));
         List<ProductVariant> var3 = new ArrayList<>();
         var3.add(new ProductVariant(3, "24GB", 50000000.0, 55000000.0, 10));
         allProducts.add(new Product(103, 3, "VGA NVIDIA RTX 4090", "Card đồ họa khủng nhất hiện nay.", var3, defaultImages));

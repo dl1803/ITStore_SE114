@@ -2,6 +2,7 @@ package com.example.itstore.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -160,6 +161,25 @@ public class ProductDetailActivity extends AppCompatActivity {
                 bottomSheet.show(getSupportFragmentManager(), "SpecsBottomSheet");
             }
         });
+        // Lấy dữ liệu mô tả thực tế từ sản phẩm
+        if (currentProduct != null && currentProduct.getDescription() != null && !currentProduct.getDescription().isEmpty()) {
+            binding.tvProductContent.setText(currentProduct.getDescription());
+        }
+        final boolean[] isDescExpanded = {false};
+
+        View.OnClickListener toggleDescriptionListener = v -> {
+            if (isDescExpanded[0]) {
+                binding.tvProductContent.setMaxLines(3);
+                binding.XemThem.setText("Xem thêm");
+                isDescExpanded[0] = false;
+            } else {
+                binding.tvProductContent.setMaxLines(Integer.MAX_VALUE);
+                binding.XemThem.setText("Thu gọn");
+                isDescExpanded[0] = true;
+            }
+        };
+        binding.XemThem.setOnClickListener(toggleDescriptionListener);
+        binding.tvProductContent.setOnClickListener(toggleDescriptionListener);
         setupReview();
     }
 

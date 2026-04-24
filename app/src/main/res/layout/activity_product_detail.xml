@@ -423,6 +423,7 @@
                 android:layout_height="wrap_content"/>
 
             <TextView
+                android:id="@+id/tvProductContent"
                 android:text="RAM Kingston Fury Beast 16GB là sự lựa chọn hoàn hảo cho các game thủ cần hiệu năng cao. Tản nhiệt thép đen mạnh mẽ..."
                 android:textColor="#666"
                 android:textSize="12dp"
