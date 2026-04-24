@@ -82,6 +82,7 @@ public class ProfileFragment extends Fragment {
                 Intent intent = new Intent(requireContext(), LoginActivity.class);
                 startActivity(intent);
             });
+
         } else {
             String cachedName = SharedPrefsManager.getInstance(requireContext()).getUserFullName();
             String cachedEmail = SharedPrefsManager.getInstance(requireContext()).getUserEmail();
