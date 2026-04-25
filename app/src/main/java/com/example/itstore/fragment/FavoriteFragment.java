@@ -17,11 +17,13 @@ import android.widget.Toast;
 
 import com.example.itstore.R;
 import com.example.itstore.activity.LoginActivity;
+import com.example.itstore.activity.ProductDetailActivity;
 import com.example.itstore.adapter.FavoriteAdapter;
 import com.example.itstore.databinding.FragmentFavoriteBinding;
 import com.example.itstore.model.Product;
 import com.example.itstore.utils.SharedPrefsManager;
 import com.example.itstore.viewmodel.HomeViewModel;
+import com.example.itstore.viewmodel.ProductDetailViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,7 @@ public class FavoriteFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentFavoriteBinding.inflate(inflater, container, false);
         String token = SharedPrefsManager.getInstance(requireContext()).getAccessToken();
+
         if (token == null || token.isEmpty()) {
             binding.rvFavorite.setVisibility(View.GONE);
             binding.layoutRequireLogin.setVisibility(View.VISIBLE);
@@ -54,22 +57,46 @@ public class FavoriteFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         homeViewModel = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
+
         FavoriteAdapter.OnFavoriteClickListener favoriteListener = new FavoriteAdapter.OnFavoriteClickListener() {
             @Override
             public void onRemoveFavorite(Product product) {
-                product.setFavorite(false);
-                homeViewModel.updateProduct(product);
+                com.example.itstore.model.MockDataRepository.getInstance().updateProduct(product);
                 Toast.makeText(requireContext(), "Đã xóa khỏi danh sách yêu thích", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onAddToCart(Product product) {
-                android.widget.Toast.makeText(requireContext(), "Đã thêm " + product.getName() + " vào giỏ", android.widget.Toast.LENGTH_SHORT).show();
+                // Kiểm tra xem có nhiều phiên bản k
+                if (product.getVariants() != null && product.getVariants().size() > 1) {
+                    // Có từ 2 phiên bản thì sang chi tiết sản phẩm chọn
+                    Toast.makeText(requireContext(), "Vui lòng chọn phiên bản bạn muốn mua", Toast.LENGTH_SHORT).show();
+
+                    Intent intent = new Intent(requireContext(), ProductDetailActivity.class);
+                    intent.putExtra("PRODUCT_INFO", product);
+                    startActivity(intent);
+                } else {
+                    // Có 1 phiên bản
+                    ProductDetailViewModel detailViewModel = new ViewModelProvider(requireActivity()).get(ProductDetailViewModel.class);
+
+                    int defaultVariantId = 1;
+                    String defaultVariantName = "Mặc định";
+
+                    if (product.getVariants() != null && !product.getVariants().isEmpty()) {
+                        defaultVariantId = product.getVariants().get(0).getId();
+                        defaultVariantName = product.getVariants().get(0).getVersion();
+                    }
+
+                    detailViewModel.addToCart(product, defaultVariantId, defaultVariantName, product.getPrice());
+                    Toast.makeText(requireContext(), "Đã thêm " + product.getName() + " vào giỏ", Toast.LENGTH_SHORT).show();
+                }
             }
         };
+
         adapter = new FavoriteAdapter(requireContext(), new ArrayList<>(), favoriteListener);
         binding.rvFavorite.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvFavorite.setAdapter(adapter);
+
         homeViewModel.getProductListLiveData().observe(getViewLifecycleOwner(), products -> {
             List<Product> favList = new ArrayList<>();
             for (Product p : products) {
@@ -79,7 +106,24 @@ public class FavoriteFragment extends Fragment {
             }
             adapter.updateList(favList);
         });
-        binding.imgBack.setOnClickListener(v ->
-                androidx.navigation.Navigation.findNavController(v).popBackStack());
+
+        binding.imgBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        String token = SharedPrefsManager.getInstance(requireContext()).getAccessToken();
+
+        if (adapter != null && token != null && !token.isEmpty()) {
+            List<Product> freshProducts = com.example.itstore.model.MockDataRepository.getInstance().getAllProducts();
+            List<Product> favList = new ArrayList<>();
+            for (Product p : freshProducts) {
+                if (p.isFavorite()) {
+                    favList.add(p);
+                }
+            }
+            adapter.updateList(favList);
+        }
     }
 }

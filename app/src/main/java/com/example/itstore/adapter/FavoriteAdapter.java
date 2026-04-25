@@ -44,6 +44,27 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
         holder.binding.tvPrice.setText(String.format("%,.0f đ", product.getPrice()));
         Glide.with(context).load(product.getImageUrl()).into(holder.binding.imgProduct);
         holder.binding.imgFavoriteItem.setImageResource(R.drawable.ic_favorite);
+        if (product.isFavorite()) {
+            int colorOrange = androidx.core.content.ContextCompat.getColor(context, R.color.orange_primary);
+            holder.binding.imgFavoriteItem.setColorFilter(colorOrange);
+        } else {
+            int colorGray = androidx.core.content.ContextCompat.getColor(context, R.color.white_gray);
+            holder.binding.imgFavoriteItem.setColorFilter(colorGray);
+        }
+        holder.binding.imgFavoriteItem.setOnClickListener(v -> {
+            product.setFavorite(false);
+            if (listener != null) {
+                listener.onRemoveFavorite(product);
+            }
+            favoriteList.remove(position);
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, favoriteList.size());
+        });
+        holder.binding.ivCartItem.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onAddToCart(product);
+            }
+        });
     }
 
     @Override

@@ -33,6 +33,7 @@ public class MockDataRepository {
         allProducts.add(new Product(101, 1, "CPU Intel Core i9-14900K", "CPU mạnh nhất của Intel, 24 nhân 32 luồng siêu mượt.", var1, defaultImages));
         List<ProductVariant> var2 = new ArrayList<>();
         var2.add(new ProductVariant(2, "32GB", 2500000.0, 2800000.0, 150));
+        var2.add(new ProductVariant(6, "64GB", 4800000.0, 5000000.0, 50));
         allProducts.add(new Product(102, 2, "RAM Corsair Vengeance 32GB", "RAM Kingston FURY Beast DDR4 16GB 3200MHz là giải pháp nâng cấp hoàn hảo, mang đến hiệu năng cực đỉnh cho dàn PC của bạn. Thiết kế tản nhiệt nhôm nguyên khối màu đen cá tính không chỉ giúp linh kiện hoạt động mát mẻ, ổn định trong thời gian dài mà còn tôn lên vẻ đẹp góc cạnh, đậm chất gaming cho hệ thống.\n\n" +
                 "Được trang bị tính năng Plug N Play tự động ép xung lên tốc độ cao nhất mà hệ thống hỗ trợ, bạn không cần phải vào BIOS tinh chỉnh rườm rà. Sản phẩm tương thích hoàn hảo và đã được kiểm tra nghiêm ngặt trên cả hai nền tảng bo mạch chủ Intel và AMD mới nhất.\n\n" +
                 "Ưu điểm nổi bật:\n" +
@@ -55,6 +56,15 @@ public class MockDataRepository {
 
     public List<Category> getAllCategories() {
         return allCategories;
+    }
+    public void updateProduct(Product updatedProduct) {
+        if (updatedProduct == null || allProducts == null) return;
+        for (int i = 0; i < allProducts.size(); i++) {
+            if (allProducts.get(i).getId() == updatedProduct.getId()) {
+                allProducts.set(i, updatedProduct);
+                return;
+            }
+        }
     }
 
 }
