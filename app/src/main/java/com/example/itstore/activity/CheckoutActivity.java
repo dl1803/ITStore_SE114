@@ -22,13 +22,18 @@ import com.example.itstore.R;
 import com.example.itstore.adapter.CheckoutAdapter;
 import com.example.itstore.adapter.DiscountAdapter;
 import com.example.itstore.databinding.ActivityCheckoutBinding;
+import com.example.itstore.model.Address;
 import com.example.itstore.model.CartItem;
+import com.example.itstore.model.CreateOrderRequest;
 import com.example.itstore.model.Discount;
 import com.example.itstore.model.Order;
+import com.example.itstore.model.OrderItemRequest;
 import com.example.itstore.utils.CartManager;
+import com.example.itstore.viewmodel.AddressViewModel;
 import com.example.itstore.viewmodel.CheckoutViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
+import java.net.InterfaceAddress;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +42,12 @@ public class CheckoutActivity extends AppCompatActivity {
 
     ActivityCheckoutBinding binding;
     private CheckoutViewModel checkoutViewModel;
+    private AddressViewModel addressViewModel;
     private CheckoutAdapter adapter;
 
     private String appliedVoucherCode = "";
+    private int selectedAddressId = -1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +62,11 @@ public class CheckoutActivity extends AppCompatActivity {
         checkoutViewModel = new ViewModelProvider(this).get(CheckoutViewModel.class);
         binding.rvCheckoutItems.setLayoutManager(new LinearLayoutManager(this));
 
+
+        addressViewModel = new ViewModelProvider(this).get(AddressViewModel.class);
+
         observeViewModel();
+
 
         binding.cardInfo.setOnClickListener(v -> {
             showAddressSelectionDialog();
@@ -85,9 +97,9 @@ public class CheckoutActivity extends AppCompatActivity {
         binding.rbCod.setChecked(true);
 
         binding.btnCheckout.setOnClickListener(v -> {
-            String paymentMethod = "COD";
-            if (binding.rbMomo.isChecked()) paymentMethod = "MOMO";
-            if (binding.rbBankTransfer.isChecked()) paymentMethod = "BANK";
+            String paymentMethod = "cod";
+            if (binding.rbMomo.isChecked()) paymentMethod = "mono";
+            if (binding.rbBankTransfer.isChecked()) paymentMethod = "bank";
 
             List<CartItem> purchasedItems = checkoutViewModel.getCheckoutItems().getValue();
             if (purchasedItems == null || purchasedItems.isEmpty()) {
@@ -95,62 +107,56 @@ public class CheckoutActivity extends AppCompatActivity {
                 return;
             }
 
-            int randomNum = new java.util.Random().nextInt(900000) + 100000;
-            String orderId = "ORD-" + randomNum;
-            String status = "Chờ xác nhận";
-
-            CartItem firstItem = purchasedItems.get(0);
-            String productName = firstItem.getProduct().getName();
-            String productType = firstItem.getVariantName();
-            int quantity = firstItem.getQuantity();
-
-            int extraItemsCount = 0;
-            if (purchasedItems.size() > 1) {
-                extraItemsCount = purchasedItems.size() - 1;
+            if (selectedAddressId == -1) {
+                Toast.makeText(this, "Vui lòng chọn địa chỉ nhận hàng!", Toast.LENGTH_SHORT).show();
+                return;
             }
 
-            long totalPrice = 0;
-            if (checkoutViewModel.getFinalTotalPrice().getValue() != null) {
-                double tienDouble = checkoutViewModel.getFinalTotalPrice().getValue();
-                totalPrice = (long) tienDouble;
+            List<OrderItemRequest> orderItems = new ArrayList<>();
+            for (CartItem item : purchasedItems){
+                orderItems.add(new OrderItemRequest(item.getVariantId(), item.getQuantity()));
             }
 
-            Order newOrder = new Order(
-                    orderId, status, productName, productType, quantity, extraItemsCount, totalPrice, R.drawable.ram1, "22/02/2026 14:30"
+            Integer couponId = appliedVoucherCode.isEmpty() ? null : 1;
+
+            CreateOrderRequest request = new CreateOrderRequest(
+                    selectedAddressId,
+                    couponId,
+                    paymentMethod,
+                    "Vui lòng giao trong giờ hành chính",
+                    orderItems
             );
 
-            System.out.println("Đã tạo đơn hàng: " + newOrder.getOrderId());
-
-            CartManager.getInstance().clearPurchasedItems();
-
-            Toast.makeText(this, "Đặt hàng thành công! Mã: " + newOrder.getOrderId(), Toast.LENGTH_LONG).show();
-
-
-            Intent intent = new Intent(this, OrderSuccessActivity.class);
-
-            intent.putExtra("ORDER_DATA", newOrder);
-            startActivity(intent);
-            finish();
+            binding.btnCheckout.setEnabled(false);
+            checkoutViewModel.placeOrder(request);
         });
+        addressViewModel.fetchAddresses(this);
+
     }
 
     // TÍNH NĂNG 1: CHỌN ĐỊA CHỈ TỪ DANH SÁCH
     private void showAddressSelectionDialog() {
-        String[] addresses = {
-                "UIT Thủ Đức, TP.HCM",
-                "Quận 1, TP.HCM (Nhà riêng)",
-                "Quận 7, TP.HCM (Công ty)"
-        };
+        List<Address> addressList = addressViewModel.getAddressList().getValue();
+
+        if (addressList == null || addressList.isEmpty()) {
+            Toast.makeText(this, "Bạn chưa có địa chỉ nào! Vui lòng vào Cài đặt để thêm.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        String[] addressStrings = new String[addressList.size()];
+        for (int i = 0; i < addressList.size(); i++) {
+            Address addr = addressList.get(i);
+            addressStrings[i] = addr.getRecipient() + " | " + addr.getPhoneNumber() + "\n"
+                    + addr.getStreet() + ", " + addr.getWard() + ", " + addr.getDistrict() + ", " + addr.getProvince();
+        }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Chọn địa chỉ nhận hàng");
 
-        builder.setItems(addresses, (dialog, which) -> {
-            String selectedAddress = addresses[which];
+        builder.setItems(addressStrings, (dialog, which) -> {
+            Address selectedAddress = addressList.get(which);
 
-            binding.tvAddress.setText(selectedAddress);
-
-            Toast.makeText(this, "Đã chọn: " + selectedAddress, Toast.LENGTH_SHORT).show();
+            updateAddressUI(selectedAddress);
         });
         builder.show();
     }
@@ -265,5 +271,52 @@ public class CheckoutActivity extends AppCompatActivity {
             binding.tvTotal.setText(formattedTotal);
         });
 
+        checkoutViewModel.getIsOrderSuccess().observe(this, isSuccess -> {
+            if (isSuccess != null && isSuccess) {
+                Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
+                CartManager.getInstance().clearPurchasedItems();
+
+                if (binding.rbCod.isChecked()){
+                    Intent intent = new Intent(this, OrderSuccessActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(this, "Đang chuyển hướng sang MoMo...", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        checkoutViewModel.getOrderError().observe(this, error -> {
+            Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+        });
+
+        addressViewModel.getAddressList().observe(this , addressList -> {
+            if (addressList != null && !addressList.isEmpty()) {
+                Address defaultAddress = null;
+                for (Address address : addressList) {
+                    if (address.isDefault()) {
+                        defaultAddress = address;
+                        break;
+                    }
+                }
+                if (defaultAddress != null) {
+                    updateAddressUI(defaultAddress);
+                }else {
+                    updateAddressUI(addressList.get(0));
+                }
+            }
+        });
+    }
+
+    private void updateAddressUI(Address address) {
+        selectedAddressId = address.getId();
+        binding.tvUserInfo.setText(address.getRecipient() + " | " + address.getPhoneNumber());
+        String fullAddress = address.getStreet() + ", " + address.getWard() + ", "
+                + address.getDistrict() + ", " + address.getProvince();
+        binding.tvAddress.setText(fullAddress);
+
+        if (checkoutViewModel != null) {
+            checkoutViewModel.calculateShippingFee(address.getDistrictId(), address.getWardCode());
+        }
     }
 }

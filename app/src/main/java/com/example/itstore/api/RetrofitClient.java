@@ -21,6 +21,7 @@ import com.example.itstore.model.AddressRequest;
 import com.example.itstore.model.AddressResponse;
 import com.example.itstore.model.ChangePasswordRequest;
 import com.example.itstore.model.ChangePasswordResponse;
+import com.example.itstore.model.CreateOrderRequest;
 import com.example.itstore.model.ForgotPasswordRequest;
 import com.example.itstore.model.ForgotPasswordResponse;
 import com.example.itstore.model.GoogleLoginRequest;
@@ -28,6 +29,7 @@ import com.example.itstore.model.LoginRequest;
 import com.example.itstore.model.LoginResponse;
 import com.example.itstore.model.LogoutRequest;
 import com.example.itstore.model.LogoutResponse;
+import com.example.itstore.model.OrderCreateResponse;
 import com.example.itstore.model.ProfileResponse;
 import com.example.itstore.model.RefreshTokenRequest;
 import com.example.itstore.model.RefreshTokenResponse;
@@ -106,6 +108,9 @@ public class RetrofitClient {
 
         @DELETE("api/users/me/addresses/{id}")
         Call<SingleAddressResponse> deleteAddress(@Path("id") int id);
+
+        @POST("api/orders")
+        Call<OrderCreateResponse> createOrder(@Body CreateOrderRequest request);
 
     }
 }
