@@ -14,6 +14,7 @@ import com.example.itstore.databinding.ActivityProductDetailBinding;
 import com.example.itstore.adapter.ImagePagerAdapter;
 import com.example.itstore.fragment.SpecsBottomSheet;
 import com.example.itstore.model.CartItem;
+import com.example.itstore.model.MockDataRepository;
 import com.example.itstore.model.Product;
 import com.example.itstore.model.Review;
 import com.example.itstore.utils.CartManager;
@@ -127,15 +128,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         });
 
         binding.ivCart.setOnClickListener(v ->{
-            String token = SharedPrefsManager.getInstance(this).getAccessToken();
-            if (token == null || token.isEmpty()) {
-                Toast.makeText(this, "Vui lòng đăng nhập để thêm vào giỏ hàng!", Toast.LENGTH_SHORT).show();
-                Intent intentLogin = new Intent(this, LoginActivity.class);
-                startActivity(intentLogin);
-            } else {
-                detailViewModel.addToCart(currentProduct, currentVariantId, currentRam, currentFinalPrice);
-                Toast.makeText(ProductDetailActivity.this, "Đã thêm bản " + currentRam + " vào giỏ!", Toast.LENGTH_SHORT).show();
-            }
+            goToCartScreen();
         });
 
         binding.imgFavoriteItem.setOnClickListener(v -> {
@@ -149,6 +142,7 @@ public class ProductDetailActivity extends AppCompatActivity {
                 boolean newStatus = !currentProduct.isFavorite();
                 currentProduct.setFavorite(newStatus);
                 updateFavoriteIcon(newStatus);
+                MockDataRepository.getInstance().updateProduct(currentProduct);
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("UPDATED_PRODUCT", currentProduct);
                 setResult(RESULT_OK, returnIntent);
@@ -236,7 +230,8 @@ public class ProductDetailActivity extends AppCompatActivity {
     private void goToCartScreen() {
         Intent intent = new Intent(ProductDetailActivity.this, MainActivity.class);
         intent.putExtra("navigate_to", "cart");
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.putExtra("from_detail", true);
+        // intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
     }
 

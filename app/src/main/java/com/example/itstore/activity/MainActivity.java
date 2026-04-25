@@ -13,6 +13,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.NavInflater;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -32,7 +33,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
-
+    private NavController navController;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -42,8 +43,21 @@ public class MainActivity extends AppCompatActivity {
 
             NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.nav_host_fragment);
-            NavController navController = navHostFragment.getNavController();
+            navController = navHostFragment.getNavController();
+        NavInflater inflater = navController.getNavInflater();
+        androidx.navigation.NavGraph graph = inflater.inflate(R.navigation.nav_graph);
 
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("navigate_to")) {
+            String destination = intent.getStringExtra("navigate_to");
+            if ("cart".equals(destination)) {
+                graph.setStartDestination(R.id.nav_cart);
+            } else if ("favorite".equals(destination)) {
+                graph.setStartDestination(R.id.nav_favorite);
+            }
+            intent.removeExtra("navigate_to");
+        }
+        navController.setGraph(graph);
             NavigationUI.setupWithNavController(binding.bottomNavigation, navController);
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.getId() == R.id.nav_search || destination.getId() == R.id.nav_cart) {
@@ -59,11 +73,16 @@ public class MainActivity extends AppCompatActivity {
         setIntent(intent);
         if (intent != null && intent.hasExtra("navigate_to")) {
             String destination = intent.getStringExtra("navigate_to");
-            if ("cart".equals(destination)) {
-                binding.bottomNavigation.setSelectedItemId(R.id.nav_cart);
-            } else if ("favorite".equals(destination)){
-                binding.bottomNavigation.equals(destination);
+            try {
+                if ("cart".equals(destination)) {
+                    navController.navigate(R.id.nav_cart);
+                } else if ("favorite".equals(destination)) {
+                    navController.navigate(R.id.nav_favorite);
+                }
+            } catch (Exception e) {
+                android.util.Log.e("Loi_Chuyen_Trang", "Lỗi ở onNewIntent: " + e.getMessage());
             }
+            intent.removeExtra("navigate_to");
         }
     }
 
