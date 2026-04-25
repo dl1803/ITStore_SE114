@@ -48,6 +48,7 @@ public class CheckoutActivity extends AppCompatActivity {
     private String appliedVoucherCode = "";
     private int selectedAddressId = -1;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         
@@ -61,7 +62,11 @@ public class CheckoutActivity extends AppCompatActivity {
         checkoutViewModel = new ViewModelProvider(this).get(CheckoutViewModel.class);
         binding.rvCheckoutItems.setLayoutManager(new LinearLayoutManager(this));
 
+
+        addressViewModel = new ViewModelProvider(this).get(AddressViewModel.class);
+
         observeViewModel();
+
 
         binding.cardInfo.setOnClickListener(v -> {
             showAddressSelectionDialog();
@@ -125,11 +130,8 @@ public class CheckoutActivity extends AppCompatActivity {
             binding.btnCheckout.setEnabled(false);
             checkoutViewModel.placeOrder(request);
         });
-
-        checkoutViewModel = new ViewModelProvider(this).get(CheckoutViewModel.class);
-
-        addressViewModel = new ViewModelProvider(this).get(AddressViewModel.class);
         addressViewModel.fetchAddresses(this);
+
     }
 
     // TÍNH NĂNG 1: CHỌN ĐỊA CHỈ TỪ DANH SÁCH
@@ -144,8 +146,8 @@ public class CheckoutActivity extends AppCompatActivity {
         String[] addressStrings = new String[addressList.size()];
         for (int i = 0; i < addressList.size(); i++) {
             Address addr = addressList.get(i);
-            addressStrings[i] = addr.getRecipient() + " - " + addr.getPhoneNumber() + "\n"
-                    + addr.getStreet() + ", " + addr.getWard();
+            addressStrings[i] = addr.getRecipient() + " | " + addr.getPhoneNumber() + "\n"
+                    + addr.getStreet() + ", " + addr.getWard() + ", " + addr.getDistrict() + ", " + addr.getProvince();
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -153,11 +155,8 @@ public class CheckoutActivity extends AppCompatActivity {
 
         builder.setItems(addressStrings, (dialog, which) -> {
             Address selectedAddress = addressList.get(which);
-            binding.tvAddress.setText(addressStrings[which]);
-            selectedAddressId = selectedAddress.getId();
-            selectedAddressId = selectedAddress.getId();
 
-            Toast.makeText(this, "Đã chọn: " + selectedAddress.getRecipient(), Toast.LENGTH_SHORT).show();
+            updateAddressUI(selectedAddress);
         });
         builder.show();
     }
@@ -290,5 +289,34 @@ public class CheckoutActivity extends AppCompatActivity {
         checkoutViewModel.getOrderError().observe(this, error -> {
             Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
         });
+
+        addressViewModel.getAddressList().observe(this , addressList -> {
+            if (addressList != null && !addressList.isEmpty()) {
+                Address defaultAddress = null;
+                for (Address address : addressList) {
+                    if (address.isDefault()) {
+                        defaultAddress = address;
+                        break;
+                    }
+                }
+                if (defaultAddress != null) {
+                    updateAddressUI(defaultAddress);
+                }else {
+                    updateAddressUI(addressList.get(0));
+                }
+            }
+        });
+    }
+
+    private void updateAddressUI(Address address) {
+        selectedAddressId = address.getId();
+        binding.tvUserInfo.setText(address.getRecipient() + " | " + address.getPhoneNumber());
+        String fullAddress = address.getStreet() + ", " + address.getWard() + ", "
+                + address.getDistrict() + ", " + address.getProvince();
+        binding.tvAddress.setText(fullAddress);
+
+        if (checkoutViewModel != null) {
+            checkoutViewModel.calculateShippingFee(address.getDistrictId(), address.getWardCode());
+        }
     }
 }

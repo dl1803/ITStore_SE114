@@ -10,9 +10,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.itstore.api.GhnApiClient;
 import com.example.itstore.api.RetrofitClient;
 import com.example.itstore.model.CartItem;
 import com.example.itstore.model.CreateOrderRequest;
+import com.example.itstore.model.GhnFeeData;
+import com.example.itstore.model.GhnFeeRequest;
+import com.example.itstore.model.GhnResponse;
 import com.example.itstore.model.OrderCreateResponse;
 
 import java.util.List;
@@ -23,9 +27,12 @@ import retrofit2.Response;
 
 public class CheckoutViewModel extends AndroidViewModel {
 
+    private final String GHN_TOKEN = "5369cdb2-3fd4-11f1-b84f-e215adfdd13e";
+    private final int GHN_SHOP_ID = 6403105;
+
     private final MutableLiveData<List<CartItem>> checkoutItems = new MutableLiveData<>();
     private final MutableLiveData<Double> subtotalPrice = new MutableLiveData<>(0.0);
-    private final MutableLiveData<Double> shippingFee = new MutableLiveData<>(30000.0);
+    private final MutableLiveData<Double> shippingFee = new MutableLiveData<>(0.0);
     private final MutableLiveData<Double> totalDiscount = new MutableLiveData<>(0.0);
     private final MutableLiveData<Double> finalTotalPrice = new MutableLiveData<>(0.0);
     private final MutableLiveData<Boolean> isOrderSuccess = new MutableLiveData<>();
@@ -53,7 +60,7 @@ public class CheckoutViewModel extends AndroidViewModel {
 
     private void calculateMoney(List<CartItem> items) {
         double subtotal = 0;
-        double discount = 0;
+        double discount = totalDiscount.getValue() != null ? totalDiscount.getValue() : 0;
 
         if (items != null) {
             for (CartItem item : items) {
@@ -63,6 +70,7 @@ public class CheckoutViewModel extends AndroidViewModel {
 
         double ship = shippingFee.getValue() != null ? shippingFee.getValue() : 0;
         double finalPrice = subtotal + ship - discount;
+        if(finalPrice < 0) finalPrice = 0;
 
         subtotalPrice.setValue(subtotal);
         totalDiscount.setValue(discount);
@@ -71,15 +79,7 @@ public class CheckoutViewModel extends AndroidViewModel {
 
     public void applyDiscount(double discountAmount) {
         totalDiscount.setValue(discountAmount);
-
-        double subtotal = subtotalPrice.getValue() != null ? subtotalPrice.getValue() : 0;
-        double ship = shippingFee.getValue() != null ? shippingFee.getValue() : 0;
-
-        double finalPrice = (subtotal + ship) - discountAmount;
-
-        if(finalPrice < 0) finalPrice = 0;
-
-        finalTotalPrice.setValue(finalPrice);
+        calculateMoney(checkoutItems.getValue());
     }
 
     public void placeOrder(CreateOrderRequest request) {
@@ -102,5 +102,44 @@ public class CheckoutViewModel extends AndroidViewModel {
                 orderError.setValue("Lỗi kết nối mạng!");
             }
         });
+    }
+
+    public void calculateShippingFee(int toDistrictId, String toWardCode) {
+        int totalWeight = 0;
+        List<CartItem> items = checkoutItems.getValue();
+        if (items != null) {
+            for (CartItem item : items) {
+                totalWeight += (item.getQuantity() * 500);  // Giả sử 500g/sản phẩm
+            }
+        }
+
+        if (totalWeight == 0)
+        {return;}
+
+        int fromDistrictId = 3695; // ID của kho Thủ đức (dựa theo địa chỉ của của hàng)
+
+        GhnFeeRequest request = new GhnFeeRequest(fromDistrictId, toDistrictId, toWardCode, totalWeight);
+
+        GhnApiClient.getApiService().getShippingFee(GHN_TOKEN, GHN_SHOP_ID, request)
+                .enqueue(new retrofit2.Callback<GhnResponse<GhnFeeData>>() {
+                    @Override
+                    public void onResponse(Call<GhnResponse<GhnFeeData>> call, Response<GhnResponse<GhnFeeData>> response) {
+                        if (response.isSuccessful() && response.body() != null && response.body().getCode() == 200) {
+                            double realFee = response.body().getData().getTotalFee();
+                            shippingFee.setValue(realFee);
+
+                            calculateMoney(checkoutItems.getValue());
+                        } else {
+                            shippingFee.setValue(30000.0);
+                            calculateMoney(checkoutItems.getValue());
+                    }
+                        }
+
+                    @Override
+                    public void onFailure(Call<GhnResponse<GhnFeeData>> call, Throwable t) {
+                        shippingFee.setValue(30000.0);
+                        calculateMoney(checkoutItems.getValue());
+                    }
+                });
     }
 }

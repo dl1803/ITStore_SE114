@@ -12,9 +12,22 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.itstore.R;
+import com.example.itstore.api.GhnApiClient;
 import com.example.itstore.databinding.ActivityAddressInfoBinding;
 import com.example.itstore.model.AddressRequest;
+import com.example.itstore.model.GhnDistrict;
+import com.example.itstore.model.GhnProvince;
+import com.example.itstore.model.GhnResponse;
+import com.example.itstore.model.GhnWard;
 import com.example.itstore.viewmodel.AddEditAddressViewModel;
+
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+
+import retrofit2.Call;
 
 public class AddEditAddressActivity extends AppCompatActivity {
 
@@ -24,10 +37,15 @@ public class AddEditAddressActivity extends AppCompatActivity {
     private boolean isEditMode = false;
     private int curAddressId = -1;
 
-    private final String[] fakeProvinces = {"TP.Hồ Chí Minh", "Hà Nội", "Đà Nẵng", "Cần Thơ"};
-    private final String[] fakeDistricts = {"Quận 1", "Quận 3", "Quận Bình Thạnh", "Thủ Đức"};
-    private final String[] fakeWards = {"Phường Bến Nghé", "Phường 30", "Phường 25", "Linh Trung"};
+    private final String GHN_TOKEN = "5369cdb2-3fd4-11f1-b84f-e215adfdd13e";
 
+    private List<GhnProvince> provinceList = new ArrayList<>();
+    private List<GhnDistrict> districtList = new ArrayList<>();
+    private List<GhnWard> wardList = new ArrayList<>();
+
+    private int selectedProvinceId = -1;
+    private int selectedDistrictId = -1;
+    private String selectedWardCode = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +88,7 @@ public class AddEditAddressActivity extends AppCompatActivity {
 
 
         setupUI();
+        fetchProvinces();
 
         handleDropdownClick();
 
@@ -135,42 +154,67 @@ public class AddEditAddressActivity extends AppCompatActivity {
 
     private void handleDropdownClick() {
         binding.edtProvince.setOnClickListener(v -> {
+            if (provinceList.isEmpty()) {
+                Toast.makeText(this, "Đang tải dữ liệu, đợi xíu sếp ơi...", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String[] provinceNames = new String[provinceList.size()];
+            for (int i = 0; i < provinceList.size(); i++) provinceNames[i] = provinceList.get(i).getProvinceName();
+
             new androidx.appcompat.app.AlertDialog.Builder(this)
                     .setTitle("Chọn Tỉnh / Thành phố")
-                    .setItems(fakeProvinces, (dialog, which) -> {
-                        String selectedProvince = fakeProvinces[which];
-                        binding.edtProvince.setText(selectedProvince);
+                    .setItems(provinceNames, (dialog, which) -> {
+                        GhnProvince selected = provinceList.get(which);
+                        binding.edtProvince.setText(selected.getProvinceName());
+
                         binding.edtDistrict.setText("");
                         binding.edtWard.setText("");
+                        districtList.clear();
+                        wardList.clear();
+
+                        selectedProvinceId = selected.getProvinceID();
+                        fetchDistricts(selectedProvinceId);
                     }).show();
         });
 
         binding.edtDistrict.setOnClickListener(v -> {
-            if (binding.edtProvince.getText().toString().isEmpty()) {
+            if (selectedProvinceId == -1 || districtList.isEmpty()) {
                 Toast.makeText(this, "Vui lòng chọn Tỉnh/Thành phố trước!", Toast.LENGTH_SHORT).show();
                 return;
             }
+            String[] districtNames = new String[districtList.size()];
+            for (int i = 0; i < districtList.size(); i++) districtNames[i] = districtList.get(i).getDistrictName();
 
             new androidx.appcompat.app.AlertDialog.Builder(this)
                     .setTitle("Chọn Quận / Huyện")
-                    .setItems(fakeDistricts, (dialog, which) -> {
-                        String selectedDistrict = fakeDistricts[which];
-                        binding.edtDistrict.setText(selectedDistrict);
+                    .setItems(districtNames, (dialog, which) -> {
+                        GhnDistrict selected = districtList.get(which);
+                        binding.edtDistrict.setText(selected.getDistrictName());
+
                         binding.edtWard.setText("");
+                        wardList.clear();
+
+                        selectedDistrictId = selected.getDistrictID();
+                        fetchWards(selectedDistrictId);
                     }).show();
         });
 
         binding.edtWard.setOnClickListener(v -> {
-            if (binding.edtDistrict.getText().toString().isEmpty()) {
+            if (selectedDistrictId == -1 || wardList.isEmpty()) {
                 Toast.makeText(this, "Vui lòng chọn Quận/Huyện trước!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
+            String[] wardNames = new String[wardList.size()];
+            for (int i = 0; i < wardList.size(); i++) wardNames[i] = wardList.get(i).getWardName();
+
             new androidx.appcompat.app.AlertDialog.Builder(this)
                     .setTitle("Chọn Phường/Xã")
-                    .setItems(fakeWards, (dialog, which) -> {
-                        String selectedWard = fakeWards[which];
-                        binding.edtWard.setText(selectedWard);
+                    .setItems(wardNames, (dialog, which) -> {
+                        GhnWard selected = wardList.get(which);
+                        binding.edtWard.setText(selected.getWardName());
+                        selectedWardCode = selected.getWardCode();
                     })
                     .show();
         });
@@ -206,5 +250,49 @@ public class AddEditAddressActivity extends AppCompatActivity {
         }
 
         return isValid;
+    }
+
+    private void fetchProvinces() {
+        GhnApiClient.getApiService().getProvinces(GHN_TOKEN).enqueue(new retrofit2.Callback<GhnResponse<List<GhnProvince>>>() {
+            @Override
+            public void onResponse(Call<GhnResponse<List<GhnProvince>>> call, retrofit2.Response<GhnResponse<List<GhnProvince>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    provinceList = response.body().getData();
+
+                    // Collator là công cụ so sánh chuỗi theo ngôn ngữ xác định
+                    Collator collator = Collator.getInstance(new Locale("vi", "VN"));
+                    Collections.sort(provinceList, (p1, p2) -> collator.compare(p1.getProvinceName(), p2.getProvinceName()));
+                }
+            }
+            @Override public void onFailure(Call<GhnResponse<List<GhnProvince>>> call, Throwable t) {}
+        });
+    }
+
+    private void fetchDistricts(int provinceId) {
+        GhnApiClient.getApiService().getDistricts(GHN_TOKEN, provinceId).enqueue(new retrofit2.Callback<GhnResponse<List<GhnDistrict>>>() {
+            @Override
+            public void onResponse(Call<GhnResponse<List<GhnDistrict>>> call, retrofit2.Response<GhnResponse<List<GhnDistrict>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    districtList = response.body().getData();
+                    Collator collator = Collator.getInstance(new Locale("vi", "VN"));
+                    Collections.sort(districtList, (d1, d2) -> collator.compare(d1.getDistrictName(), d2.getDistrictName()));
+                }
+            }
+            @Override public void onFailure(Call<GhnResponse<List<GhnDistrict>>> call, Throwable t) {}
+        });
+    }
+
+    private void fetchWards(int districtId) {
+        GhnApiClient.getApiService().getWards(GHN_TOKEN, districtId).enqueue(new retrofit2.Callback<GhnResponse<List<GhnWard>>>() {
+            @Override
+            public void onResponse(Call<GhnResponse<List<GhnWard>>> call, retrofit2.Response<GhnResponse<List<GhnWard>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    wardList = response.body().getData();
+                    Collator collator = Collator.getInstance(new Locale("vi", "VN"));
+                    Collections.sort(wardList, (w1, w2) -> collator.compare(w1.getWardName(), w2.getWardName()));
+                }
+            }
+            @Override public void onFailure(Call<GhnResponse<List<GhnWard>>> call, Throwable t) {}
+        });
     }
 }
