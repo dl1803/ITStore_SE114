@@ -73,7 +73,18 @@ public class CartFragment extends Fragment {
         setupRecyclerView();
         observeViewModel();
         binding.ivBack.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigateUp();
+            Intent intent = requireActivity().getIntent();
+
+            // Kiểm tra xem có đi từ màn hình chi tiết sang k
+            if (intent != null && intent.getBooleanExtra("from_detail", false)) {
+                requireActivity().finish();
+            } else {
+                try {
+                    androidx.navigation.Navigation.findNavController(v).popBackStack();
+                } catch (Exception e) {
+                    requireActivity().onBackPressed();
+                }
+            }
         });
 
         binding.layoutCartDiscount.setOnClickListener(v -> {

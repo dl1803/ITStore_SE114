@@ -91,7 +91,7 @@
                     />
 
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/btnAddToCart"
+                    android:id="@+id/ivCartItem"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     app:cardCornerRadius="6dp"
@@ -101,9 +101,9 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/ic_add_shopping_cart"
                         android:padding="6dp"
-                        app:tint="@color/white"/>
+                        android:src="@drawable/ic_add_shopping_cart"
+                        app:tint="@color/white" />
                 </androidx.cardview.widget.CardView>
 
             </LinearLayout>

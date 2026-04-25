@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,13 +21,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.itstore.R;
+import com.example.itstore.activity.LoginActivity;
+import com.example.itstore.activity.ProductDetailActivity;
 import com.example.itstore.adapter.BannerAdapter;
 import com.example.itstore.adapter.CategoryAdapter;
 import com.example.itstore.adapter.ProductAdapter;
 import com.example.itstore.databinding.FragmentHomeBinding;
 import com.example.itstore.model.Category;
+import com.example.itstore.model.MockDataRepository;
 import com.example.itstore.model.Product;
+import com.example.itstore.utils.SharedPrefsManager;
 import com.example.itstore.viewmodel.HomeViewModel;
+import com.example.itstore.viewmodel.ProductDetailViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,12 +124,61 @@ public class HomeFragment extends Fragment {
         rcvProducts = binding.recyclerProduct;
         rcvProducts.setLayoutManager(new GridLayoutManager(requireContext(), 2));
         homeViewModel.getProductListLiveData().observe(getViewLifecycleOwner(), products -> {
-            productAdapter = new ProductAdapter(requireContext(), products, new ProductAdapter.OnProductClickListener() {
+            productAdapter = new ProductAdapter(requireContext(), products, new ProductAdapter.OnProductInteractionListener() {
+
+                // Chuyển sang màn hình chi tiết
                 @Override
                 public void onProductClick(Product product) {
-                    Intent intent = new Intent(requireContext(), com.example.itstore.activity.ProductDetailActivity.class);
+                    Intent intent = new Intent(requireContext(), ProductDetailActivity.class);
                     intent.putExtra("PRODUCT_INFO", product);
                     detailLauncher.launch(intent);
+                }
+
+                // Nút tim
+                @Override
+                public void onFavoriteClick(Product product, int position) {
+                    String token = SharedPrefsManager.getInstance(requireContext()).getAccessToken();
+                    if (token == null || token.isEmpty()) {
+                        Toast.makeText(requireContext(), "Vui lòng đăng nhập để lưu yêu thích!", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(requireContext(), LoginActivity.class));
+                    } else {
+                        boolean newStatus = !product.isFavorite();
+                        product.setFavorite(newStatus);
+                        MockDataRepository.getInstance().updateProduct(product);
+                        productAdapter.notifyItemChanged(position);
+                        Toast.makeText(requireContext(), newStatus ? "Đã thêm vào yêu thích" : "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                // Nút thêm vào giỏ hàng
+                @Override
+                public void onAddToCartClick(Product product) {
+                    String token = SharedPrefsManager.getInstance(requireContext()).getAccessToken();
+                    if (token == null || token.isEmpty()) {
+                        Toast.makeText(requireContext(), "Vui lòng đăng nhập để thêm vào giỏ!", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(requireContext(), LoginActivity.class));
+                        return;
+                    }
+
+                    if (product.getVariants() != null && product.getVariants().size() > 1) {
+                        // Nhiều phiên bản thì qua chi tiết sản phẩm chọn
+                        Toast.makeText(requireContext(), "Vui lòng chọn phiên bản bạn muốn mua", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(requireContext(), ProductDetailActivity.class);
+                        intent.putExtra("PRODUCT_INFO", product);
+                        detailLauncher.launch(intent);
+                    } else {
+                        ProductDetailViewModel detailViewModel = new ViewModelProvider(requireActivity()).get(ProductDetailViewModel.class);
+
+                        int defaultVariantId = 1;
+                        String defaultVariantName = "Mặc định";
+                        if (product.getVariants() != null && !product.getVariants().isEmpty()) {
+                            defaultVariantId = product.getVariants().get(0).getId();
+                            defaultVariantName = product.getVariants().get(0).getVersion();
+                        }
+
+                        detailViewModel.addToCart(product, defaultVariantId, defaultVariantName, product.getPrice());
+                        Toast.makeText(requireContext(), "Đã thêm " + product.getName() + " vào giỏ", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
             rcvProducts.setAdapter(productAdapter);
@@ -150,7 +205,14 @@ public class HomeFragment extends Fragment {
         return view;
 
     }
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (productAdapter != null) {
+            List<Product> freshProducts = MockDataRepository.getInstance().getAllProducts();
+            productAdapter.updateList(freshProducts);
+        }
+    }
     @Override
     public void onDestroyView() {
         super.onDestroyView();

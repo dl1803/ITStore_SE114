@@ -15,16 +15,18 @@ import java.util.List;
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder>{
     private Context context;
     private List<Product> productList;
-    private OnProductClickListener listener;
-    public interface OnProductClickListener {
+    private OnProductInteractionListener listener;
+    public interface OnProductInteractionListener {
         void onProductClick(Product product);
+        void onFavoriteClick(Product product, int position);
+        void onAddToCartClick(Product product);
     }
     public ProductAdapter(Context context, List<Product> productList) {
         this.context = context;
         this.productList = productList;
     }
 
-    public ProductAdapter(Context context, List<Product> productList, OnProductClickListener listener) {
+    public ProductAdapter(Context context, List<Product> productList, OnProductInteractionListener listener) {
         this.context = context;
         this.productList = productList;
         this.listener = listener;
@@ -50,6 +52,30 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                 Intent intent = new android.content.Intent(context, com.example.itstore.activity.ProductDetailActivity.class);
                 intent.putExtra("PRODUCT_INFO", product);
                 context.startActivity(intent);
+            }
+        });
+        if (product.isFavorite()) {
+            int colorOrange = androidx.core.content.ContextCompat.getColor(context, R.color.orange_primary);
+            holder.binding.imgFavoriteItem.setColorFilter(colorOrange);
+        } else {
+            int colorGray = androidx.core.content.ContextCompat.getColor(context, R.color.white_gray);
+            holder.binding.imgFavoriteItem.setColorFilter(colorGray);
+        }
+        holder.binding.imgFavoriteItem.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onFavoriteClick(product, position);
+            }
+        });
+
+        holder.binding.ivCartItem.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onAddToCartClick(product);
+            }
+        });
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onProductClick(product);
             }
         });
     }
