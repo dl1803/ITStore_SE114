@@ -19,6 +19,7 @@ import retrofit2.http.Path;
 
 import com.example.itstore.model.AddressRequest;
 import com.example.itstore.model.AddressResponse;
+import com.example.itstore.model.BrandResponse;
 import com.example.itstore.model.ChangePasswordRequest;
 import com.example.itstore.model.ChangePasswordResponse;
 import com.example.itstore.model.ForgotPasswordRequest;
@@ -106,6 +107,8 @@ public class RetrofitClient {
 
         @DELETE("api/users/me/addresses/{id}")
         Call<SingleAddressResponse> deleteAddress(@Path("id") int id);
+        @GET("api/brands")
+        Call<BrandResponse> getBrands();
 
     }
 }

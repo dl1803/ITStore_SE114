@@ -7,6 +7,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.itstore.model.Brand;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -14,12 +17,16 @@ import java.util.Set;
 
 public class BrandFilterAdapter extends RecyclerView.Adapter<BrandFilterAdapter.BrandViewHolder> {
 
-    private List<String> brandList;
+    private List<Brand> brandList;
     // Lưu nhiều vị trí khách đang tick
     private Set<Integer> selectedPositions = new HashSet<>();
-
-    public BrandFilterAdapter(List<String> brandList) {
+    private OnBrandFilterListener listener;
+    public interface OnBrandFilterListener {
+        void onFilterChanged(List<Integer> selectedBrandIds);
+    }
+    public BrandFilterAdapter(List<Brand> brandList, OnBrandFilterListener listener) {
         this.brandList = brandList;
+        this.listener = listener;
         selectedPositions.add(0);
     }
 
@@ -32,8 +39,8 @@ public class BrandFilterAdapter extends RecyclerView.Adapter<BrandFilterAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull BrandViewHolder holder, int position) {
-        String brand = brandList.get(position);
-        holder.tvBrand.setText(brand);
+        Brand brand = brandList.get(position);
+        holder.tvBrand.setText(brand.getName());
 
         // Bật màu nếu hãng này đang được khách chọn
         if (selectedPositions.contains(position)) {
@@ -61,6 +68,9 @@ public class BrandFilterAdapter extends RecyclerView.Adapter<BrandFilterAdapter.
                 }
             }
             notifyDataSetChanged();
+            if (listener != null) {
+                listener.onFilterChanged(getSelectedBrandIds());
+            }
         });
     }
 
@@ -69,13 +79,13 @@ public class BrandFilterAdapter extends RecyclerView.Adapter<BrandFilterAdapter.
         return brandList.size();
     }
 
-    public List<String> getSelectedBrands() {
-        List<String> result = new ArrayList<>();
+    public List<Integer> getSelectedBrandIds() {
+        List<Integer> result = new ArrayList<>();
         if (selectedPositions.contains(0)) {
-            return result;
+            return result; // Chọn "Tất cả" thì trả mảng rỗng
         }
         for (int pos : selectedPositions) {
-            result.add(brandList.get(pos));
+            result.add(brandList.get(pos).getId());
         }
         return result;
     }

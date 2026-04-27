@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
@@ -24,6 +26,7 @@ import com.example.itstore.R;
 import com.example.itstore.activity.LoginActivity;
 import com.example.itstore.activity.ProductDetailActivity;
 import com.example.itstore.adapter.BannerAdapter;
+import com.example.itstore.adapter.BrandFilterAdapter;
 import com.example.itstore.adapter.CategoryAdapter;
 import com.example.itstore.adapter.ProductAdapter;
 import com.example.itstore.databinding.FragmentHomeBinding;
@@ -46,14 +49,12 @@ public class HomeFragment extends Fragment {
     private ProductAdapter productAdapter;
     private RecyclerView rcvCategories;
     private CategoryAdapter categoryAdapter;
-
     private Handler handler;
     private Runnable runBanner;
 
     private LinearLayout layoutIndicators;
-    private final androidx.activity.result.ActivityResultLauncher<Intent> detailLauncher =
-            registerForActivityResult(
-                    new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
+    private final ActivityResultLauncher<Intent> detailLauncher = registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
                     result -> {
                         if (result.getResultCode() == android.app.Activity.RESULT_OK && result.getData() != null) {
                             Product updatedProduct = (Product) result.getData().getSerializableExtra("UPDATED_PRODUCT");

@@ -1,15 +1,24 @@
 package com.example.itstore.viewmodel;
 
+import android.content.Context;
+
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import java.util.ArrayList;
 import java.util.List;
 import com.example.itstore.R;
+import com.example.itstore.api.RetrofitClient;
+import com.example.itstore.model.Brand;
+import com.example.itstore.model.BrandResponse;
 import com.example.itstore.model.Category;
 import com.example.itstore.model.MockDataRepository;
 import com.example.itstore.model.Product;
 import com.example.itstore.model.ProductImage;
 import com.example.itstore.model.ProductVariant;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomeViewModel extends ViewModel {
     private final MutableLiveData<List<Category>> categoryListLiveData = new MutableLiveData<>();
@@ -26,6 +35,8 @@ public class HomeViewModel extends ViewModel {
     public MutableLiveData<List<Product>> getProductListLiveData() {
         return productListLiveData;
     }
+
+
     public void updateProduct(Product updatedProduct) {
         for (int i = 0; i < allProducts.size(); i++) {
             if (allProducts.get(i).getId() == updatedProduct.getId()) {

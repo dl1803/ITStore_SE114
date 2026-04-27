@@ -89,7 +89,8 @@ public class OrderDetailActivity extends AppCompatActivity {
                 currentOrder.getProductName(),
                 currentOrder.getProductType(),
                 variants,
-                listImages
+                listImages,
+                1
         );
         OrderItem dummyItem = new OrderItem(
                 dummyProduct,

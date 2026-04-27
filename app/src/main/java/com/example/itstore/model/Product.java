@@ -11,14 +11,16 @@ public class Product implements Serializable {
     private List<ProductImage> images;
     private boolean isFavorite = false;
     private int quantity;
+    private int brandId;
 
-    public Product(int id, int categoryId, String name, String description, List<ProductVariant> variants, List<ProductImage> images) {
+    public Product(int id, int categoryId, String name, String description, List<ProductVariant> variants, List<ProductImage> images, int brandId) {
         this.id = id;
         this.categoryId = categoryId;
         this.name = name;
         this.description = description;
         this.variants = variants;
         this.images = images;
+        this.brandId = brandId;
     }
 
     public int getId() {
@@ -55,6 +57,10 @@ public class Product implements Serializable {
 
     public int getQuantity() {
         return quantity;
+    }
+
+    public int getBrandId() {
+        return brandId;
     }
 
     public void setQuantity(int quantity) {

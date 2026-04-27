@@ -30,7 +30,7 @@ public class MockDataRepository {
         defaultImages.add(new ProductImage(1, mockImageUrl, true));
         List<ProductVariant> var1 = new ArrayList<>();
         var1.add(new ProductVariant(1, "Mặc định", 15000000.0, 18000000.0, 50));
-        allProducts.add(new Product(101, 1, "CPU Intel Core i9-14900K", "CPU mạnh nhất của Intel, 24 nhân 32 luồng siêu mượt.", var1, defaultImages));
+        allProducts.add(new Product(101, 1, "CPU Intel Core i9-14900K", "CPU mạnh nhất của Intel, 24 nhân 32 luồng siêu mượt.", var1, defaultImages, 1));
         List<ProductVariant> var2 = new ArrayList<>();
         var2.add(new ProductVariant(2, "32GB", 2500000.0, 2800000.0, 150));
         var2.add(new ProductVariant(6, "64GB", 4800000.0, 5000000.0, 50));
@@ -39,16 +39,16 @@ public class MockDataRepository {
                 "Ưu điểm nổi bật:\n" +
                 "- Dung lượng 16GB dư sức xử lý đa nhiệm, thiết kế đồ họa 2D/3D và chiến mượt các tựa game AAA.\n" +
                 "- Tốc độ Bus 3200MHz kết hợp cùng độ trễ thấp CL16 giúp tối ưu thời gian phản hồi, loại bỏ giật lag.\n" +
-                "- Hỗ trợ cấu hình Intel XMP 2.0 giúp việc ép xung trở nên dễ dàng chỉ với một cú click chuột.", var2, defaultImages));
+                "- Hỗ trợ cấu hình Intel XMP 2.0 giúp việc ép xung trở nên dễ dàng chỉ với một cú click chuột.", var2, defaultImages, 2));
         List<ProductVariant> var3 = new ArrayList<>();
         var3.add(new ProductVariant(3, "24GB", 50000000.0, 55000000.0, 10));
-        allProducts.add(new Product(103, 3, "VGA NVIDIA RTX 4090", "Card đồ họa khủng nhất hiện nay.", var3, defaultImages));
+        allProducts.add(new Product(103, 3, "VGA NVIDIA RTX 4090", "Card đồ họa khủng nhất hiện nay.", var3, defaultImages, 3));
         List<ProductVariant> var4 = new ArrayList<>();
         var4.add(new ProductVariant(4, "Mặc định", 14000000.0, 18000000.0, 30));
-        allProducts.add(new Product(104, 1, "CPU AMD Ryzen 9 7950X", "Đối thủ truyền kiếp của Core i9.", var4, defaultImages));
+        allProducts.add(new Product(104, 1, "CPU AMD Ryzen 9 7950X", "Đối thủ truyền kiếp của Core i9.", var4, defaultImages, 4));
         List<ProductVariant> var5 = new ArrayList<>();
         var5.add(new ProductVariant(5, "16GB", 1200000.0, 1500000.0, 200));
-        allProducts.add(new Product(105, 2, "RAM Kingston Fury 16GB", "RAM DDR4 giá rẻ hiệu năng cao.", var5, defaultImages));
+        allProducts.add(new Product(105, 2, "RAM Kingston Fury 16GB", "RAM DDR4 giá rẻ hiệu năng cao.", var5, defaultImages, 5));
     }
     public List<Product> getAllProducts() {
         return allProducts;

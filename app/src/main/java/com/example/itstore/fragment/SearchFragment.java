@@ -21,6 +21,7 @@ import com.example.itstore.R;
 import com.example.itstore.adapter.ProductAdapter;
 import com.example.itstore.databinding.FragmentSearchBinding;
 import com.example.itstore.dialog.FilterProductDialog;
+import com.example.itstore.model.Brand;
 import com.example.itstore.viewmodel.SearchViewModel;
 import com.google.android.material.chip.Chip;
 
@@ -35,7 +36,8 @@ public class SearchFragment extends Fragment {
     private String currentCategory = "Tất cả";
     private double currentMinPrice = 0;
     private double currentMaxPrice = Double.MAX_VALUE;
-    private List<String> currentBrands = new ArrayList<>();
+    private List<Integer> currentBrandIds = new ArrayList<>();
+    private List<Brand> fetchedBrands = new ArrayList<>();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -47,7 +49,12 @@ public class SearchFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
-
+        viewModel.getListBrandsLiveData().observe(getViewLifecycleOwner(), brands -> {
+            if (brands != null) {
+                fetchedBrands = brands;
+            }
+        });
+        viewModel.fetchBrands(requireContext());
         productAdapter = new ProductAdapter(requireContext(), new ArrayList<>());
         binding.rvSearchRecommend.setLayoutManager(new GridLayoutManager(requireContext(), 2));
         binding.rvSearchRecommend.setAdapter(productAdapter);
@@ -93,10 +100,11 @@ public class SearchFragment extends Fragment {
         // KHI BẤM NÚT MỞ DIALOG LỌC
         binding.btnOpenFilter.setOnClickListener(v -> {
             FilterProductDialog dialog = new FilterProductDialog();
-            dialog.setOnFilterAppliedListener((min, max, brand) -> {
+            dialog.setBrandList(fetchedBrands);
+            dialog.setOnFilterAppliedListener((min, max, brandIds) -> {
                 currentMinPrice = min;
                 currentMaxPrice = max;
-                currentBrands = brand;
+                currentBrandIds = brandIds;
 
                 performCombinedSearch(); // Gọi hàm lọc
             });
@@ -108,18 +116,15 @@ public class SearchFragment extends Fragment {
     // Hàm lọc
     private void performCombinedSearch() {
         String query = binding.edtSearch.getText().toString().trim();
-        if (!query.isEmpty() || !currentCategory.equals("Tất cả") || currentMinPrice > 0 || !currentBrands.isEmpty()) {
+        if (!query.isEmpty() || !currentCategory.equals("Tất cả") || currentMinPrice > 0 || !currentBrandIds.isEmpty()) {
             binding.tvResultRecommend.setText("Kết quả lọc");
-            // Bấm vào nút tìm kiếm thì hiện nút lọc
             binding.btnOpenFilter.setVisibility(View.VISIBLE);
         } else {
             binding.tvResultRecommend.setText("Gợi ý tìm kiếm");
-            // Không bấm vào thì k hiện nút lọc
             binding.btnOpenFilter.setVisibility(View.GONE);
         }
-        viewModel.filterProducts(query, currentCategory, currentMinPrice, currentMaxPrice, currentBrands);
+        viewModel.filterProducts(query, currentCategory, currentMinPrice, currentMaxPrice, currentBrandIds);
     }
-
     private void hideKeyboard(View view) {
         InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {

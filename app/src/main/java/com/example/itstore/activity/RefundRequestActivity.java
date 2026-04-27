@@ -74,7 +74,8 @@ public class RefundRequestActivity extends AppCompatActivity {
                 currentOrder.getProductName() != null ? currentOrder.getProductName() : "Sản phẩm Demo",
                 "Mô tả tạm thời",
                 mockVariants,
-                null
+                null,
+                1
         );
         dummyProduct.setQuantity(1);
         mockList.add(dummyProduct);
