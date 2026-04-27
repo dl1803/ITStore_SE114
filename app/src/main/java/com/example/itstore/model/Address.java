@@ -17,6 +17,12 @@ public class Address {
     private String ward;
     private String street;
 
+    @SerializedName("district_id")
+    private int districtId;
+
+    @SerializedName("ward_code")
+    private String wardCode;
+
     @SerializedName("is_default")
     private boolean isDefault;
 
@@ -55,6 +61,14 @@ public class Address {
 
     public boolean isDefault() {
         return isDefault;
+    }
+
+    public int getDistrictId() {
+        return districtId;
+    }
+
+    public String getWardCode() {
+        return wardCode;
     }
 
 
