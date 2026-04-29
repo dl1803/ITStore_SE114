@@ -7,6 +7,7 @@ public class GhnFeeRequest {
     public String to_ward_code;
     public int weight;
 
+
     public GhnFeeRequest(int from_district_id, int to_district_id, String to_ward_code, int weight) {
         this.from_district_id = from_district_id;
         this.to_district_id = to_district_id;
