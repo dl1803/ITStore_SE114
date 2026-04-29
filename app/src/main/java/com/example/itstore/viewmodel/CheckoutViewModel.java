@@ -13,6 +13,8 @@ import androidx.lifecycle.ViewModel;
 import com.example.itstore.api.GhnApiClient;
 import com.example.itstore.api.RetrofitClient;
 import com.example.itstore.model.CartItem;
+import com.example.itstore.model.Coupon;
+import com.example.itstore.model.CouponResponse;
 import com.example.itstore.model.CreateOrderRequest;
 import com.example.itstore.model.GhnFeeData;
 import com.example.itstore.model.GhnFeeRequest;
@@ -39,6 +41,8 @@ public class CheckoutViewModel extends AndroidViewModel {
 
     private final MutableLiveData<String> orderError = new MutableLiveData<>();
 
+    private final MutableLiveData<List<Coupon>> couponList = new MutableLiveData<>();
+    private final MutableLiveData<Integer> selectedCouponId = new MutableLiveData<>(null);
     public CheckoutViewModel(@NonNull Application application) {
         super(application);
     }
@@ -50,6 +54,9 @@ public class CheckoutViewModel extends AndroidViewModel {
     public LiveData<Double> getFinalTotalPrice() { return finalTotalPrice; }
     public LiveData<Boolean> getIsOrderSuccess() { return isOrderSuccess; }
     public LiveData<String> getOrderError() { return orderError; }
+
+    public LiveData<List<Coupon>> getCouponList() { return couponList; }
+    public LiveData<Integer> getSelectedCouponId() { return selectedCouponId; }
 
 
 
@@ -77,8 +84,9 @@ public class CheckoutViewModel extends AndroidViewModel {
         finalTotalPrice.setValue(finalPrice);
     }
 
-    public void applyDiscount(double discountAmount) {
+    public void applyDiscount(double discountAmount, int couponId) {
         totalDiscount.setValue(discountAmount);
+        selectedCouponId.setValue(couponId);
         calculateMoney(checkoutItems.getValue());
     }
 
@@ -142,4 +150,21 @@ public class CheckoutViewModel extends AndroidViewModel {
                     }
                 });
     }
+    public void fetchActiveCoupons() {
+        RetrofitClient.getApiService(getApplication()).getCoupons().enqueue(new Callback<CouponResponse>() {
+
+            @Override
+            public void onResponse(Call<CouponResponse> call, Response<CouponResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    couponList.setValue(response.body().getData());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CouponResponse> call, Throwable t) {
+
+            }
+        });
+    }
+
 }

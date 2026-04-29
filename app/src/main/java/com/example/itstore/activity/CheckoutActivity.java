@@ -21,9 +21,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.itstore.R;
 import com.example.itstore.adapter.CheckoutAdapter;
 import com.example.itstore.adapter.DiscountAdapter;
+import com.example.itstore.api.RetrofitClient;
 import com.example.itstore.databinding.ActivityCheckoutBinding;
 import com.example.itstore.model.Address;
 import com.example.itstore.model.CartItem;
+import com.example.itstore.model.Coupon;
+import com.example.itstore.model.CouponResponse;
 import com.example.itstore.model.CreateOrderRequest;
 import com.example.itstore.model.Discount;
 import com.example.itstore.model.Order;
@@ -37,6 +40,10 @@ import java.net.InterfaceAddress;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CheckoutActivity extends AppCompatActivity {
 
@@ -85,9 +92,11 @@ public class CheckoutActivity extends AppCompatActivity {
             String passedCode = intent.getStringExtra("VOUCHER_CODE");
             double passedAmount = intent.getDoubleExtra("VOUCHER_AMOUNT", 0.0);
 
+            int passedId = intent.getIntExtra("VOUCHER_ID", -1);
+
             if (passedCode != null && passedAmount > 0) {
                 appliedVoucherCode = passedCode;
-                checkoutViewModel.applyDiscount(passedAmount);
+                checkoutViewModel.applyDiscount(passedAmount, passedId);
             }
         } else {
             Toast.makeText(this, "Lỗi: Không tìm thấy sản phẩm nào!", Toast.LENGTH_SHORT).show();
@@ -98,7 +107,7 @@ public class CheckoutActivity extends AppCompatActivity {
 
         binding.btnCheckout.setOnClickListener(v -> {
             String paymentMethod = "cod";
-            if (binding.rbMomo.isChecked()) paymentMethod = "mono";
+            if (binding.rbMomo.isChecked()) paymentMethod = "momo";
             if (binding.rbBankTransfer.isChecked()) paymentMethod = "bank";
 
             List<CartItem> purchasedItems = checkoutViewModel.getCheckoutItems().getValue();
@@ -117,7 +126,7 @@ public class CheckoutActivity extends AppCompatActivity {
                 orderItems.add(new OrderItemRequest(item.getVariantId(), item.getQuantity()));
             }
 
-            Integer couponId = appliedVoucherCode.isEmpty() ? null : 1;
+            Integer couponId = checkoutViewModel.getSelectedCouponId().getValue();
 
             CreateOrderRequest request = new CreateOrderRequest(
                     selectedAddressId,
@@ -131,7 +140,7 @@ public class CheckoutActivity extends AppCompatActivity {
             checkoutViewModel.placeOrder(request);
         });
         addressViewModel.fetchAddresses(this);
-
+        checkoutViewModel.fetchActiveCoupons();
     }
 
     // TÍNH NĂNG 1: CHỌN ĐỊA CHỈ TỪ DANH SÁCH
@@ -163,6 +172,13 @@ public class CheckoutActivity extends AppCompatActivity {
 
     // TÍNH NĂNG 2: MỞ BOTTOM SHEET CHỌN VOUCHER
     private void showDiscountBottomSheet() {
+        List<Coupon> realCoupons = checkoutViewModel.getCouponList().getValue();
+
+        if (realCoupons == null || realCoupons.isEmpty()) {
+            Toast.makeText(this, "Hiện tại chưa có mã giảm giá nào!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
 
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_discount, null);
@@ -173,15 +189,14 @@ public class CheckoutActivity extends AppCompatActivity {
         RecyclerView rvDiscounts = dialogView.findViewById(R.id.rvDiscountList);
         ImageView btnClose = dialogView.findViewById(R.id.btnCloseDialog);
 
-        List<Discount> myVouchers = new ArrayList<>();
-        myVouchers.add(new Discount("UIT_20", "Giảm 20.000đ", "Đơn tối thiểu 150k", "HSD: 31/12/2026", 20000, 150000));
-        myVouchers.add(new Discount("UIT_50", "Giảm 50.000đ", "Đơn tối thiểu 500k", "HSD: 31/12/2026", 50000, 500000));
 
         rvDiscounts.setLayoutManager(new LinearLayoutManager(this));
-        DiscountAdapter discountAdapter = new DiscountAdapter(myVouchers, discount -> {
-            applyDiscountToCart(discount.getCode(), discount.getAmount(), discount.getMinOrderValue());
+        DiscountAdapter discountAdapter = new DiscountAdapter(realCoupons, coupon -> {
+            applyDiscountToCart(coupon);
             bottomSheetDialog.dismiss();
         });
+
+
         rvDiscounts.setAdapter(discountAdapter);
 
         btnApply.setOnClickListener(v -> {
@@ -190,16 +205,17 @@ public class CheckoutActivity extends AppCompatActivity {
                 Toast.makeText(this, "Vui lòng nhập mã!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            Discount foundDiscount = null;
-            for (Discount discount : myVouchers) {
-                if (discount.getCode().equalsIgnoreCase(inputCode)) {
-                    foundDiscount = discount;
+
+            Coupon foundCoupon = null;
+            for (Coupon c : realCoupons) {
+                if (c.getCode().equalsIgnoreCase(inputCode)) {
+                    foundCoupon = c;
                     break;
                 }
             }
 
-            if (foundDiscount != null) {
-                applyDiscountToCart(foundDiscount.getCode(), foundDiscount.getAmount(), foundDiscount.getMinOrderValue());
+            if (foundCoupon != null) {
+                applyDiscountToCart(foundCoupon);
                 bottomSheetDialog.dismiss();
             } else {
                 Toast.makeText(this, "Mã giảm giá không hợp lệ!", Toast.LENGTH_SHORT).show();
@@ -215,27 +231,32 @@ public class CheckoutActivity extends AppCompatActivity {
 
     }
 
-    private void applyDiscountToCart(String code, double amount, double minOrderValue) {
-        double currentSubtotal = 0;
-        if (checkoutViewModel.getSubtotalPrice().getValue() != null) {
-            currentSubtotal = checkoutViewModel.getSubtotalPrice().getValue();
-        }
+    private void applyDiscountToCart(Coupon coupon) {
+        double currentSubtotal = checkoutViewModel.getSubtotalPrice().getValue() != null
+                ? checkoutViewModel.getSubtotalPrice().getValue() : 0;
 
         if (currentSubtotal <= 0) {
             Toast.makeText(this, "Đơn hàng trống!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (currentSubtotal < minOrderValue) {
-            String requiredAmount = String.format("%,.0f đ", minOrderValue);
+        if (currentSubtotal < coupon.getMinOrderValue()) {
+            String requiredAmount = String.format("%,.0f đ", coupon.getMinOrderValue());
             Toast.makeText(this, "Chưa đạt mức tối thiểu " + requiredAmount + " để dùng mã này!", Toast.LENGTH_LONG).show();
             return;
         }
 
-        appliedVoucherCode = code;
-        Toast.makeText(this, "Đã áp dụng mã: " + code, Toast.LENGTH_SHORT).show();
+        double discountAmount = 0;
+        if ("percent".equals(coupon.getDiscountType())) {
+            discountAmount = currentSubtotal * (coupon.getDiscountValue() / 100.0);
+        } else {
+            discountAmount = coupon.getDiscountValue();
+        }
 
-        checkoutViewModel.applyDiscount(amount);
+        checkoutViewModel.applyDiscount(discountAmount, coupon.getId());
+        appliedVoucherCode = coupon.getCode();
+
+        Toast.makeText(this, "Đã áp dụng mã: " + coupon.getCode(), Toast.LENGTH_SHORT).show();
     }
 
 
@@ -288,6 +309,7 @@ public class CheckoutActivity extends AppCompatActivity {
 
         checkoutViewModel.getOrderError().observe(this, error -> {
             Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+            binding.btnCheckout.setEnabled(true);
         });
 
         addressViewModel.getAddressList().observe(this , addressList -> {

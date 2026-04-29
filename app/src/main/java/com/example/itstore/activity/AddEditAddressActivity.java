@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -162,7 +163,7 @@ public class AddEditAddressActivity extends AppCompatActivity {
             String[] provinceNames = new String[provinceList.size()];
             for (int i = 0; i < provinceList.size(); i++) provinceNames[i] = provinceList.get(i).getProvinceName();
 
-            new androidx.appcompat.app.AlertDialog.Builder(this)
+            new AlertDialog.Builder(this)
                     .setTitle("Chọn Tỉnh / Thành phố")
                     .setItems(provinceNames, (dialog, which) -> {
                         GhnProvince selected = provinceList.get(which);
@@ -186,7 +187,7 @@ public class AddEditAddressActivity extends AppCompatActivity {
             String[] districtNames = new String[districtList.size()];
             for (int i = 0; i < districtList.size(); i++) districtNames[i] = districtList.get(i).getDistrictName();
 
-            new androidx.appcompat.app.AlertDialog.Builder(this)
+            new AlertDialog.Builder(this)
                     .setTitle("Chọn Quận / Huyện")
                     .setItems(districtNames, (dialog, which) -> {
                         GhnDistrict selected = districtList.get(which);
@@ -209,7 +210,7 @@ public class AddEditAddressActivity extends AppCompatActivity {
             String[] wardNames = new String[wardList.size()];
             for (int i = 0; i < wardList.size(); i++) wardNames[i] = wardList.get(i).getWardName();
 
-            new androidx.appcompat.app.AlertDialog.Builder(this)
+            new AlertDialog.Builder(this)
                     .setTitle("Chọn Phường/Xã")
                     .setItems(wardNames, (dialog, which) -> {
                         GhnWard selected = wardList.get(which);

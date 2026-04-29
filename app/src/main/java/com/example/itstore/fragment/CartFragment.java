@@ -24,8 +24,11 @@ import com.example.itstore.activity.CheckoutActivity;
 import com.example.itstore.activity.LoginActivity;
 import com.example.itstore.adapter.CartAdapter;
 import com.example.itstore.adapter.DiscountAdapter;
+import com.example.itstore.api.RetrofitClient;
 import com.example.itstore.databinding.FragmentCartBinding;
 import com.example.itstore.model.CartItem;
+import com.example.itstore.model.Coupon;
+import com.example.itstore.model.CouponResponse;
 import com.example.itstore.model.Discount;
 import com.example.itstore.utils.CartManager;
 import com.example.itstore.utils.SharedPrefsManager;
@@ -34,6 +37,11 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class CartFragment extends Fragment {
     private FragmentCartBinding binding;
     private CartViewModel cartViewModel;
@@ -41,8 +49,9 @@ public class CartFragment extends Fragment {
 
     private String selectedVoucherCode = "";
     private double selectedVoucherAmount = 0;
+    private int selectedVoucherId = -1;
 
-    private Discount appliedDiscount;
+    private Coupon appliedCoupon;
 
 
     @Nullable
@@ -111,6 +120,7 @@ public class CartFragment extends Fragment {
 
             intent.putExtra("VOUCHER_CODE", selectedVoucherCode);
             intent.putExtra("VOUCHER_AMOUNT", selectedVoucherAmount);
+            intent.putExtra("VOUCHER_ID", selectedVoucherId);
 
 
             startActivity(intent);
@@ -126,6 +136,9 @@ public class CartFragment extends Fragment {
         if (checkCart != null) {
             Toast.makeText(requireContext(), "Trong giỏ đang có: " + checkCart.size() + " món", Toast.LENGTH_SHORT).show();
         }
+
+        cartViewModel.fetchActiveCoupons();
+
     }
 
     private void setupRecyclerView() {
@@ -181,17 +194,22 @@ public class CartFragment extends Fragment {
         cartViewModel.getIsAllSelectedLiveData().observe(getViewLifecycleOwner(), isAllSelected -> {
             binding.cbBuyAll.setChecked(isAllSelected);
         });
+
+        cartViewModel.getCouponError().observe(getViewLifecycleOwner(), error -> {
+            if (error != null) Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show();
+        });
     }
 
     // Hàm kiểm tra điều kiện tổng tiền tối thiểu để áp dụng mã giảm giá
     private void validateVoucherWithTotal(double rawTotal) {
-        if (appliedDiscount != null) {
+        if (appliedCoupon != null) {
 
-            if (rawTotal <= 0 || rawTotal < appliedDiscount.getMinOrderValue()) {
+            if (rawTotal <= 0 || rawTotal < appliedCoupon.getMinOrderValue()) {
 
                 selectedVoucherCode = "";
                 selectedVoucherAmount = 0;
-                appliedDiscount = null;
+                selectedVoucherId = -1;
+                appliedCoupon = null;
 
                 binding.tvCartVoucherCode.setText("Chọn hoặc nhập mã");
                 binding.tvCartVoucherCode.setTextColor(Color.parseColor("#888888"));
@@ -231,46 +249,83 @@ public class CartFragment extends Fragment {
         RecyclerView rvDiscounts = dialogView.findViewById(R.id.rvDiscountList);
         ImageView btnClose = dialogView.findViewById(R.id.btnCloseDialog);
 
-        // Mock Data
-        List<Discount> myVouchers = new ArrayList<>();
-        myVouchers.add(new Discount("UIT_20", "Giảm 20.000đ", "Đơn tối thiểu 150k", "HSD: 31/12/2026", 20000, 150000));
-        myVouchers.add(new Discount("UIT_50", "Giảm 50.000đ", "Đơn tối thiểu 500k", "HSD: 31/12/2026", 50000, 500000));
+        List<Coupon> coupons = cartViewModel.getCouponList().getValue();
+
+        if (coupons == null || coupons.isEmpty()) {
+            Toast.makeText(requireContext(), "Hiện tại chưa có mã giảm giá nào!", Toast.LENGTH_SHORT).show();
+            cartViewModel.fetchActiveCoupons();
+            return;
+        }
 
         rvDiscounts.setLayoutManager(new LinearLayoutManager(requireContext()));
-
-        DiscountAdapter discountAdapter = new DiscountAdapter(myVouchers, discount -> {
-            double currentTotal = cartViewModel.getTotalPrice().getValue() != null ? cartViewModel.getTotalPrice().getValue() : 0;
-
-            if (currentTotal <= 0) {
-                Toast.makeText(requireContext(), "Vui lòng chọn sản phẩm trước khi áp mã!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (currentTotal < discount.getMinOrderValue()) {
-                String requiredAmount = String.format("%,.0f đ", discount.getMinOrderValue());
-                Toast.makeText(requireContext(), "Đơn hàng chưa đạt tối thiểu " + requiredAmount + "!", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            selectedVoucherCode = discount.getCode();
-            selectedVoucherAmount = discount.getAmount();
-
-            this.appliedDiscount = discount;
-
-            binding.tvCartVoucherCode.setText(selectedVoucherCode);
-            binding.tvCartVoucherCode.setTextColor(getResources().getColor(R.color.orange_primary));
-
-            updateTotalPriceUI(currentTotal);
-
-            Toast.makeText(requireContext(), "Đã lưu mã: " + selectedVoucherCode, Toast.LENGTH_SHORT).show();
+        DiscountAdapter discountAdapter = new DiscountAdapter(coupons, coupon -> {
+            applyDiscountToCart(coupon);
             bottomSheetDialog.dismiss();
         });
-
         rvDiscounts.setAdapter(discountAdapter);
 
-        if (btnClose != null) btnClose.setOnClickListener(v -> bottomSheetDialog.dismiss());
+        btnApply.setOnClickListener(v -> {
+            String inputCode = edtCode.getText().toString().trim();
+
+            if (inputCode.isEmpty()) {
+                Toast.makeText(requireContext(), "Vui lòng nhập mã!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Coupon foundCoupon = null;
+            for (Coupon c : coupons) {
+                if (c.getCode().equalsIgnoreCase(inputCode)) {
+                    foundCoupon = c;
+                    break;
+                }
+            }
+
+            if (foundCoupon != null) {
+                applyDiscountToCart(foundCoupon);
+                bottomSheetDialog.dismiss();
+            } else {
+                Toast.makeText(requireContext(), "Mã giảm giá không hợp lệ!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        if (btnClose != null) {
+            btnClose.setOnClickListener(v -> bottomSheetDialog.dismiss());
+        }
 
         bottomSheetDialog.show();
+    }
+
+    private void applyDiscountToCart(Coupon coupon) {
+        double currentTotal = cartViewModel.getTotalPrice().getValue() != null
+                ? cartViewModel.getTotalPrice().getValue() : 0;
+
+        if (currentTotal <= 0) {
+            Toast.makeText(requireContext(), "Vui lòng chọn sản phẩm trước khi áp mã!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (currentTotal < coupon.getMinOrderValue()) {
+            String requiredAmount = String.format("%,.0f đ", coupon.getMinOrderValue());
+            Toast.makeText(requireContext(), "Đơn hàng chưa đạt tối thiểu " + requiredAmount + "!", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        selectedVoucherCode = coupon.getCode();
+        selectedVoucherId = coupon.getId();
+
+        if ("percent".equals(coupon.getDiscountType())) {
+            selectedVoucherAmount = currentTotal * (coupon.getDiscountValue() / 100.0);
+        } else {
+            selectedVoucherAmount = coupon.getDiscountValue();
+        }
+
+        appliedCoupon = coupon;
+
+        binding.tvCartVoucherCode.setText(selectedVoucherCode);
+        binding.tvCartVoucherCode.setTextColor(getResources().getColor(R.color.orange_primary));
+
+        updateTotalPriceUI(currentTotal);
+
+        Toast.makeText(requireContext(), "Đã lưu mã: " + selectedVoucherCode, Toast.LENGTH_SHORT).show();
     }
 
 

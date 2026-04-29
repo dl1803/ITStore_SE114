@@ -22,6 +22,7 @@ import com.example.itstore.model.AddressResponse;
 import com.example.itstore.model.BrandResponse;
 import com.example.itstore.model.ChangePasswordRequest;
 import com.example.itstore.model.ChangePasswordResponse;
+import com.example.itstore.model.CouponResponse;
 import com.example.itstore.model.CreateOrderRequest;
 import com.example.itstore.model.ForgotPasswordRequest;
 import com.example.itstore.model.ForgotPasswordResponse;
@@ -111,9 +112,11 @@ public class RetrofitClient {
         Call<SingleAddressResponse> deleteAddress(@Path("id") int id);
         @GET("api/brands")
         Call<BrandResponse> getBrands();
-
         @POST("api/orders")
         Call<OrderCreateResponse> createOrder(@Body CreateOrderRequest request);
+
+        @GET("api/coupons")
+        Call<CouponResponse> getCoupons();
 
     }
 }

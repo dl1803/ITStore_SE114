@@ -10,21 +10,22 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.itstore.R;
+import com.example.itstore.model.Coupon;
 import com.example.itstore.model.Discount;
 
 import java.util.List;
 
 public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.DiscountViewHolder> {
 
-    private List<Discount> discountList;
+    private List<Coupon> discountList;
 
     private OnDiscountClickListener listener;
 
     public interface OnDiscountClickListener {
-        void onDiscountClick(Discount discount);
+        void onDiscountClick(Coupon discount);
     }
 
-    public DiscountAdapter (List<Discount> discountList, OnDiscountClickListener listener ){
+    public DiscountAdapter (List<Coupon> discountList, OnDiscountClickListener listener ){
         this.discountList = discountList;
         this.listener = listener;
     }
@@ -38,12 +39,26 @@ public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.Discou
 
     @Override
     public void onBindViewHolder(@NonNull DiscountAdapter.DiscountViewHolder holder, int position) {
-        Discount item = discountList.get(position);
+        Coupon item = discountList.get(position);
 
         holder.tvCode.setText(item.getCode());
-        holder.tvTitle.setText(item.getTitle());
-        holder.tvCondition.setText(item.getCondition());
-        holder.tvDate.setText(item.getDate());
+        String titleText = item.getDiscountType().equals("percent")
+                ? "Giảm " + item.getDiscountValue() + "%"
+                : "Giảm " + String.format("%,.0fđ", item.getDiscountValue());
+        holder.tvTitle.setText(titleText);
+        holder.tvCondition.setText("Đơn tối thiểu " + String.format("%,.0fđ", item.getMinOrderValue()));
+        String rawDate = item.getExpiresAt();
+        if (rawDate != null && rawDate.length() >= 10) {
+            String dateOnly = rawDate.substring(0, 10);
+            String[] parts = dateOnly.split("-"); // hàm split của String dùng để tách chuỗi thành mảng các chuỗi con dựa trên ký tự phân tách
+            if (parts.length == 3) {
+                holder.tvDate.setText("HSD: " + parts[2] + "/" + parts[1] + "/" + parts[0]);
+            } else {
+                holder.tvDate.setText("HSD: " + rawDate);
+            }
+        } else {
+            holder.tvDate.setText("HSD: Không giới hạn");
+        }
 
         holder.btnUse.setOnClickListener(v -> {
             listener.onDiscountClick(item);
