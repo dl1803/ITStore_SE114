@@ -56,8 +56,8 @@
             app:layout_constraintRight_toRightOf="parent"
             >
 
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toRightOf="@id/cv_item_product"
@@ -74,7 +74,10 @@
                     android:maxLines="3"
                     android:text="RAM Desktop Kingston Fury Beast"
                     android:textSize="14dp"
-                    android:textStyle="bold"></TextView>
+                    android:textStyle="bold"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    ></TextView>
                 <androidx.cardview.widget.CardView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -82,6 +85,8 @@
                     android:elevation="0dp"
                     android:layout_marginRight="4dp"
                     app:cardElevation="0dp"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
                     >
 
                     <ImageView
@@ -93,7 +98,7 @@
                         android:src="@drawable/ic_close"
                         app:tint="#8B8989"></ImageView>
                 </androidx.cardview.widget.CardView>
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
                 android:id="@+id/tvVariant"

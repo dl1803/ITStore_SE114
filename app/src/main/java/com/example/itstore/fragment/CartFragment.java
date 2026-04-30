@@ -81,20 +81,6 @@ public class CartFragment extends Fragment {
         cartViewModel = new ViewModelProvider(this).get(CartViewModel.class);
         setupRecyclerView();
         observeViewModel();
-        binding.ivBack.setOnClickListener(v -> {
-            Intent intent = requireActivity().getIntent();
-
-            // Kiểm tra xem có đi từ màn hình chi tiết sang k
-            if (intent != null && intent.getBooleanExtra("from_detail", false)) {
-                requireActivity().finish();
-            } else {
-                try {
-                    androidx.navigation.Navigation.findNavController(v).popBackStack();
-                } catch (Exception e) {
-                    requireActivity().onBackPressed();
-                }
-            }
-        });
 
         binding.layoutCartDiscount.setOnClickListener(v -> {
             showDiscountBottomSheet();
@@ -131,18 +117,13 @@ public class CartFragment extends Fragment {
             cartViewModel.toggleSelectAll(isChecked);
         });
 
-        cartViewModel.loadCartFromManager();
-        List<CartItem> checkCart = CartManager.getInstance().getCartList();
-        if (checkCart != null) {
-            Toast.makeText(requireContext(), "Trong giỏ đang có: " + checkCart.size() + " món", Toast.LENGTH_SHORT).show();
-        }
+        cartViewModel.fetchCart();
 
         cartViewModel.fetchActiveCoupons();
 
     }
 
     private void setupRecyclerView() {
-        List<CartItem> currentList = CartManager.getInstance().getCartList();
         cartAdapter = new CartAdapter(new ArrayList<>(), new CartAdapter.CartClickListener() {
             @Override
             public void onIncrease(CartItem item, int position) {
@@ -165,7 +146,7 @@ public class CartFragment extends Fragment {
                 item.setSelected(isChecked);
                 cartViewModel.checkAllSelectedStatus();
                 cartViewModel.calculateTotal();
-                cartViewModel.getCartItems().setValue(currentList);
+                cartViewModel.getCartItems().setValue(cartViewModel.getCartItems().getValue());
             }
         });
         binding.rvCart.setLayoutManager(new LinearLayoutManager(requireContext()));
