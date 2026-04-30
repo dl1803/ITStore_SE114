@@ -11,6 +11,7 @@ import com.example.itstore.api.RetrofitClient;
 import com.example.itstore.model.Brand;
 import com.example.itstore.model.BrandResponse;
 import com.example.itstore.model.Category;
+import com.example.itstore.model.CategoryResponse;
 import com.example.itstore.model.MockDataRepository;
 import com.example.itstore.model.Product;
 import com.example.itstore.model.ProductImage;
@@ -68,6 +69,26 @@ public class HomeViewModel extends ViewModel {
             }
         }
         productListLiveData.setValue(filteredList);
+    }
+    public void fetchCategories(Context context) {
+        RetrofitClient.ApiService apiService = RetrofitClient.getApiService(context);
+
+        apiService.getCategories().enqueue(new Callback<CategoryResponse>() {
+            @Override
+            public void onResponse(Call<CategoryResponse> call, Response<CategoryResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    List<Category> apiCategories = response.body().getData();
+                    List<Category> finalCategories = new ArrayList<>();
+                    finalCategories.add(new Category(-1, "Tất cả", ""));
+                    finalCategories.addAll(apiCategories);
+                    categoryListLiveData.setValue(finalCategories);
+                }
+            }
+            @Override
+            public void onFailure(Call<CategoryResponse> call, Throwable t) {
+                android.util.Log.e("API_ERR", "Lỗi lấy danh mục Home: " + t.getMessage());
+            }
+        });
     }
 }
 

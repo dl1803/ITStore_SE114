@@ -52,4 +52,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
             this.binding = binding;
         }
     }
+    public void updateData(List<Category> newCategoryList) {
+        this.categoryList = newCategoryList;
+        notifyDataSetChanged();
+    }
 }
