@@ -29,8 +29,10 @@ import com.example.itstore.adapter.BannerAdapter;
 import com.example.itstore.adapter.BrandFilterAdapter;
 import com.example.itstore.adapter.CategoryAdapter;
 import com.example.itstore.adapter.ProductAdapter;
+import com.example.itstore.api.RetrofitClient;
 import com.example.itstore.databinding.FragmentHomeBinding;
 import com.example.itstore.model.Category;
+import com.example.itstore.model.CategoryResponse;
 import com.example.itstore.model.MockDataRepository;
 import com.example.itstore.model.Product;
 import com.example.itstore.utils.SharedPrefsManager;
@@ -39,6 +41,10 @@ import com.example.itstore.viewmodel.ProductDetailViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomeFragment extends Fragment {
 
@@ -185,24 +191,31 @@ public class HomeFragment extends Fragment {
             rcvProducts.setAdapter(productAdapter);
         });
 
+        categoryAdapter = new CategoryAdapter(requireContext(), new ArrayList<>(), new CategoryAdapter.OnCategoryClickListener() {
+            @Override
+            public void onCategoryClick(Category category) {
+                homeViewModel.filterByCategory(category.getId());
+            }
+        });
         rcvCategories = binding.recyclerCategory;
         rcvCategories.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false));
+        rcvCategories.setAdapter(categoryAdapter);
+
         homeViewModel.getCategoryListLiveData().observe(getViewLifecycleOwner(), categories -> {
-            categoryAdapter = new CategoryAdapter(requireContext(), categories, new CategoryAdapter.OnCategoryClickListener() {
-                @Override
-                public void onCategoryClick(Category category) {
-                    homeViewModel.filterByCategory(category.getId());
-                }
-            });
-            rcvCategories.setAdapter(categoryAdapter);
+            if (categories != null) {
+                categoryAdapter.updateData(categories);
+            }
         });
+
+        // lấy data từ api
+        homeViewModel.fetchCategories(requireContext());
+
         binding.tvSeeAll.setOnClickListener(v -> {
             androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_search);
         });
         binding.layoutSearchBar.setOnClickListener(v -> {
             androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_search);
         });
-
         return view;
 
     }
