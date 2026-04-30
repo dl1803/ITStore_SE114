@@ -1,8 +1,11 @@
 package com.example.itstore.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class CartItem {
     private int id;
     private int cartId;
+    @SerializedName("variant_id")
     private int variantId;
     private int quantity;
 

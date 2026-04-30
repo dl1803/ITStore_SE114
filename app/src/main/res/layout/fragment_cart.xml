@@ -15,28 +15,6 @@
         app:layout_constraintRight_toRightOf="parent"
         android:paddingVertical="20dp">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/btnBackCart"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            app:cardCornerRadius="22dp"
-            app:cardBackgroundColor="@color/orange_light"
-            app:cardElevation="1dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:padding="10dp"
-            android:layout_marginLeft="20dp"
-            >
-
-            <ImageView
-                android:id="@+id/ivBack"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="10dp"
-                android:src="@drawable/ic_back"
-                app:tint="#808080" />
-        </androidx.cardview.widget.CardView>
         <TextView android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             app:layout_constraintLeft_toLeftOf="parent"
