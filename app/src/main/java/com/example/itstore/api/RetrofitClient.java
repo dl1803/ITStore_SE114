@@ -20,6 +20,7 @@ import retrofit2.http.Path;
 import com.example.itstore.model.AddressRequest;
 import com.example.itstore.model.AddressResponse;
 import com.example.itstore.model.BrandResponse;
+import com.example.itstore.model.CategoryResponse;
 import com.example.itstore.model.ChangePasswordRequest;
 import com.example.itstore.model.ChangePasswordResponse;
 import com.example.itstore.model.CouponResponse;
@@ -40,6 +41,7 @@ import com.example.itstore.model.RegisterResponse;
 import com.example.itstore.model.ResetPasswordRequest;
 import com.example.itstore.model.ResetPasswordResponse;
 import com.example.itstore.model.SingleAddressResponse;
+import com.example.itstore.model.SingleBrandResponse;
 import com.example.itstore.model.UpdateProfileRequest;
 
 public class RetrofitClient {
@@ -112,11 +114,14 @@ public class RetrofitClient {
         Call<SingleAddressResponse> deleteAddress(@Path("id") int id);
         @GET("api/brands")
         Call<BrandResponse> getBrands();
+        @GET("api/brands/{id}")
+        Call<SingleBrandResponse> getBrandById(@Path("id") int id);
         @POST("api/orders")
         Call<OrderCreateResponse> createOrder(@Body CreateOrderRequest request);
 
         @GET("api/coupons")
         Call<CouponResponse> getCoupons();
-
+        @GET("api/categories")
+        Call<CategoryResponse> getCategories();
     }
 }
