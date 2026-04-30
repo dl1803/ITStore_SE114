@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         navController.setGraph(graph);
             NavigationUI.setupWithNavController(binding.bottomNavigation, navController);
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            if (destination.getId() == R.id.nav_search || destination.getId() == R.id.nav_cart) {
+            if (destination.getId() == R.id.nav_search) {
                 binding.bottomNavigation.setVisibility(View.GONE);
             } else {
                 binding.bottomNavigation.setVisibility(View.VISIBLE);
