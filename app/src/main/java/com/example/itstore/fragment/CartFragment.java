@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.itstore.R;
 import com.example.itstore.activity.CheckoutActivity;
 import com.example.itstore.activity.LoginActivity;
+import com.example.itstore.activity.ProductDetailActivity;
 import com.example.itstore.adapter.CartAdapter;
 import com.example.itstore.adapter.DiscountAdapter;
 import com.example.itstore.api.RetrofitClient;
@@ -30,6 +31,7 @@ import com.example.itstore.model.CartItem;
 import com.example.itstore.model.Coupon;
 import com.example.itstore.model.CouponResponse;
 import com.example.itstore.model.Discount;
+import com.example.itstore.model.Product;
 import com.example.itstore.utils.CartManager;
 import com.example.itstore.utils.SharedPrefsManager;
 import com.example.itstore.viewmodel.CartViewModel;
@@ -166,6 +168,12 @@ public class CartFragment extends Fragment {
                 cartViewModel.checkAllSelectedStatus();
                 cartViewModel.calculateTotal();
                 cartViewModel.getCartItems().setValue(currentList);
+            }
+            @Override
+            public void onProductClick(Product product) {
+                Intent intent = new Intent(requireContext(), ProductDetailActivity.class);
+                intent.putExtra("PRODUCT_INFO", product);
+                startActivity(intent);
             }
         });
         binding.rvCart.setLayoutManager(new LinearLayoutManager(requireContext()));
