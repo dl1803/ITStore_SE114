@@ -21,33 +21,16 @@ public class OrderSuccessActivity extends AppCompatActivity {
 
     private ActivityOrderSuccessBinding binding;
     private Order order;
+    private int currentOrderId = -1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityOrderSuccessBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        order = (Order) getIntent().getSerializableExtra("ORDER_DATA");
-
-        if (order != null) {
-            binding.tvOrder.setText("#" + order.getOrderId());
-        } else {
-            binding.tvOrder.setText("#LỖI_KHÔNG_CÓ_MÃ");
-        }
         setupClickListeners();
     }
 
     private void setupClickListeners() {
-        binding.btnCopyOrder.setOnClickListener(v -> {
-            if (order != null) {
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("Mã đơn hàng", order.getOrderId());
-                clipboard.setPrimaryClip(clip);
-
-                Toast.makeText(this, "Đã copy mã đơn hàng!", Toast.LENGTH_SHORT).show();
-            }
-        });
-
         binding.btnContinueBuy.setOnClickListener(v -> {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
@@ -57,7 +40,7 @@ public class OrderSuccessActivity extends AppCompatActivity {
 
         binding.tvViewDetail.setOnClickListener(v -> {
             Intent intent = new Intent(this, OrderDetailActivity.class);
-            intent.putExtra("ORDER_DATA", order);
+            intent.putExtra("TAB_TO_OPEN", "PENDING");
             startActivity(intent);
             finish();
         });
