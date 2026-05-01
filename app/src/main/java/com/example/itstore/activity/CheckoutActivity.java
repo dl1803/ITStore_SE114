@@ -286,12 +286,6 @@ public class CheckoutActivity extends AppCompatActivity {
             }
         });
 
-        checkoutViewModel.getFinalTotalPrice().observe(this, finalTotal -> {
-            String formattedTotal = String.format("%,.0f đ", finalTotal);
-            binding.tvTotalPrice.setText(formattedTotal);
-            binding.tvTotal.setText(formattedTotal);
-        });
-
         checkoutViewModel.getIsOrderSuccess().observe(this, isSuccess -> {
             if (isSuccess != null && isSuccess) {
                 Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
@@ -305,6 +299,12 @@ public class CheckoutActivity extends AppCompatActivity {
                     Toast.makeText(this, "Đang chuyển hướng sang MoMo...", Toast.LENGTH_SHORT).show();
                 }
             }
+        });
+
+        checkoutViewModel.getFinalTotalPrice().observe(this, finalTotal -> {
+            String formattedTotal = String.format("%,.0f đ", finalTotal);
+            binding.tvTotalPrice.setText(formattedTotal);
+            binding.tvTotal.setText(formattedTotal);
         });
 
         checkoutViewModel.getOrderError().observe(this, error -> {
