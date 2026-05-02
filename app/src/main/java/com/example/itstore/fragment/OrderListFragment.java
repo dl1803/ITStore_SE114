@@ -4,20 +4,26 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.itstore.R;
 import com.example.itstore.adapter.OrderAdapter;
 import com.example.itstore.model.Order;
+import com.example.itstore.viewmodel.OrderHistoryViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class OrderListFragment extends Fragment {
     private String tabStatus;
+    private OrderAdapter adapter;
+
+    private OrderHistoryViewModel viewModel;
 
     public static OrderListFragment newInstance(String tabStatus) {
         OrderListFragment fragment = new OrderListFragment();
@@ -42,29 +48,43 @@ public class OrderListFragment extends Fragment {
         RecyclerView rvOrders = v.findViewById(R.id.rvOrders);
         rvOrders.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        OrderAdapter adapter = new OrderAdapter();
+        adapter = new OrderAdapter();
         rvOrders.setAdapter(adapter);
 
-        List<Order> fakeList = new ArrayList<>();
-
-        if (tabStatus.equals("Tất cả") || tabStatus.equals("Chờ xác nhận")) {
-            fakeList.add(new Order("#DH001", "Chờ xác nhận", "RAM Desktop Kingston Fury", "16GB", 1, 2, 3486000, R.drawable.ram1, "22/02/2026 14:30"));
-        }
-        if (tabStatus.equals("Tất cả") || tabStatus.equals("Đang giao")) {
-            fakeList.add(new Order("#DH002", "Đang giao", "Laptop Gaming Asus", "Đen", 1, 0, 25000000, R.drawable.ram1, "22/02/2026 14:30"));
-        }
-        if (tabStatus.equals("Tất cả") || tabStatus.equals("Đã hủy")) {
-            fakeList.add(new Order("#DH003", "Đã hủy", "Chuột Logitech", "Không dây", 2, 0, 450000, R.drawable.ram1, "22/02/2026 14:30"));
-        }
-        if (tabStatus.equals("Tất cả") || tabStatus.equals("Đã giao")) {
-            fakeList.add(new Order("#DH004", "Đã giao", "Chuột Logitech", "Không dây", 2, 0, 450000, R.drawable.ram1, "22/02/2026 14:30"));
-        }
-
-        adapter.setOrderList(fakeList);
-
+        adapter.setOrderList(new ArrayList<>());
         return v;
     }
 
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState){
+        viewModel = new ViewModelProvider(requireActivity()).get(OrderHistoryViewModel.class);
 
+        // hàm getViewLifecycleOwner() dùng để gắn observe vào view , khi view bị xóa thì sẽ xóa observe theo, tránh memory leak khi dùng this sẽ bị tạo lại observe khi chuyển tab
+        viewModel.getOrderList().observe(getViewLifecycleOwner(), orders -> {
+            if (orders != null) {
+                List<Order> filteredOrders = new ArrayList<>();
+                for (Order order : orders) {
+                    String status = "Chờ xác nhận";
+                    if (order.getStatus().equalsIgnoreCase("pending")) status = "Chờ xác nhận";
+                    else if (order.getStatus().equalsIgnoreCase("processing")) status = "Đang giao";
+                    else if (order.getStatus().equalsIgnoreCase("delivered")) status = "Đã giao";
+                    else if (order.getStatus().equalsIgnoreCase("cancelled")) status = "Đã hủy";
+                    if (tabStatus.equals("Tất cả") || tabStatus.equals(status)){
+                        filteredOrders.add(order);
+                    }
+                }
+                adapter.setOrderList(filteredOrders);
+            }
+        });
 
+        viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
+            if (error != null && tabStatus.equals("Tất cả")){
+                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        if (tabStatus.equals("Tất cả") && viewModel.getOrderList().getValue() == null) {
+            viewModel.fetchOrderHistory();
+        }
+    }
 }
