@@ -34,6 +34,7 @@ import com.example.itstore.model.LoginResponse;
 import com.example.itstore.model.LogoutRequest;
 import com.example.itstore.model.LogoutResponse;
 import com.example.itstore.model.OrderCreateResponse;
+import com.example.itstore.model.OrderHistoryResponse;
 import com.example.itstore.model.ProfileResponse;
 import com.example.itstore.model.RefreshTokenRequest;
 import com.example.itstore.model.RefreshTokenResponse;
@@ -124,6 +125,10 @@ public class RetrofitClient {
 
         @POST("api/orders")
         Call<OrderCreateResponse> createOrder(@Body CreateOrderRequest request);
+
+        @GET("api/orders")
+        Call<OrderHistoryResponse> getOrderHistory();
+
 
         @GET("api/brands/{id}")
         Call<SingleBrandResponse> getBrandById(@Path("id") int id);
