@@ -1,12 +1,30 @@
 package com.example.itstore.model;
+
 import com.google.gson.annotations.SerializedName;
+import java.util.List;
+
 public class Category {
     @SerializedName("id")
     private int id;
+
     @SerializedName("name")
     private String name;
+
     @SerializedName("image_url")
     private String imageUrl;
+
+    // 🟢 THÊM CÁC TRƯỜNG MỚI TỪ API Ở ĐÂY
+    @SerializedName("slug")
+    private String slug;
+
+    @SerializedName("description")
+    private String description;
+    @SerializedName("parent_id")
+    private Integer parentId;
+
+    @SerializedName("children")
+    private List<Category> children;
+
     public Category() {
     }
 
@@ -38,5 +56,37 @@ public class Category {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Integer getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
+    }
+
+    public List<Category> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<Category> children) {
+        this.children = children;
     }
 }

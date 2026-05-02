@@ -5,11 +5,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.itstore.databinding.ItemProductCartBinding;
 import com.example.itstore.model.CartItem;
+import com.example.itstore.model.Product;
+
 import java.util.List;
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder>{
     private List<CartItem> cartList;
     private CartClickListener listener;
     public interface CartClickListener {
+        void onProductClick(Product product);
         void onIncrease(CartItem item, int position);
         void onDecrease(CartItem item, int position);
         void onDelete(CartItem item, int position);
@@ -56,6 +59,16 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             item.setSelected(isChecked);
             if (listener != null) {
                 listener.onItemSelected(item, isChecked);
+            }
+        });
+        holder.binding.imgProduct.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onProductClick(item.getProduct());
+            }
+        });
+        holder.binding.tvProductName.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onProductClick(item.getProduct());
             }
         });
     }
