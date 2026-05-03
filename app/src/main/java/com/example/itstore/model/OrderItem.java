@@ -1,27 +1,65 @@
 package com.example.itstore.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 public class OrderItem implements Serializable {
-    private Product product;
+    @SerializedName("variant_id")
+    private int variantId;
+    @SerializedName("quantity")
     private int quantity;
-    private double price;
+    @SerializedName("unit_price")
+    private double unitPrice;
+    @SerializedName("image_url")
+    private String imageUrl;
 
-    public OrderItem(Product product, int quantity, double price) {
-        this.product = product;
-        this.quantity = quantity;
-        this.price = price;
+    @SerializedName("product")
+    private ProductInfo productInfo;
+
+    @SerializedName("variant")
+    private VariantInfo variantInfo;
+
+    public int getQuantity() { return quantity; }
+
+    public double getPrice() { return unitPrice; }
+
+    public String getImageUrl() { return imageUrl; }
+
+    public String getProductName() {
+        return productInfo != null ? productInfo.name : "Sản phẩm không rõ";
     }
 
-    public Product getProduct() {
-        return product;
+    public String getProductType() {
+        if (variantInfo != null) {
+            String type = "";
+            if (variantInfo.version != null && !variantInfo.version.isEmpty()) {
+                type += variantInfo.version;
+            }
+            if (variantInfo.color != null && !variantInfo.color.isEmpty()) {
+                type += (type.isEmpty() ? "" : " - ") + variantInfo.color;
+            }
+            return type.isEmpty() ? "Mặc định" : type;
+        }
+        return "";
     }
 
-    public int getQuantity() {
-        return quantity;
+    public int getProductId() {
+        return productInfo != null ? productInfo.id : -1;
     }
 
-    public double getPrice() {
-        return price;
+    public static class ProductInfo implements Serializable {
+
+        @SerializedName("id")
+        private int id;
+        @SerializedName("name")
+        private String name;
+    }
+
+    public static class VariantInfo implements Serializable {
+        @SerializedName("version")
+        private String version;
+        @SerializedName("color")
+        private String color;
     }
 }

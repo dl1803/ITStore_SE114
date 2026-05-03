@@ -60,7 +60,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         DecimalFormat formatter = new DecimalFormat("###,###,###");
 
         binding.tvOrderId.setText("Mã đơn hàng: #" + currentOrder.getOrderId());
-        binding.tvOrderDate.setText("Ngày đặt: 22/02/2026 14:30");
+        binding.tvOrderDate.setText("Ngày đặt: " + currentOrder.getOrderDate());
 
         String status = currentOrder.getStatus();
         binding.tvOrderStatus.setText("Trạng thái: " + status);
@@ -72,35 +72,14 @@ public class OrderDetailActivity extends AppCompatActivity {
             binding.tvOrderStatus.setTextColor(Color.parseColor("#F57C00"));
         }
 
-        binding.tvCustomerName.setText("Nguyễn Đại Vương | 0987654321");
-        binding.tvAddress.setText("123 Đường Linh Kiện, Phường 10, Quận 1, TPHCM");
 
-        List<OrderItem> mockOrderItemList = new ArrayList<>();
+        List<OrderItem> itemList = currentOrder.getItems();
 
-        List<ProductVariant> variants = new ArrayList<>();
-        variants.add(new ProductVariant(1, currentOrder.getProductType(), (double) currentOrder.getTotalPrice(), 0, 100));
+        if (itemList == null) {
+            itemList = new ArrayList<>();
+        }
 
-        List<ProductImage> listImages = new ArrayList<>();
-        listImages.add(new ProductImage(1, String.valueOf(currentOrder.getImageRes()), true));
-
-        Product dummyProduct = new Product(
-                1,
-                1,
-                currentOrder.getProductName(),
-                currentOrder.getProductType(),
-                variants,
-                listImages,
-                1
-        );
-        OrderItem dummyItem = new OrderItem(
-                dummyProduct,
-                currentOrder.getQuantity(),
-                currentOrder.getTotalPrice()
-        );
-
-        mockOrderItemList.add(dummyItem);
-
-        OrderDetailAdapter adapter = new OrderDetailAdapter(mockOrderItemList);
+        OrderDetailAdapter adapter = new OrderDetailAdapter(itemList);
         binding.rvProducts.setLayoutManager(new LinearLayoutManager(this));
         binding.rvProducts.setAdapter(adapter);
 

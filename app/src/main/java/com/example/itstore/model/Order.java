@@ -1,70 +1,81 @@
 package com.example.itstore.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
+import java.util.List;
 
 public class Order implements Serializable {
-    private String orderId;
-    private String status;
-    private String productName;
-    private String productType;
-    private int quantity;
-    private int extraItemsCount;
-    private long totalPrice;
-    private int imageRes;
-    private String orderDate;
-    public Order(String orderId, String status, String productName, String productType, int quantity, int extraItemsCount, long totalPrice, int imageRes, String orderDate){
-        this.orderId = orderId;
-        this.status = status;
-        this.productName = productName;
-        this.productType = productType;
-        this.quantity = quantity;
-        this.extraItemsCount = extraItemsCount;
-        this.totalPrice = totalPrice;
-        this.imageRes = imageRes;
-        this.orderDate = orderDate;
+    @SerializedName("id")
+    private int id;
+
+    @SerializedName("total")
+    private double total;
+
+    @SerializedName("order_status")
+    private String orderStatus;
+
+    @SerializedName("created_at")
+    private String createdAt;
+
+    @SerializedName("items")
+    private List<OrderItem> items;
+    public String getOrderId() { return String.valueOf(id); }
+
+    public String getStatus() { return orderStatus; }
+
+    public long getTotalPrice() { return (long) total; }
+
+    public String getOrderDate() { return createdAt; }
+
+    // Auto lấy tên của sản phẩm đầu trong đơn hàng
+    public String getProductName() {
+        if (items != null && !items.isEmpty()) {
+            return items.get(0).getProductName();
+        }
+        return "Đơn hàng rỗng";
     }
 
-    public String getOrderId(){
-        return orderId;
+    // Auto lấy loại sản phẩm đầu trong đơn hàng
+    public String getProductType() {
+        if (items != null && !items.isEmpty()) {
+            return items.get(0).getProductType();
+        }
+        return "";
     }
 
-    public String getStatus(){
-        return status;
+    // Auto tính số lượng món phụ (Tổng số món - 1)
+    public int getExtraItemsCount() {
+        if (items != null && items.size() > 1) {
+            return items.size() - 1;
+        }
+        return 0;
     }
 
-    public String getProductName(){
-        return productName;
+    // Auto đếm tổng số lượng sản phẩm trong đơn hàng
+    public int getQuantity() {
+        int totalQty = 0;
+        if (items != null) {
+            for (OrderItem item : items) {
+                totalQty += item.getQuantity();
+            }
+        }
+        return totalQty;
     }
 
-    public String getProductType(){
-        return productType;
+    // Auto lấy ảnh của sản phẩm đầu trong đơn hàng
+    public String getImageUrl() {
+        if (items != null && !items.isEmpty()) {
+            return items.get(0).getImageUrl();
+        }
+        return "";
     }
 
-    public int getQuantity(){
-        return quantity;
+    public List<OrderItem> getItems() {
+        return items;
     }
 
-    public int getExtraItemsCount(){
-        return extraItemsCount;
-    }
-
-    public long getTotalPrice(){
-        return totalPrice;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public int getImageRes(){
-        return imageRes;
-    }
-
-    public String getOrderDate() {
-        return orderDate;
-    }
-
-    public void setOrderDate(String orderDate) {
-        this.orderDate = orderDate;
+    public void setStatus(String newStatus) {
+     this.orderStatus = newStatus;
     }
 }

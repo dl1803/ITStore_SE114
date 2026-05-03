@@ -3,6 +3,7 @@ package com.example.itstore.viewmodel;
 import static androidx.lifecycle.AndroidViewModel_androidKt.getApplication;
 
 import android.app.Application;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -12,6 +13,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.itstore.api.RetrofitClient;
 import com.example.itstore.model.CartItem;
+import com.example.itstore.model.CartResponse;
 import com.example.itstore.model.Coupon;
 import com.example.itstore.model.CouponResponse;
 import com.example.itstore.utils.CartManager;
@@ -140,6 +142,37 @@ public class CartViewModel extends AndroidViewModel {
             @Override
             public void onFailure(Call<CouponResponse> call, Throwable t) {
                 couponError.setValue("Lỗi kết nối server");
+            }
+        });
+    }
+    
+    public void fetchCart() {
+        RetrofitClient.getApiService(getApplication()).getCart().enqueue(new Callback<CartResponse>() {
+
+            @Override
+            public void onResponse(Call<CartResponse> call, Response<CartResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    if (response.body().isSuccess()) {
+                        List<CartItem> cartItems = response.body().getData();
+                        if (cartItems != null) {
+                            cartItemsLiveData.setValue(cartItems);
+                            calculateTotal();
+                        } else {
+                            Toast.makeText(getApplication(), "Lỗi từ server", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        if (response.code() == 401) {
+                            Toast.makeText(getApplication(), "Phiên đăng nhập đã hết hạn", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getApplication(), "Lỗi từ server", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CartResponse> call, Throwable t) {
+                Toast.makeText(getApplication(), "Lỗi mạng: Không thể tải giỏ hàng", Toast.LENGTH_SHORT).show();
             }
         });
     }

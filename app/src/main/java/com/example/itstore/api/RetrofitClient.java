@@ -20,6 +20,7 @@ import retrofit2.http.Path;
 import com.example.itstore.model.AddressRequest;
 import com.example.itstore.model.AddressResponse;
 import com.example.itstore.model.BrandResponse;
+import com.example.itstore.model.CartResponse;
 import com.example.itstore.model.CategoryResponse;
 import com.example.itstore.model.ChangePasswordRequest;
 import com.example.itstore.model.ChangePasswordResponse;
@@ -33,6 +34,7 @@ import com.example.itstore.model.LoginResponse;
 import com.example.itstore.model.LogoutRequest;
 import com.example.itstore.model.LogoutResponse;
 import com.example.itstore.model.OrderCreateResponse;
+import com.example.itstore.model.OrderHistoryResponse;
 import com.example.itstore.model.ProfileResponse;
 import com.example.itstore.model.RefreshTokenRequest;
 import com.example.itstore.model.RefreshTokenResponse;
@@ -115,13 +117,23 @@ public class RetrofitClient {
         Call<SingleAddressResponse> deleteAddress(@Path("id") int id);
         @GET("api/brands")
         Call<BrandResponse> getBrands();
-        @GET("api/brands/{id}")
-        Call<SingleBrandResponse> getBrandById(@Path("id") int id);
-        @POST("api/orders")
-        Call<OrderCreateResponse> createOrder(@Body CreateOrderRequest request);
 
         @GET("api/coupons")
         Call<CouponResponse> getCoupons();
+
+        @GET("api/cart")
+        Call<CartResponse> getCart();
+
+        @POST("api/orders")
+        Call<OrderCreateResponse> createOrder(@Body CreateOrderRequest request);
+
+        @GET("api/orders")
+        Call<OrderHistoryResponse> getOrderHistory();
+
+
+        @GET("api/brands/{id}")
+        Call<SingleBrandResponse> getBrandById(@Path("id") int id);
+       
         @GET("api/categories")
         Call<CategoryResponse> getCategories();
         @GET("api/categories/{id}")

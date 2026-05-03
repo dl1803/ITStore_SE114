@@ -33,30 +33,20 @@ public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         OrderItem item = orderItemList.get(position);
-        Product product = item.getProduct();
 
-        holder.binding.tvProductName.setText(product.getName());
+        holder.binding.tvProductName.setText(item.getProductName());
         holder.binding.tvProductPrice.setText(String.format("%,.0fđ", item.getPrice()));
         holder.binding.tvProductCount.setText("Số lượng: " + item.getQuantity());
 
-        if (product.getVariants() != null && !product.getVariants().isEmpty()) {
-            holder.binding.tvProductType.setText("Phân loại: " + product.getVariants().get(0).getVersion());
-        } else {
-            holder.binding.tvProductType.setText("Phân loại: Mặc định");
-        }
+        holder.binding.tvProductType.setText("Phân loại: " + item.getProductType());
 
-
-        String imageUrl = product.getImageUrl();
-        try {
-            int imageResId = Integer.parseInt(imageUrl);
-            Glide.with(holder.itemView.getContext()).load(imageResId).into(holder.binding.imgProduct);
-        } catch (NumberFormatException e) {
-            Glide.with(holder.itemView.getContext()).load(imageUrl).into(holder.binding.imgProduct);
-        }
+        Glide.with(holder.itemView.getContext())
+                .load(item.getImageUrl())
+                .into(holder.binding.imgProduct);
 
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(holder.itemView.getContext(), ProductDetailActivity.class);
-            intent.putExtra("PRODUCT_ID", product.getId());
+            intent.putExtra("PRODUCT_ID", item.getProductId());
             holder.itemView.getContext().startActivity(intent);
         });
     }
