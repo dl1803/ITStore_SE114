@@ -1,6 +1,7 @@
 package com.example.itstore.viewmodel;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -86,7 +87,7 @@ public class HomeViewModel extends ViewModel {
             }
             @Override
             public void onFailure(Call<CategoryResponse> call, Throwable t) {
-                android.util.Log.e("API_ERR", "Lỗi lấy danh mục Home: " + t.getMessage());
+                Log.e("API_ERR", "Lỗi lấy danh mục Home: " + t.getMessage());
             }
         });
     }

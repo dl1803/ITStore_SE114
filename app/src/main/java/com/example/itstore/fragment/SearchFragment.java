@@ -22,6 +22,8 @@ import com.example.itstore.adapter.ProductAdapter;
 import com.example.itstore.databinding.FragmentSearchBinding;
 import com.example.itstore.dialog.FilterProductDialog;
 import com.example.itstore.model.Brand;
+import com.example.itstore.model.Category;
+import com.example.itstore.viewmodel.HomeViewModel;
 import com.example.itstore.viewmodel.SearchViewModel;
 import com.google.android.material.chip.Chip;
 
@@ -33,7 +35,7 @@ public class SearchFragment extends Fragment {
     private FragmentSearchBinding binding;
     private SearchViewModel viewModel;
     private ProductAdapter productAdapter;
-    private String currentCategory = "Tất cả";
+    private int currentCategoryId = -1;
     private double currentMinPrice = 0;
     private double currentMaxPrice = Double.MAX_VALUE;
     private List<Integer> currentBrandIds = new ArrayList<>();
@@ -64,6 +66,30 @@ public class SearchFragment extends Fragment {
             binding.tvResultRecommend.setText("Tìm thấy " + products.size() + " sản phẩm");
         });
 
+        // Lay data cua chip tu api
+        HomeViewModel homeViewModel = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
+        homeViewModel.getCategoryListLiveData().observe(getViewLifecycleOwner(), categories -> {
+            if (categories != null && !categories.isEmpty()) {
+                binding.chipGroupFilter.removeAllViews();
+
+                Chip chipAll = (Chip) getLayoutInflater().inflate(R.layout.item_chip_search, binding.chipGroupFilter, false);
+                chipAll.setText("Tất cả");
+                chipAll.setCheckable(true);
+                chipAll.setChecked(true);
+                chipAll.setTag("-1");
+                binding.chipGroupFilter.addView(chipAll);
+
+                for (Category category : categories) {
+                    if (category.getId() != -1) {
+                        Chip chip = (Chip) getLayoutInflater().inflate(R.layout.item_chip_search, binding.chipGroupFilter, false);
+                        chip.setText(category.getName());
+                        chip.setCheckable(true);
+                        chip.setTag(category.getId());
+                        binding.chipGroupFilter.addView(chip);
+                    }
+                }
+            }
+        });
         // Bật bàn phím khi mới vào
         binding.edtSearch.requestFocus();
         binding.edtSearch.postDelayed(() -> {
@@ -89,10 +115,18 @@ public class SearchFragment extends Fragment {
                 Chip selectedChip = group.findViewById(selectedChipId);
                 String categoryId = selectedChip.getTag().toString();
                 String categoryName = selectedChip.getText().toString();
-                Bundle bundle = new Bundle();
-                bundle.putString("CATEGORY_ID", categoryId);
-                bundle.putString("CATEGORY_NAME", categoryName);
-                Navigation.findNavController(requireView()).navigate(R.id.action_nav_search_to_nav_category_product, bundle);
+
+                if (!categoryId.equals("-1")) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("CATEGORY_ID", categoryId);
+                    bundle.putString("CATEGORY_NAME", categoryName);
+                    Navigation.findNavController(requireView()).navigate(R.id.action_nav_search_to_nav_category_product, bundle);
+                }
+                // Nếu bấm nút tất cả thì lọc tại chỗ
+                else {
+                    currentCategoryId = -1;
+                    performCombinedSearch();
+                }
                 group.clearCheck();
             }
         });
@@ -116,14 +150,14 @@ public class SearchFragment extends Fragment {
     // Hàm lọc
     private void performCombinedSearch() {
         String query = binding.edtSearch.getText().toString().trim();
-        if (!query.isEmpty() || !currentCategory.equals("Tất cả") || currentMinPrice > 0 || !currentBrandIds.isEmpty()) {
+        if (!query.isEmpty() || currentCategoryId != -1 || currentMinPrice > 0 || !currentBrandIds.isEmpty()) {
             binding.tvResultRecommend.setText("Kết quả lọc");
             binding.btnOpenFilter.setVisibility(View.VISIBLE);
         } else {
             binding.tvResultRecommend.setText("Gợi ý tìm kiếm");
             binding.btnOpenFilter.setVisibility(View.GONE);
         }
-        viewModel.filterProducts(query, currentCategory, currentMinPrice, currentMaxPrice, currentBrandIds);
+        viewModel.filterProducts(query, currentCategoryId, currentMinPrice, currentMaxPrice, currentBrandIds);
     }
     private void hideKeyboard(View view) {
         InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);

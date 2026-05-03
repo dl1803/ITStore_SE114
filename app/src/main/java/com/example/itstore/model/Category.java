@@ -12,8 +12,6 @@ public class Category {
 
     @SerializedName("image_url")
     private String imageUrl;
-
-    // 🟢 THÊM CÁC TRƯỜNG MỚI TỪ API Ở ĐÂY
     @SerializedName("slug")
     private String slug;
 
@@ -24,6 +22,8 @@ public class Category {
 
     @SerializedName("children")
     private List<Category> children;
+    @SerializedName("created_at")
+    private String createdAt;
 
     public Category() {
     }
@@ -35,6 +35,7 @@ public class Category {
     }
 
     public int getId() {
+
         return id;
     }
 
@@ -43,14 +44,17 @@ public class Category {
     }
 
     public String getName() {
+
         return name;
     }
 
     public void setName(String name) {
+
         this.name = name;
     }
 
     public String getImageUrl() {
+
         return imageUrl;
     }
 
@@ -59,34 +63,50 @@ public class Category {
     }
 
     public String getSlug() {
+
         return slug;
     }
 
     public void setSlug(String slug) {
+
         this.slug = slug;
     }
 
     public String getDescription() {
+
         return description;
     }
 
     public void setDescription(String description) {
+
         this.description = description;
     }
 
     public Integer getParentId() {
+
         return parentId;
     }
 
     public void setParentId(Integer parentId) {
+
         this.parentId = parentId;
     }
 
     public List<Category> getChildren() {
+
         return children;
     }
 
     public void setChildren(List<Category> children) {
+
         this.children = children;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 }

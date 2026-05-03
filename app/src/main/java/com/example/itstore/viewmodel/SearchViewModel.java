@@ -33,20 +33,10 @@ public class SearchViewModel extends ViewModel {
 
     public SearchViewModel() {
         allProducts = MockDataRepository.getInstance().getAllProducts();
-        allCategories = MockDataRepository.getInstance().getAllCategories();
-        filterProducts("", "Tất cả", 0, Double.MAX_VALUE, new ArrayList<Integer>());
+        filterProducts("", -1, 0, Double.MAX_VALUE, new ArrayList<Integer>());
     }
-    public void filterProducts(String query, String categoryName, double minPrice, double maxPrice, List<Integer> selectedBrandIds) {
+    public void filterProducts(String query, int targetCategoryId, double minPrice, double maxPrice, List<Integer> selectedBrandIds) {
         List<Product> filteredList = new ArrayList<>();
-        int targetCategoryId = -1;
-        if (categoryName != null && !categoryName.equalsIgnoreCase("Tất cả")) {
-            for (Category cat : allCategories) {
-                if (cat.getName().equalsIgnoreCase(categoryName)) {
-                    targetCategoryId = cat.getId();
-                    break;
-                }
-            }
-        }
 
         for (Product p : allProducts) {
             // 1. Lọc từ khóa

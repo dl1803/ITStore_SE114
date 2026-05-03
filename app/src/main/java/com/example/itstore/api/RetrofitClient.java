@@ -42,6 +42,7 @@ import com.example.itstore.model.ResetPasswordRequest;
 import com.example.itstore.model.ResetPasswordResponse;
 import com.example.itstore.model.SingleAddressResponse;
 import com.example.itstore.model.SingleBrandResponse;
+import com.example.itstore.model.SingleCategoryResponse;
 import com.example.itstore.model.UpdateProfileRequest;
 
 public class RetrofitClient {
@@ -123,5 +124,7 @@ public class RetrofitClient {
         Call<CouponResponse> getCoupons();
         @GET("api/categories")
         Call<CategoryResponse> getCategories();
+        @GET("api/categories/{id}")
+        Call<SingleCategoryResponse> getCategoryById(@Path("id") int id);
     }
 }
