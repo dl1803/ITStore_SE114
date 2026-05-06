@@ -130,8 +130,7 @@ public class HomeFragment extends Fragment {
 
         rcvProducts = binding.recyclerProduct;
         rcvProducts.setLayoutManager(new GridLayoutManager(requireContext(), 2));
-        homeViewModel.getProductListLiveData().observe(getViewLifecycleOwner(), products -> {
-            productAdapter = new ProductAdapter(requireContext(), products, new ProductAdapter.OnProductInteractionListener() {
+        productAdapter = new ProductAdapter(requireContext(), new ArrayList<>(), new ProductAdapter.OnProductInteractionListener() {
 
                 // Chuyển sang màn hình chi tiết
                 @Override
@@ -188,7 +187,11 @@ public class HomeFragment extends Fragment {
                     }
                 }
             });
-            rcvProducts.setAdapter(productAdapter);
+        rcvProducts.setAdapter(productAdapter);
+        homeViewModel.getProductListLiveData().observe(getViewLifecycleOwner(), products -> {
+            if (products != null) {
+                productAdapter.updateList(products);
+            }
         });
 
         categoryAdapter = new CategoryAdapter(requireContext(), new ArrayList<>(), new CategoryAdapter.OnCategoryClickListener() {
@@ -216,16 +219,15 @@ public class HomeFragment extends Fragment {
         binding.layoutSearchBar.setOnClickListener(v -> {
             androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_search);
         });
+        // goi ham lay san pham tu api
+        homeViewModel.fetchCategories(requireContext());
+        homeViewModel.fetchSuggestedProducts(requireContext());
         return view;
 
     }
     @Override
     public void onResume() {
         super.onResume();
-        if (productAdapter != null) {
-            List<Product> freshProducts = MockDataRepository.getInstance().getAllProducts();
-            productAdapter.updateList(freshProducts);
-        }
     }
     @Override
     public void onDestroyView() {

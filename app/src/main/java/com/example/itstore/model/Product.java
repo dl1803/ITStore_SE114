@@ -1,4 +1,6 @@
 package com.example.itstore.model;
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -12,6 +14,16 @@ public class Product implements Serializable {
     private boolean isFavorite = false;
     private int quantity;
     private int brandId;
+    @SerializedName("primary_image")
+    private String primaryImage;
+
+    @SerializedName("price_min")
+    private double priceMin;
+
+    @SerializedName("price_max")
+    private double priceMax;
+    @SerializedName("category")
+    private Category categoryObj;
 
     public Product(int id, int categoryId, String name, String description, List<ProductVariant> variants, List<ProductImage> images, int brandId) {
         this.id = id;
@@ -28,6 +40,9 @@ public class Product implements Serializable {
     }
 
     public int getCategoryId() {
+        if (categoryObj != null) {
+            return categoryObj.getId();
+        }
         return categoryId;
     }
 
@@ -67,7 +82,62 @@ public class Product implements Serializable {
         this.quantity = quantity;
     }
 
+    public void setVariants(List<ProductVariant> variants) {
+        this.variants = variants;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setImages(List<ProductImage> images) {
+        this.images = images;
+    }
+
+    public void setBrandId(int brandId) {
+        this.brandId = brandId;
+    }
+
+    public String getPrimaryImage() {
+        return primaryImage;
+    }
+
+    public void setPrimaryImage(String primaryImage) {
+        this.primaryImage = primaryImage;
+    }
+
+    public double getPriceMin() {
+        return priceMin;
+    }
+
+    public void setPriceMin(double priceMin) {
+        this.priceMin = priceMin;
+    }
+
+    public double getPriceMax() {
+        return priceMax;
+    }
+
+    public void setPriceMax(double priceMax) {
+        this.priceMax = priceMax;
+    }
+
     public double getPrice() {
+        if (priceMin > 0) {
+            return priceMin;
+        }
         if (variants != null && !variants.isEmpty()) {
             return variants.get(0).getPrice();
         }
@@ -80,6 +150,9 @@ public class Product implements Serializable {
         return 0;
     }
     public String getImageUrl() {
+        if (primaryImage != null && !primaryImage.isEmpty()) {
+            return primaryImage;
+        }
         if (images != null && !images.isEmpty()) {
             for (ProductImage img : images) {
                 if (img.isPrimary()) return img.getImageUrl();

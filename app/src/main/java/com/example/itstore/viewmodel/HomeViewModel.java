@@ -16,6 +16,7 @@ import com.example.itstore.model.CategoryResponse;
 import com.example.itstore.model.MockDataRepository;
 import com.example.itstore.model.Product;
 import com.example.itstore.model.ProductImage;
+import com.example.itstore.model.ProductResponse;
 import com.example.itstore.model.ProductVariant;
 
 import retrofit2.Call;
@@ -37,7 +38,6 @@ public class HomeViewModel extends ViewModel {
     public MutableLiveData<List<Product>> getProductListLiveData() {
         return productListLiveData;
     }
-
 
     public void updateProduct(Product updatedProduct) {
         for (int i = 0; i < allProducts.size(); i++) {
@@ -88,6 +88,26 @@ public class HomeViewModel extends ViewModel {
             @Override
             public void onFailure(Call<CategoryResponse> call, Throwable t) {
                 Log.e("API_ERR", "Lỗi lấy danh mục Home: " + t.getMessage());
+            }
+        });
+    }
+    public void fetchSuggestedProducts(Context context) {
+        RetrofitClient.getApiService(context).getProducts(
+                1, 20, null, null, null, null, null, "newest"
+        ).enqueue(new Callback<ProductResponse>() {
+            @Override
+            public void onResponse(Call<ProductResponse> call, Response<ProductResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    List<Product> apiProducts = response.body().getData();
+                    productListLiveData.setValue(apiProducts);
+
+                    allProducts = apiProducts;
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ProductResponse> call, Throwable t) {
+                Log.e("API_ERR", "Lỗi lấy sản phẩm Gợi ý: " + t.getMessage());
             }
         });
     }

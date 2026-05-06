@@ -16,6 +16,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 import com.example.itstore.model.AddressRequest;
 import com.example.itstore.model.AddressResponse;
@@ -35,6 +36,7 @@ import com.example.itstore.model.LogoutRequest;
 import com.example.itstore.model.LogoutResponse;
 import com.example.itstore.model.OrderCreateResponse;
 import com.example.itstore.model.OrderHistoryResponse;
+import com.example.itstore.model.ProductResponse;
 import com.example.itstore.model.ProfileResponse;
 import com.example.itstore.model.RefreshTokenRequest;
 import com.example.itstore.model.RefreshTokenResponse;
@@ -138,5 +140,16 @@ public class RetrofitClient {
         Call<CategoryResponse> getCategories();
         @GET("api/categories/{id}")
         Call<SingleCategoryResponse> getCategoryById(@Path("id") int id);
+        @GET("api/products")
+        Call<ProductResponse> getProducts(
+                @Query("page") Integer page,
+                @Query("limit") Integer limit,
+                @Query("keyword") String keyword,
+                @Query("category_id") Integer categoryId,
+                @Query("brand_id") Integer brandId,
+                @Query("price_min") Double priceMin,
+                @Query("price_max") Double priceMax,
+                @Query("sort") String sort
+        );
     }
 }

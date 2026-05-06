@@ -1,6 +1,7 @@
 package com.example.itstore.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,11 +19,13 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 
 import com.example.itstore.R;
+import com.example.itstore.activity.ProductDetailActivity;
 import com.example.itstore.adapter.ProductAdapter;
 import com.example.itstore.databinding.FragmentSearchBinding;
 import com.example.itstore.dialog.FilterProductDialog;
 import com.example.itstore.model.Brand;
 import com.example.itstore.model.Category;
+import com.example.itstore.model.Product;
 import com.example.itstore.viewmodel.HomeViewModel;
 import com.example.itstore.viewmodel.SearchViewModel;
 import com.google.android.material.chip.Chip;
@@ -58,12 +61,37 @@ public class SearchFragment extends Fragment {
         });
         viewModel.fetchBrands(requireContext());
         productAdapter = new ProductAdapter(requireContext(), new ArrayList<>());
+        productAdapter.setOnProductInteractionListener(new ProductAdapter.OnProductInteractionListener() {
+            @Override
+            public void onProductClick(Product product) {
+                Intent intent = new Intent(requireContext(), ProductDetailActivity.class);
+                intent.putExtra("PRODUCT_INFO", product);
+                startActivity(intent);
+            }
+            @Override
+            public void onFavoriteClick(Product product, int position) {
+                // Code xử lý bấm nút Tim ở đây
+            }
+
+            @Override
+            public void onAddToCartClick(Product product) {
+                // Code xử lý bấm nút Giỏ hàng ở đây
+            }
+        });
         binding.rvSearchRecommend.setLayoutManager(new GridLayoutManager(requireContext(), 2));
         binding.rvSearchRecommend.setAdapter(productAdapter);
 
         viewModel.searchResults.observe(getViewLifecycleOwner(), products -> {
-            productAdapter.updateList(products);
-            binding.tvResultRecommend.setText("Tìm thấy " + products.size() + " sản phẩm");
+            if (products != null) {
+                productAdapter.updateList(products);
+                String query = binding.edtSearch.getText().toString().trim();
+                boolean isFiltering = !query.isEmpty() || currentCategoryId != -1 || currentMinPrice > 0 || !currentBrandIds.isEmpty();
+                if (isFiltering) {
+                    binding.tvResultRecommend.setText("Tìm thấy " + products.size() + " sản phẩm");
+                } else {
+                    binding.tvResultRecommend.setText("Gợi ý tìm kiếm");
+                }
+            }
         });
 
         // Lay data cua chip tu api
@@ -146,6 +174,7 @@ public class SearchFragment extends Fragment {
             dialog.show(getChildFragmentManager(), "FilterProductDialog");
             hideKeyboard(v);
         });
+        performCombinedSearch();
     }
     // Hàm lọc
     private void performCombinedSearch() {
@@ -157,7 +186,7 @@ public class SearchFragment extends Fragment {
             binding.tvResultRecommend.setText("Gợi ý tìm kiếm");
             binding.btnOpenFilter.setVisibility(View.GONE);
         }
-        viewModel.filterProducts(query, currentCategoryId, currentMinPrice, currentMaxPrice, currentBrandIds);
+        viewModel.searchProducts(requireContext(), query, currentCategoryId, currentMinPrice, currentMaxPrice, currentBrandIds);
     }
     private void hideKeyboard(View view) {
         InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);

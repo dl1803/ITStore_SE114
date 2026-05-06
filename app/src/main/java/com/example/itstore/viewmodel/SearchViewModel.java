@@ -1,6 +1,7 @@
 package com.example.itstore.viewmodel;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -12,6 +13,7 @@ import com.example.itstore.model.BrandResponse;
 import com.example.itstore.model.Category;
 import com.example.itstore.model.MockDataRepository;
 import com.example.itstore.model.Product;
+import com.example.itstore.model.ProductResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,37 +34,29 @@ public class SearchViewModel extends ViewModel {
     }
 
     public SearchViewModel() {
-        allProducts = MockDataRepository.getInstance().getAllProducts();
-        filterProducts("", -1, 0, Double.MAX_VALUE, new ArrayList<Integer>());
     }
-    public void filterProducts(String query, int targetCategoryId, double minPrice, double maxPrice, List<Integer> selectedBrandIds) {
-        List<Product> filteredList = new ArrayList<>();
+    public void searchProducts(Context context, String query, int categoryId, double minPrice, double maxPrice, List<Integer> brandIds) {
 
-        for (Product p : allProducts) {
-            // 1. Lọc từ khóa
-            boolean matchesQuery = query.isEmpty() ||
-                    (p.getName() != null && p.getName().toLowerCase().contains(query.toLowerCase())) ||
-                    (p.getDescription() != null && p.getDescription().toLowerCase().contains(query.toLowerCase()));
+        Integer apiCategoryId = (categoryId == -1) ? null : categoryId;
+        Double apiMinPrice = (minPrice <= 0) ? null : minPrice;
+        Double apiMaxPrice = (maxPrice == Double.MAX_VALUE) ? null : maxPrice;
 
-            // 2. Lọc danh mục (Chip)
-            boolean matchesCategory = (targetCategoryId == -1) || (p.getCategoryId() == targetCategoryId);
-
-            // 3. Lọc Giá tiền (Dialog)
-            double currentPrice = p.getPrice();
-            boolean matchesPrice = currentPrice >= minPrice && currentPrice <= maxPrice;
-
-            // 4. Lọc Thương hiệu (Dialog)
-            boolean matchesBrand = true;
-            if (selectedBrandIds != null && !selectedBrandIds.isEmpty()) {
-                matchesBrand = selectedBrandIds.contains(p.getBrandId());
+        Integer apiBrandId = (brandIds != null && !brandIds.isEmpty()) ? brandIds.get(0) : null;
+        RetrofitClient.getApiService(context).getProducts(
+                1, 20, query, apiCategoryId, apiBrandId, apiMinPrice, apiMaxPrice, null
+        ).enqueue(new Callback<ProductResponse>() {
+            @Override
+            public void onResponse(Call<ProductResponse> call, Response<ProductResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    _searchResults.setValue(response.body().getData());
+                }
             }
 
-            // Vượt qua cả 4 vòng thì mới được hiển thị
-            if (matchesQuery && matchesCategory && matchesPrice && matchesBrand) {
-                filteredList.add(p);
+            @Override
+            public void onFailure(Call<ProductResponse> call, Throwable t) {
+                android.util.Log.e("API_ERR", "Lỗi tìm kiếm sản phẩm: " + t.getMessage());
             }
-        }
-        _searchResults.setValue(filteredList);
+        });
     }
     public void fetchBrands(Context context) {
         RetrofitClient.ApiService apiService = RetrofitClient.getApiService(context);
@@ -78,7 +72,7 @@ public class SearchViewModel extends ViewModel {
             }
             @Override
             public void onFailure(Call<BrandResponse> call, Throwable t) {
-                android.util.Log.e("API_ERR", "Lỗi lấy Brand bên Search: " + t.getMessage());
+                Log.e("API_ERR", "Lỗi lấy Brand bên Search: " + t.getMessage());
             }
         });
     }

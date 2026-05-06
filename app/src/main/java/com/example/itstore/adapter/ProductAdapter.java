@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.itstore.R;
 import com.example.itstore.databinding.ItemProductBinding;
 import com.example.itstore.model.Product;
@@ -31,7 +32,9 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         this.productList = productList;
         this.listener = listener;
     }
-
+    public void setOnProductInteractionListener(OnProductInteractionListener listener) {
+        this.listener = listener;
+    }
     @NonNull
     @Override
     public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -44,14 +47,17 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         if (product == null) return;
         holder.binding.tvName.setText(product.getName());
         holder.binding.tvPrice.setText(String.format(java.util.Locale.US, "%,.0f VNĐ", product.getPrice()));
-        holder.binding.imgProduct.setImageURI(Uri.parse(product.getImageUrl()));
+
+        // 🟢 IN LINK ẢNH RA ĐỂ BẮT BỆNH NÈ SẾP:
+        android.util.Log.d("KIEM_TRA_LINK", "Tên SP: " + product.getName() + " | Link ảnh: " + product.getImageUrl());
+
+        Glide.with(context)
+                .load(product.getImageUrl())
+                .placeholder(R.drawable.ic_search)
+                .into(holder.binding.imgProduct);
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onProductClick(product);
-            } else {
-                Intent intent = new android.content.Intent(context, com.example.itstore.activity.ProductDetailActivity.class);
-                intent.putExtra("PRODUCT_INFO", product);
-                context.startActivity(intent);
             }
         });
         if (product.isFavorite()) {
