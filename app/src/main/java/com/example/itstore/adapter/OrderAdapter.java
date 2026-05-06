@@ -39,13 +39,59 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         if (order == null) return;
 
         holder.tvOrderId.setText("Mã ĐH: " + order.getOrderId());
-        holder.tvOrderStatus.setText(order.getStatus());
+        String rawStatus = order.getStatus();
+        String statusVN = "Chờ xác nhận";
+        int statusColor = Color.parseColor("#F57C00");
+        if (rawStatus != null) {
+            switch (rawStatus.toLowerCase()){
+                case "pending":
+                    statusVN = "Chờ xác nhận";
+                    statusColor = Color.parseColor("#F57C00"); // Cam
+                    break;
+                case "processing":
+                case "delivering":
+                    statusVN = "Đang giao";
+                    statusColor = Color.parseColor("#2196F3"); // Xanh dương
+                    break;
+                case "delivered":
+                case "completed":
+                    statusVN = "Đã giao";
+                    statusColor = Color.parseColor("#4CAF50"); // Xanh lá
+                    break;
+                case "cancelled":
+                    statusVN = "Đã hủy";
+                    statusColor = Color.parseColor("#FF3B30"); // Đỏ
+                    break;
+            }
+        }
+        holder.tvOrderStatus.setText(statusVN);
+        holder.tvOrderStatus.setTextColor(statusColor);
         holder.tvProductName.setText(order.getProductName());
-        holder.tvProductType.setText(order.getProductType());
+
+        if (order.getProductType() == null || order.getProductType().isEmpty()) {
+            holder.tvProductType.setVisibility(View.GONE);
+        } else {
+            holder.tvProductType.setVisibility(View.VISIBLE);
+            holder.tvProductType.setText(order.getProductType());
+        }
+
         holder.tvQuantity.setText("x" + order.getQuantity());
 
         DecimalFormat formatter = new DecimalFormat("###,###,###");
         holder.tvTotalPrice.setText("Thành tiền: " + formatter.format(order.getTotalPrice()) + "đ");
+
+        if (statusVN.equalsIgnoreCase("Đã giao")) {
+            holder.btnReviewOrder.setVisibility(View.VISIBLE);
+        } else {
+            holder.btnReviewOrder.setVisibility(View.GONE);
+        }
+
+        if (order.getExtraItemsCount() > 0) {
+            holder.tvTotalItems.setVisibility(View.VISIBLE);
+            holder.tvTotalItems.setText("Và " + order.getExtraItemsCount() + " sản phẩm khác");
+        } else {
+            holder.tvTotalItems.setVisibility(View.GONE);
+        }
 
         holder.btnOrderDetail.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), OrderDetailActivity.class);
@@ -58,31 +104,6 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             v.getContext().startActivity(intent);
         });
 
-        if (order.getStatus().equalsIgnoreCase("Đã hủy")) {
-            holder.tvOrderStatus.setTextColor(Color.parseColor("#FF0000"));
-        } else if (order.getStatus().equalsIgnoreCase("Đã giao")) {
-            holder.tvOrderStatus.setTextColor(Color.parseColor("#00FF00"));
-        } else {
-            holder.tvOrderStatus.setTextColor(Color.parseColor("#F57C00"));
-        }
-
-        if (order.getStatus().equalsIgnoreCase("Hoàn thành") || order.getStatus().equalsIgnoreCase("Đã giao")) {
-            holder.btnReviewOrder.setVisibility(View.VISIBLE);
-        } else {
-            holder.btnReviewOrder.setVisibility(View.GONE);
-        }
-
-        if (order.getExtraItemsCount() > 0) {
-            holder.tvTotalItems.setVisibility(View.VISIBLE);
-            holder.tvTotalItems.setText("Và " + order.getExtraItemsCount() + " sản phẩm khác");
-        } else {
-            holder.tvTotalItems.setVisibility(View.GONE);
-        }
-        holder.btnOrderDetail.setOnClickListener(v -> {
-            Intent intent = new Intent(holder.itemView.getContext(), OrderDetailActivity.class);
-            intent.putExtra("ORDER_DATA", order);
-            holder.itemView.getContext().startActivity(intent);
-        });
     }
 
 
