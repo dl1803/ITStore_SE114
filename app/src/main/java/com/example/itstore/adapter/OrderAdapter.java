@@ -78,7 +78,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         holder.tvQuantity.setText("x" + order.getQuantity());
 
         DecimalFormat formatter = new DecimalFormat("###,###,###");
-        holder.tvTotalPrice.setText("Thành tiền: " + formatter.format(order.getTotalPrice()) + "đ");
+        holder.tvTotalPrice.setText("Thành tiền: " + formatter.format(order.getTotalPrice() + 30000) + "đ");
 
         if (statusVN.equalsIgnoreCase("Đã giao")) {
             holder.btnReviewOrder.setVisibility(View.VISIBLE);
@@ -95,7 +95,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
         holder.btnOrderDetail.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), OrderDetailActivity.class);
-            intent.putExtra("ORDER_DATA", order);
+            intent.putExtra("ORDER_ID", Integer.parseInt(order.getOrderId()));
             v.getContext().startActivity(intent);
         });
 
