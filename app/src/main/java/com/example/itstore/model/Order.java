@@ -20,6 +20,43 @@ public class Order implements Serializable {
 
     @SerializedName("items")
     private List<OrderItem> items;
+
+    @SerializedName("address")
+    private AddressInfo addressInfo;
+
+    @SerializedName("timeline")
+    private List<TimelineItem> timelineList;
+
+    public static class AddressInfo {
+        @SerializedName("recipient")
+        public String recipient;
+
+        @SerializedName("phone_number")
+        public String phoneNumber;
+
+        @SerializedName("street")
+        public String street;
+
+        @SerializedName("ward")
+        public String ward;
+
+        @SerializedName("district")
+        public String district;
+
+        @SerializedName("province")
+        public String province;
+    }
+    public static class TimelineItem {
+        @SerializedName("new_status")
+        public String newStatus;
+
+        @SerializedName("note")
+        public String note;
+
+        @SerializedName("changed_at")
+        public String changedAt;
+    }
+
     public String getOrderId() { return String.valueOf(id); }
 
     public String getStatus() { return orderStatus; }
@@ -77,5 +114,28 @@ public class Order implements Serializable {
 
     public void setStatus(String newStatus) {
      this.orderStatus = newStatus;
+    }
+
+    // Lấy Tên người nhận
+    public String getCustomerName() {
+        return addressInfo != null ? addressInfo.recipient : null;
+    }
+
+    // Lấy Số điện thoại
+    public String getPhoneNumber() {
+        return addressInfo != null ? addressInfo.phoneNumber : null;
+    }
+
+    // Ghép nối Địa chỉ đầy đủ
+    public String getShippingAddress() {
+        if (addressInfo != null) {
+            return addressInfo.street + ", " + addressInfo.ward + ", " +
+                    addressInfo.district + ", " + addressInfo.province;
+        }
+        return null;
+    }
+
+    public List<TimelineItem> getTimelineList() {
+        return timelineList;
     }
 }
