@@ -1,17 +1,22 @@
 package com.example.itstore.fragment;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.itstore.R;
+import com.example.itstore.activity.OrderDetailActivity;
 import com.example.itstore.adapter.OrderAdapter;
 import com.example.itstore.model.Order;
 import com.example.itstore.viewmodel.OrderHistoryViewModel;
@@ -32,6 +37,15 @@ public class OrderListFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
+    private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    viewModel.fetchOrderHistory();
+                }
+            }
+    );
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,12 +78,9 @@ public class OrderListFragment extends Fragment {
             if (orders != null) {
                 List<Order> filteredOrders = new ArrayList<>();
                 for (Order order : orders) {
-                    String status = "Chờ xác nhận";
-                    if (order.getStatus().equalsIgnoreCase("pending")) status = "Chờ xác nhận";
-                    else if (order.getStatus().equalsIgnoreCase("processing")) status = "Đang giao";
-                    else if (order.getStatus().equalsIgnoreCase("delivered")) status = "Đã giao";
-                    else if (order.getStatus().equalsIgnoreCase("cancelled")) status = "Đã hủy";
-                    if (tabStatus.equals("Tất cả") || tabStatus.equals(status)){
+                    String statusVN = order.getStatusVN();
+
+                    if (tabStatus.equals("Tất cả") || tabStatus.equals(statusVN)){
                         filteredOrders.add(order);
                     }
                 }
@@ -86,5 +97,11 @@ public class OrderListFragment extends Fragment {
         if (tabStatus.equals("Tất cả") && viewModel.getOrderList().getValue() == null) {
             viewModel.fetchOrderHistory();
         }
+
+        adapter.setOnOrderClickListener(order -> {
+            Intent intent = new Intent(requireContext(), OrderDetailActivity.class);
+            intent.putExtra("ORDER_ID", Integer.parseInt(order.getOrderId()));
+            launcher.launch(intent);
+        });
     }
 }
