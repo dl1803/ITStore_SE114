@@ -71,20 +71,42 @@ public class OrderDetailActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        viewModel.getIsCancelSuccess().observe(this, success -> {
+            if (success) {
+                Toast.makeText(this, "Đã hủy đơn hàng thành công!", Toast.LENGTH_SHORT).show();
+                viewModel.fetchOrderDetail(Integer.parseInt(currentOrder.getOrderId()));
+                Intent resultIntent = new Intent();
+                setResult(RESULT_OK, resultIntent);
+            }
+        });
+
+        viewModel.getCancelError().observe(this, error -> {
+            if (error != null) {
+                Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        viewModel.getIsConfirmSuccess().observe(this, success -> {
+            if (success) {
+                Toast.makeText(this, "Cảm ơn bạn! Hãy đánh giá sản phẩm nhé.", Toast.LENGTH_SHORT).show();
+
+                // Lưu trạng thái đơn hàng đã xác nhận vào SharedPreferences (bộ nhớ đt)
+                getSharedPreferences("ConfirmedOrders", MODE_PRIVATE)
+                        .edit()
+                        .putBoolean(currentOrder.getOrderId(), true)
+                        .apply();
+
+                binding.btnConfirmReceived.setVisibility(View.GONE);
+                binding.btnRefundOrderDetail.setVisibility(View.GONE);
+                binding.btnReviewDetail.setVisibility(View.VISIBLE);
+
+                Intent resultIntent = new Intent();
+                setResult(RESULT_OK, resultIntent);
+            }
+        });
     }
 
-    private String getStatusVN(String rawStatus) {
-        if (rawStatus == null) return "Chờ xác nhận";
-        switch (rawStatus.toLowerCase()) {
-            case "pending": return "Chờ xác nhận";
-            case "processing":
-            case "delivering": return "Đang giao";
-            case "delivered":
-            case "completed": return "Đã giao";
-            case "cancelled": return "Đã hủy";
-            default: return "Chờ xác nhận";
-        }
-    }
 
     private int getStatusColor(String statusVN) {
         switch (statusVN) {
@@ -123,7 +145,7 @@ public class OrderDetailActivity extends AppCompatActivity {
             binding.tvAddress.setText("Chưa cập nhật địa chỉ giao hàng");
         }
 
-        String statusVN = getStatusVN(currentOrder.getStatus());
+        String statusVN = currentOrder.getStatusVN();
         binding.tvOrderStatus.setText("Trạng thái: " + statusVN);
         binding.tvOrderStatus.setTextColor(getStatusColor(statusVN));
 
@@ -153,20 +175,27 @@ public class OrderDetailActivity extends AppCompatActivity {
         binding.btnConfirmReceived.setVisibility(View.GONE);
         binding.btnReviewDetail.setVisibility(View.GONE);
 
-        String statusVN = getStatusVN(currentOrder.getStatus());
 
-        switch (statusVN) {
-            case "Chờ xác nhận":
+        String rawStatus = currentOrder.getStatus();
+        if (rawStatus == null) return;
+
+        switch (rawStatus.toLowerCase()) {
+            case "pending":
                 binding.btnCancelOrderDetail.setVisibility(View.VISIBLE);
                 break;
-            case "Đang giao":
-                binding.btnConfirmReceived.setVisibility(View.VISIBLE);
+            case "shipping":
                 break;
-            case "Đã giao":
-                binding.btnRefundOrderDetail.setVisibility(View.VISIBLE);
-                binding.btnReviewDetail.setVisibility(View.VISIBLE);
+            case "delivered":
+                boolean isConfirmed = getSharedPreferences("ConfirmedOrders", MODE_PRIVATE)
+                        .getBoolean(currentOrder.getOrderId(), false);
+                if (isConfirmed) {
+                    binding.btnReviewDetail.setVisibility(View.VISIBLE);
+                } else {
+                    binding.btnConfirmReceived.setVisibility(View.VISIBLE);
+                    binding.btnRefundOrderDetail.setVisibility(View.VISIBLE);
+                }
                 break;
-            case "Đã hủy":
+            case "cancelled":
                 break;
         }
     }
@@ -177,17 +206,8 @@ public class OrderDetailActivity extends AppCompatActivity {
         });
         binding.tvViewTimeline.setOnClickListener(v -> showTimelineDialog());
         binding.btnConfirmReceived.setOnClickListener(v -> {
-            currentOrder.setStatus("completed");
-            String statusVN = getStatusVN(currentOrder.getStatus());
-            binding.tvOrderStatus.setText("Trạng thái: " + statusVN);
-            binding.tvOrderStatus.setTextColor(getStatusColor(statusVN));
-            updateBottomButtons();
-
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra("UPDATED_ORDER", currentOrder);
-            setResult(RESULT_OK, resultIntent);
-
-            Toast.makeText(this, "Chốt đơn thành công! Hãy đánh giá nhé.", Toast.LENGTH_SHORT).show();
+            int orderId = Integer.parseInt(currentOrder.getOrderId());
+            viewModel.confirmReceived(orderId);
         });
 
         binding.btnRefundOrderDetail.setOnClickListener(v -> {
@@ -237,17 +257,20 @@ public class OrderDetailActivity extends AppCompatActivity {
                 return;
             }
 
-            currentOrder.setStatus("cancelled");
-            String statusVN = getStatusVN(currentOrder.getStatus());
-            binding.tvOrderStatus.setText("Trạng thái: " + statusVN);
-            binding.tvOrderStatus.setTextColor(getStatusColor(statusVN));
-            updateBottomButtons();
+            String cancelReason = "";
+            if (selectedId == R.id.rbReasonOther) {
+                cancelReason = edtOtherReason.getText().toString().trim();
+                if (cancelReason.isEmpty()) {
+                    Toast.makeText(this, "Vui lòng nhập lý do khác!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            } else {
+                android.widget.RadioButton rbSelected = dialog.findViewById(selectedId);
+                cancelReason = rbSelected.getText().toString();
+            }
 
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra("UPDATED_ORDER", currentOrder);
-            setResult(RESULT_OK, resultIntent);
-
-            Toast.makeText(this, "Đã hủy đơn hàng thành công!", Toast.LENGTH_SHORT).show();
+            int orderId = Integer.parseInt(currentOrder.getOrderId());
+            viewModel.cancelOrder(orderId, cancelReason);
             dialog.dismiss();
         });
         dialog.show();

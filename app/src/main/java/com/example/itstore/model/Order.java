@@ -13,7 +13,7 @@ public class Order implements Serializable {
     private double total;
 
     @SerializedName("order_status")
-    private String orderStatus;
+    private String status;
 
     @SerializedName("created_at")
     private String createdAt;
@@ -26,6 +26,7 @@ public class Order implements Serializable {
 
     @SerializedName("timeline")
     private List<TimelineItem> timelineList;
+
 
     public static class AddressInfo {
         @SerializedName("recipient")
@@ -59,7 +60,7 @@ public class Order implements Serializable {
 
     public String getOrderId() { return String.valueOf(id); }
 
-    public String getStatus() { return orderStatus; }
+    public String getStatus() { return status; }
 
     public long getTotalPrice() { return (long) total; }
 
@@ -113,7 +114,7 @@ public class Order implements Serializable {
     }
 
     public void setStatus(String newStatus) {
-     this.orderStatus = newStatus;
+     this.status = newStatus;
     }
 
     // Lấy Tên người nhận
@@ -137,5 +138,18 @@ public class Order implements Serializable {
 
     public List<TimelineItem> getTimelineList() {
         return timelineList;
+    }
+
+    public String getStatusVN() {
+        if (status == null) return "Chờ xác nhận";
+        switch (status.toLowerCase()) {
+            case "pending": return "Chờ xác nhận";
+            case "processing":
+            case "shipping": return "Đang giao";
+            case "delivered":
+            case "completed": return "Đã giao";
+            case "cancelled": return "Đã hủy";
+            default: return "Chờ xác nhận";
+        }
     }
 }

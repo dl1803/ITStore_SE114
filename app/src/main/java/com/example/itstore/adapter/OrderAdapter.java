@@ -1,6 +1,8 @@
 package com.example.itstore.adapter;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +28,16 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         notifyDataSetChanged();
     }
 
+    public interface OnOrderClickListener {
+        void onOrderClick(Order order);
+    }
+
+    private OnOrderClickListener listener;
+
+    public void setOnOrderClickListener(OnOrderClickListener listener) {
+        this.listener = listener;
+    }
+
     @NonNull
     @Override
     public OrderAdapter.OrderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -39,33 +51,18 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         if (order == null) return;
 
         holder.tvOrderId.setText("Mã ĐH: " + order.getOrderId());
-        String rawStatus = order.getStatus();
-        String statusVN = "Chờ xác nhận";
-        int statusColor = Color.parseColor("#F57C00");
-        if (rawStatus != null) {
-            switch (rawStatus.toLowerCase()){
-                case "pending":
-                    statusVN = "Chờ xác nhận";
-                    statusColor = Color.parseColor("#F57C00"); // Cam
-                    break;
-                case "processing":
-                case "delivering":
-                    statusVN = "Đang giao";
-                    statusColor = Color.parseColor("#2196F3"); // Xanh dương
-                    break;
-                case "delivered":
-                case "completed":
-                    statusVN = "Đã giao";
-                    statusColor = Color.parseColor("#4CAF50"); // Xanh lá
-                    break;
-                case "cancelled":
-                    statusVN = "Đã hủy";
-                    statusColor = Color.parseColor("#FF3B30"); // Đỏ
-                    break;
-            }
-        }
+
+        String statusVN = order.getStatusVN();
         holder.tvOrderStatus.setText(statusVN);
+        int statusColor = Color.parseColor("#F57C00");
+        switch (statusVN) {
+            case "Chờ xác nhận": statusColor = Color.parseColor("#F57C00"); break; // Cam
+            case "Đang giao": statusColor = Color.parseColor("#2196F3"); break; // Xanh dương
+            case "Đã giao": statusColor = Color.parseColor("#4CAF50"); break; // Xanh lá
+            case "Đã hủy": statusColor = Color.parseColor("#FF3B30"); break; // Đỏ
+        }
         holder.tvOrderStatus.setTextColor(statusColor);
+
         holder.tvProductName.setText(order.getProductName());
 
         if (order.getProductType() == null || order.getProductType().isEmpty()) {
@@ -81,7 +78,15 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         holder.tvTotalPrice.setText("Thành tiền: " + formatter.format(order.getTotalPrice() + 30000) + "đ");
 
         if (statusVN.equalsIgnoreCase("Đã giao")) {
-            holder.btnReviewOrder.setVisibility(View.VISIBLE);
+            // Kiểm tra trạng thái đơn hàng trong bộ nhớ SharedPreferences đã xác nhận hay chưa
+            SharedPreferences prefs = holder.itemView.getContext().getSharedPreferences("ConfirmedOrders", Context.MODE_PRIVATE);
+            boolean isConfirmed = prefs.getBoolean(order.getOrderId(), false);
+
+            if (isConfirmed) {
+                holder.btnReviewOrder.setVisibility(View.VISIBLE);
+            } else {
+                holder.btnReviewOrder.setVisibility(View.GONE);
+            }
         } else {
             holder.btnReviewOrder.setVisibility(View.GONE);
         }
@@ -94,9 +99,9 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         }
 
         holder.btnOrderDetail.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), OrderDetailActivity.class);
-            intent.putExtra("ORDER_ID", Integer.parseInt(order.getOrderId()));
-            v.getContext().startActivity(intent);
+            if (listener != null) {
+                listener.onOrderClick(order);
+            }
         });
 
         holder.btnReviewOrder.setOnClickListener(v -> {

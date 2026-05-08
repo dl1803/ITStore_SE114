@@ -21,6 +21,7 @@ import retrofit2.http.Query;
 import com.example.itstore.model.AddressRequest;
 import com.example.itstore.model.AddressResponse;
 import com.example.itstore.model.BrandResponse;
+import com.example.itstore.model.CancelOrderRequest;
 import com.example.itstore.model.CartResponse;
 import com.example.itstore.model.CategoryResponse;
 import com.example.itstore.model.ChangePasswordRequest;
@@ -136,9 +137,16 @@ public class RetrofitClient {
         @GET("api/orders/{id}")
         Call<SingleOrderResponse> getOrderById(@Path("id") int id);
 
+        @PATCH("api/orders/{id}/cancel")
+        Call<SingleOrderResponse> cancelOrder(@Path("id") int id, @Body CancelOrderRequest request);
+
+        @PATCH("api/orders/{id}/confirm-received")
+        Call<SingleOrderResponse> confirmReceived(@Path("id") int id);
+
         @GET("api/brands/{id}")
         Call<SingleBrandResponse> getBrandById(@Path("id") int id);
-       
+
+
         @GET("api/categories")
         Call<CategoryResponse> getCategories();
         @GET("api/categories/{id}")

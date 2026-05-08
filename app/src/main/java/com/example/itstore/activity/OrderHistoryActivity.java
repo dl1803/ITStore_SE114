@@ -32,6 +32,10 @@ public class OrderHistoryActivity extends AppCompatActivity {
         OrderPagerAdapter pagerAdapter = new OrderPagerAdapter(this);
         binding.viewListOrders.setAdapter(pagerAdapter);
 
+        // Buộc ViewPager2 tải và giữ nguyên cả 5 tab trong bộ nhớ.
+        // preload trước các tab gần đó, giữ Fragment trong RAM, không destroy khi vuốt
+        binding.viewListOrders.setOffscreenPageLimit(5);
+
         new TabLayoutMediator(binding.tabLayoutOrderStatus, binding.viewListOrders,
                 (tab, position) -> tab.setText(tabTitles[position])
         ).attach();
@@ -53,5 +57,6 @@ public class OrderHistoryActivity extends AppCompatActivity {
         public int getItemCount() {
             return tabTitles.length;
         }
+
     }
 }
