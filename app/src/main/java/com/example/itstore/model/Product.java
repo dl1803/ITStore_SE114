@@ -2,7 +2,9 @@ package com.example.itstore.model;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Product implements Serializable {
     private int id;
@@ -24,6 +26,10 @@ public class Product implements Serializable {
     private double priceMax;
     @SerializedName("category")
     private Category categoryObj;
+    @SerializedName("slug")
+    private String slug;
+    @SerializedName("specifications")
+    private Map<String, String> specificationsMap;
 
     public Product(int id, int categoryId, String name, String description, List<ProductVariant> variants, List<ProductImage> images, int brandId) {
         this.id = id;
@@ -160,5 +166,18 @@ public class Product implements Serializable {
             return images.get(0).getImageUrl();
         }
         return "";
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+    public List<Specification> getSpecificationList() {
+        List<Specification> list = new ArrayList<>();
+        if (specificationsMap != null) {
+            for (Map.Entry<String, String> entry : specificationsMap.entrySet()) {
+                list.add(new Specification(entry.getKey(), entry.getValue()));
+            }
+        }
+        return list;
     }
 }

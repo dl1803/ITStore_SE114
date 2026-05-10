@@ -26,6 +26,7 @@ import retrofit2.Response;
 public class HomeViewModel extends ViewModel {
     private final MutableLiveData<List<Category>> categoryListLiveData = new MutableLiveData<>();
     private final MutableLiveData<List<Product>> productListLiveData = new MutableLiveData<>();
+
     private List<Product> allProducts = new ArrayList<>();
     public HomeViewModel() {
         allProducts = MockDataRepository.getInstance().getAllProducts();

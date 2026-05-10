@@ -47,8 +47,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         if (product == null) return;
         holder.binding.tvName.setText(product.getName());
         holder.binding.tvPrice.setText(String.format(java.util.Locale.US, "%,.0f VNĐ", product.getPrice()));
-
-        // 🟢 IN LINK ẢNH RA ĐỂ BẮT BỆNH NÈ SẾP:
         android.util.Log.d("KIEM_TRA_LINK", "Tên SP: " + product.getName() + " | Link ảnh: " + product.getImageUrl());
 
         Glide.with(context)

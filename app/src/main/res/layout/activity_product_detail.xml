@@ -345,6 +345,7 @@
                     android:layout_height="wrap_content"/>
 
                 <LinearLayout
+                    android:id="@+id/layoutHighlightSpecs"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -358,13 +359,16 @@
                         android:orientation="horizontal"
                         android:layout_marginBottom="8dp">
                         <TextView
-                            android:text="Bus RAM:"
+                            android:id="@+id/tvHighlightKey1"
+                            android:text="..."
                             android:textStyle="bold"
                             android:width="100dp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             />
-                        <TextView android:text="3200MHz"
+                        <TextView
+                            android:id="@+id/tvHighlightValue1"
+                            android:text="..."
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
                     </LinearLayout>
@@ -374,13 +378,16 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:layout_marginBottom="8dp">
-                        <TextView android:text="Loại:"
+                        <TextView
+                            android:id="@+id/tvHighlightKey2"
+                            android:text="..."
                             android:textStyle="bold"
                             android:width="100dp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
                         <TextView
-                            android:text="DDR4 Desktop"
+                            android:id="@+id/tvHighlightValue2"
+                            android:text="..."
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
                     </LinearLayout>
@@ -389,12 +396,16 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
-                        <TextView android:text="Độ trễ (Cas):"
+                        <TextView
+                            android:id="@+id/tvHighlightKey3"
+                            android:text="..."
                             android:textStyle="bold"
                             android:width="100dp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
-                        <TextView android:text="CL16"
+                        <TextView
+                            android:id="@+id/tvHighlightValue3"
+                            android:text="..."
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
                     </LinearLayout>

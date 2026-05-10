@@ -2,6 +2,7 @@ package com.example.itstore.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,13 +11,18 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.itstore.R;
 import com.example.itstore.adapter.ReviewAdapter;
+import com.example.itstore.api.RetrofitClient;
 import com.example.itstore.databinding.ActivityProductDetailBinding;
 import com.example.itstore.adapter.ImagePagerAdapter;
 import com.example.itstore.fragment.SpecsBottomSheet;
 import com.example.itstore.model.CartItem;
 import com.example.itstore.model.MockDataRepository;
 import com.example.itstore.model.Product;
+import com.example.itstore.model.ProductImage;
+import com.example.itstore.model.ProductVariant;
 import com.example.itstore.model.Review;
+import com.example.itstore.model.SingleProductResponse;
+import com.example.itstore.model.Specification;
 import com.example.itstore.utils.CartManager;
 import com.example.itstore.utils.SharedPrefsManager;
 import com.example.itstore.viewmodel.ProductDetailViewModel;
@@ -29,12 +35,17 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class ProductDetailActivity extends AppCompatActivity {
     private ActivityProductDetailBinding binding;
     private Product currentProduct;
+    private Product fullProductData;
     private ProductDetailViewModel detailViewModel;
-    private int currentVariantId = 1;
-    private String currentRam = "8GB";
+    private int currentVariantId = 0;
+    private String currentVariantName = "";
     private double currentFinalPrice;
 
     @Override
@@ -63,57 +74,52 @@ public class ProductDetailActivity extends AppCompatActivity {
         binding.tvProductName.setText(currentProduct.getName());
         updatePriceDisplay(basePrice, baseOldPrice);
 
-        List<Integer> listImages = new ArrayList<>();
-        listImages.add(R.drawable.ram1);
+        List<String> listImages = new ArrayList<>();
+        if (currentProduct != null && currentProduct.getImageUrl() != null) {
+            listImages.add(currentProduct.getImageUrl());
+        }
         ImagePagerAdapter imageAdapter = new ImagePagerAdapter(listImages);
         binding.imgProductDetail.setAdapter(imageAdapter);
+
+        if (currentProduct.getSlug() != null && !currentProduct.getSlug().isEmpty()) {
+            fetchFullProductDetail(currentProduct.getSlug());
+        } else {
+            Toast.makeText(this, "Sản phẩm không có dữ liệu chi tiết!", Toast.LENGTH_SHORT).show();
+        }
 
         updateFavoriteIcon(currentProduct.isFavorite());
 
         binding.ivBack.setOnClickListener(v -> finish());
-
-        binding.cardChoice1.setOnClickListener(v -> {
-            binding.cardChoice1.setBackgroundResource(R.color.orange_primary);
-            binding.cardChoice1.setTextColor(ContextCompat.getColor(this, R.color.white));
-            binding.cardChoice2.setBackgroundResource(android.R.color.transparent);
-            binding.cardChoice2.setTextColor(ContextCompat.getColor(this, R.color.dark_gray));
-            updatePriceDisplay(basePrice, baseOldPrice);
-            currentVariantId = 1;
-            currentRam = "8GB";
-            currentFinalPrice = basePrice;
+        binding.ivCart.setOnClickListener(v ->{
+            goToCartScreen();
         });
 
-        binding.cardChoice2.setOnClickListener(v -> {
-            binding.cardChoice2.setBackgroundResource(R.color.orange_primary);
-            binding.cardChoice2.setTextColor(ContextCompat.getColor(this, R.color.white));
-            binding.cardChoice1.setBackgroundResource(android.R.color.transparent);
-            binding.cardChoice1.setTextColor(ContextCompat.getColor(this, R.color.dark_gray));
-            updatePriceDisplay(basePrice + 500000, baseOldPrice + 500000);
-            currentVariantId = 2;
-            currentRam = "16GB";
-            currentFinalPrice = basePrice + 500000;
-        });
 
         binding.btnAddToCart.setOnClickListener(v -> {
+            if (fullProductData == null || currentVariantId == 0) {
+                Toast.makeText(this, "Đang tải dữ liệu từ Server...", Toast.LENGTH_SHORT).show();
+                return;
+            }
             String token = SharedPrefsManager.getInstance(this).getAccessToken();
             if (token == null || token.isEmpty()) {
                 Toast.makeText(this, "Vui lòng đăng nhập để thêm vào giỏ hàng!", Toast.LENGTH_SHORT).show();
                 Intent intentLogin = new Intent(this, LoginActivity.class);
                 startActivity(intentLogin);
             } else {
-                detailViewModel.addToCart(currentProduct, currentVariantId, currentRam, currentFinalPrice);
-                Toast.makeText(ProductDetailActivity.this, "Đã thêm bản " + currentRam + " vào giỏ!", Toast.LENGTH_SHORT).show();
+                detailViewModel.addToCart(fullProductData, currentVariantId, currentVariantName, 1);
+                Toast.makeText(ProductDetailActivity.this, "Đã thêm bản " + currentVariantName + " vào giỏ!", Toast.LENGTH_SHORT).show();
             }
         });
 
         binding.btnBuyNow.setOnClickListener(v -> {
+            if (fullProductData == null || currentVariantId == 0) return;
             CartItem buyNowItem = new CartItem(
                     0,
                     0,
                     currentVariantId,
                     1,
-                    currentProduct,
-                    currentRam,
+                    fullProductData,
+                    currentVariantName,
                     currentFinalPrice
             );
             buyNowItem.setSelected(true);
@@ -127,9 +133,6 @@ public class ProductDetailActivity extends AppCompatActivity {
             startActivity(intentBuyNow);
         });
 
-        binding.ivCart.setOnClickListener(v ->{
-            goToCartScreen();
-        });
 
         binding.imgFavoriteItem.setOnClickListener(v -> {
             String token = SharedPrefsManager.getInstance(this).getAccessToken();
@@ -150,9 +153,11 @@ public class ProductDetailActivity extends AppCompatActivity {
             }
         });
         binding.tvXemCauHinhChiTiet.setOnClickListener(v -> {
-            if (currentProduct != null) {
-                SpecsBottomSheet bottomSheet = new SpecsBottomSheet(currentProduct);
+            if (fullProductData != null) {
+                SpecsBottomSheet bottomSheet = new SpecsBottomSheet(fullProductData);
                 bottomSheet.show(getSupportFragmentManager(), "SpecsBottomSheet");
+            } else {
+                Toast.makeText(this, "Đang tải dữ liệu, vui lòng đợi...", Toast.LENGTH_SHORT).show();
             }
         });
         // Lấy dữ liệu mô tả thực tế từ sản phẩm
@@ -176,7 +181,110 @@ public class ProductDetailActivity extends AppCompatActivity {
         binding.tvProductContent.setOnClickListener(toggleDescriptionListener);
         setupReview();
     }
+    private void fetchFullProductDetail(String slug) {
+        RetrofitClient.getApiService(this).getProductBySlug(slug)
+                .enqueue(new Callback<SingleProductResponse>() {
+                    @Override
+                    public void onResponse(Call<SingleProductResponse> call, Response<SingleProductResponse> response) {
+                        if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                            fullProductData = response.body().getData();
+                            setupDynamicData(); // lấy data từ api xong thì cập nhật lại giao diện
+                        }
+                    }
 
+                    @Override
+                    public void onFailure(Call<SingleProductResponse> call, Throwable t) {
+                        Log.e("API_ERR", "Lỗi tải chi tiết sản phẩm: " + t.getMessage());
+                    }
+                });
+    }
+    private void setupDynamicData() {
+        if (fullProductData.getDescription() != null ) {
+            binding.tvProductContent.setText(fullProductData.getDescription());
+        }
+        List<String> listImagesUrls = new ArrayList<>();
+        if (fullProductData.getImages() != null && !fullProductData.getImages().isEmpty()) {
+            for (ProductImage img : fullProductData.getImages()) {
+                listImagesUrls.add(img.getImageUrl());
+            }
+        }
+        ImagePagerAdapter imageAdapter = new ImagePagerAdapter(listImagesUrls);
+        binding.imgProductDetail.setAdapter(imageAdapter);
+
+        List<ProductVariant> variants = fullProductData.getVariants();
+        if (variants != null && !variants.isEmpty()) {
+            // Mặc định chọn bản đầu tiên
+            ProductVariant var1 = variants.get(0);
+            currentVariantId = var1.getId();
+            currentVariantName = var1.getVersion();
+            currentFinalPrice = var1.getPrice();
+            updatePriceDisplay(currentFinalPrice, var1.getCompareAtPrice());
+
+            binding.cardChoice1.setVisibility(View.VISIBLE);
+            binding.cardChoice1.setText(currentVariantName);
+
+            binding.cardChoice1.setOnClickListener(v -> {
+                binding.cardChoice1.setBackgroundResource(R.color.orange_primary);
+                binding.cardChoice1.setTextColor(ContextCompat.getColor(this, R.color.white));
+                binding.cardChoice2.setBackgroundResource(android.R.color.transparent);
+                binding.cardChoice2.setTextColor(ContextCompat.getColor(this, R.color.dark_gray));
+
+                currentVariantId = var1.getId();
+                currentVariantName = var1.getVersion();
+                currentFinalPrice = var1.getPrice();
+                updatePriceDisplay(currentFinalPrice, var1.getCompareAtPrice());
+            });
+
+            // Nếu có bản thứ 2
+            if (variants.size() > 1) {
+                ProductVariant var2 = variants.get(1);
+                binding.cardChoice2.setVisibility(View.VISIBLE);
+
+                binding.cardChoice2.setText(var2.getVersion());
+
+                binding.cardChoice2.setOnClickListener(v -> {
+                    binding.cardChoice2.setBackgroundResource(R.color.orange_primary);
+                    binding.cardChoice2.setTextColor(ContextCompat.getColor(this, R.color.white));
+                    binding.cardChoice1.setBackgroundResource(android.R.color.transparent);
+                    binding.cardChoice1.setTextColor(ContextCompat.getColor(this, R.color.dark_gray));
+
+                    currentVariantId = var2.getId();
+                    currentVariantName = var2.getVersion();
+                    currentFinalPrice = var2.getPrice();
+                    updatePriceDisplay(currentFinalPrice, var2.getCompareAtPrice());
+                });
+            } else {
+                binding.cardChoice2.setVisibility(View.GONE);
+            }
+        }
+        List<Specification> specs = fullProductData.getSpecificationList();
+
+        if (specs != null && !specs.isEmpty()) {
+            binding.layoutHighlightSpecs.setVisibility(View.VISIBLE);
+
+            binding.tvHighlightKey1.setText(""); binding.tvHighlightValue1.setText("");
+            binding.tvHighlightKey2.setText(""); binding.tvHighlightValue2.setText("");
+            binding.tvHighlightKey3.setText(""); binding.tvHighlightValue3.setText("");
+
+            if (specs.size() > 0) {
+                binding.tvHighlightKey1.setText(specs.get(0).getKey().toUpperCase() + ":");
+                binding.tvHighlightValue1.setText(specs.get(0).getValue());
+            }
+
+            if (specs.size() > 1) {
+                binding.tvHighlightKey2.setText(specs.get(1).getKey().toUpperCase() + ":");
+                binding.tvHighlightValue2.setText(specs.get(1).getValue());
+            }
+
+            if (specs.size() > 2) {
+                binding.tvHighlightKey3.setText(specs.get(2).getKey().toUpperCase() + ":");
+                binding.tvHighlightValue3.setText(specs.get(2).getValue());
+            }
+        } else {
+
+            binding.layoutHighlightSpecs.setVisibility(View.GONE);
+        }
+    }
     private void setupReview(){
         List<Review> allReviews = getReviews();
 
@@ -231,7 +339,6 @@ public class ProductDetailActivity extends AppCompatActivity {
         Intent intent = new Intent(ProductDetailActivity.this, MainActivity.class);
         intent.putExtra("navigate_to", "cart");
         intent.putExtra("from_detail", true);
-        // intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
     }
 

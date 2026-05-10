@@ -1,9 +1,12 @@
 package com.example.itstore.model;
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 public class ProductVariant implements Serializable{
     private int id;
     private String version;
     private double price;
+    @SerializedName("compare_at_price")
     private double compareAtPrice;
     private int stock;
 

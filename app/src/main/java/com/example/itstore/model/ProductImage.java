@@ -1,7 +1,10 @@
 package com.example.itstore.model;
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 public class ProductImage implements Serializable{
     private int id;
+    @SerializedName("image_url")
     private String imageUrl;
     private boolean isPrimary;
 

@@ -58,7 +58,7 @@ public class FilterProductDialog extends BottomSheetDialogFragment {
         binding.btnResetFilter.setOnClickListener(v -> {
             binding.edtMinPrice.setText("");
             binding.edtMaxPrice.setText("");
-            brandAdapter.resetSelection(); // Trả màu về chữ "Tất cả"
+            brandAdapter.resetSelection(); // trả về chữ tất cả
         });
         binding.btnCloseFilter.setOnClickListener(v -> dismiss());
     }
