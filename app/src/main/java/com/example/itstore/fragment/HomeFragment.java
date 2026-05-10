@@ -182,7 +182,7 @@ public class HomeFragment extends Fragment {
                             defaultVariantName = product.getVariants().get(0).getVersion();
                         }
 
-                        detailViewModel.addToCart(product, defaultVariantId, defaultVariantName, product.getPrice());
+                        detailViewModel.addToCart(product, defaultVariantId, defaultVariantName, 1);
                         Toast.makeText(requireContext(), "Đã thêm " + product.getName() + " vào giỏ", Toast.LENGTH_SHORT).show();
                     }
                 }

@@ -47,6 +47,7 @@ import com.example.itstore.model.ResetPasswordResponse;
 import com.example.itstore.model.SingleAddressResponse;
 import com.example.itstore.model.SingleBrandResponse;
 import com.example.itstore.model.SingleCategoryResponse;
+import com.example.itstore.model.SingleProductResponse;
 import com.example.itstore.model.UpdateProfileRequest;
 
 public class RetrofitClient {
@@ -151,5 +152,14 @@ public class RetrofitClient {
                 @Query("price_max") Double priceMax,
                 @Query("sort") String sort
         );
+        @GET("api/products/by-category/{category_id}")
+        Call<ProductResponse> getProductsByCategoryBlock(
+                @Path("category_id") int categoryId,
+                @Query("limit") Integer limit
+        );
+        @GET("api/products/{id}")
+        Call<SingleProductResponse> getProductById(@Path("id") int productId);
+        @GET("api/products/{slug}")
+        Call<SingleProductResponse> getProductBySlug(@Path("slug") String slug);
     }
 }

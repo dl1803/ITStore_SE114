@@ -39,7 +39,7 @@ public class SpecAdapter extends RecyclerView.Adapter<SpecAdapter.SpecViewHolder
     @Override
     public void onBindViewHolder(@NonNull SpecViewHolder holder, int position) {
         Specification spec = specList.get(position);
-        holder.tvSpecKey.setText(spec.getKey());
+        holder.tvSpecKey.setText(spec.getKey().toUpperCase());
         holder.tvSpecValue.setText(spec.getValue());
     }
     @Override

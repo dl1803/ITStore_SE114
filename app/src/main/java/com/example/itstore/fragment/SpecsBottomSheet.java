@@ -37,13 +37,9 @@ public class SpecsBottomSheet extends BottomSheetDialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         List<Specification> specs = new ArrayList<>();
-        specs.add(new Specification("Thương hiệu", "Kingston"));
-        specs.add(new Specification("Dung lượng", "16GB (1x16GB)"));
-        specs.add(new Specification("Loại RAM", "DDR4 Desktop"));
-        specs.add(new Specification("Bus RAM", "3200MHz"));
-        specs.add(new Specification("Độ trễ (Cas)", "CL16"));
-        specs.add(new Specification("Điện áp", "1.35V"));
-        specs.add(new Specification("Tản nhiệt", "Nhôm đen"));
+        if (currentProduct != null && currentProduct.getSpecificationList() != null) {
+            specs = currentProduct.getSpecificationList();
+        }
 
         //Setup RecyclerView
         SpecAdapter specAdapter = new SpecAdapter(specs);
