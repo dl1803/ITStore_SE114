@@ -1,6 +1,8 @@
 package com.example.itstore.adapter;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +28,16 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         notifyDataSetChanged();
     }
 
+    public interface OnOrderClickListener {
+        void onOrderClick(Order order);
+    }
+
+    private OnOrderClickListener listener;
+
+    public void setOnOrderClickListener(OnOrderClickListener listener) {
+        this.listener = listener;
+    }
+
     @NonNull
     @Override
     public OrderAdapter.OrderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -39,35 +51,42 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         if (order == null) return;
 
         holder.tvOrderId.setText("Mã ĐH: " + order.getOrderId());
-        holder.tvOrderStatus.setText(order.getStatus());
+
+        String statusVN = order.getStatusVN();
+        holder.tvOrderStatus.setText(statusVN);
+        int statusColor = Color.parseColor("#F57C00");
+        switch (statusVN) {
+            case "Chờ xác nhận": statusColor = Color.parseColor("#F57C00"); break; // Cam
+            case "Đang giao": statusColor = Color.parseColor("#2196F3"); break; // Xanh dương
+            case "Đã giao": statusColor = Color.parseColor("#4CAF50"); break; // Xanh lá
+            case "Đã hủy": statusColor = Color.parseColor("#FF3B30"); break; // Đỏ
+        }
+        holder.tvOrderStatus.setTextColor(statusColor);
+
         holder.tvProductName.setText(order.getProductName());
-        holder.tvProductType.setText(order.getProductType());
+
+        if (order.getProductType() == null || order.getProductType().isEmpty()) {
+            holder.tvProductType.setVisibility(View.GONE);
+        } else {
+            holder.tvProductType.setVisibility(View.VISIBLE);
+            holder.tvProductType.setText(order.getProductType());
+        }
+
         holder.tvQuantity.setText("x" + order.getQuantity());
 
         DecimalFormat formatter = new DecimalFormat("###,###,###");
-        holder.tvTotalPrice.setText("Thành tiền: " + formatter.format(order.getTotalPrice()) + "đ");
+        holder.tvTotalPrice.setText("Thành tiền: " + formatter.format(order.getTotalPrice() + 30000) + "đ");
 
-        holder.btnOrderDetail.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), OrderDetailActivity.class);
-            intent.putExtra("ORDER_DATA", order);
-            v.getContext().startActivity(intent);
-        });
+        if (statusVN.equalsIgnoreCase("Đã giao")) {
+            // Kiểm tra trạng thái đơn hàng trong bộ nhớ SharedPreferences đã xác nhận hay chưa
+            SharedPreferences prefs = holder.itemView.getContext().getSharedPreferences("ConfirmedOrders", Context.MODE_PRIVATE);
+            boolean isConfirmed = prefs.getBoolean(order.getOrderId(), false);
 
-        holder.btnReviewOrder.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), WriteReviewActivity.class);
-            v.getContext().startActivity(intent);
-        });
-
-        if (order.getStatus().equalsIgnoreCase("Đã hủy")) {
-            holder.tvOrderStatus.setTextColor(Color.parseColor("#FF0000"));
-        } else if (order.getStatus().equalsIgnoreCase("Đã giao")) {
-            holder.tvOrderStatus.setTextColor(Color.parseColor("#00FF00"));
-        } else {
-            holder.tvOrderStatus.setTextColor(Color.parseColor("#F57C00"));
-        }
-
-        if (order.getStatus().equalsIgnoreCase("Hoàn thành") || order.getStatus().equalsIgnoreCase("Đã giao")) {
-            holder.btnReviewOrder.setVisibility(View.VISIBLE);
+            if (isConfirmed) {
+                holder.btnReviewOrder.setVisibility(View.VISIBLE);
+            } else {
+                holder.btnReviewOrder.setVisibility(View.GONE);
+            }
         } else {
             holder.btnReviewOrder.setVisibility(View.GONE);
         }
@@ -78,11 +97,18 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         } else {
             holder.tvTotalItems.setVisibility(View.GONE);
         }
+
         holder.btnOrderDetail.setOnClickListener(v -> {
-            Intent intent = new Intent(holder.itemView.getContext(), OrderDetailActivity.class);
-            intent.putExtra("ORDER_DATA", order);
-            holder.itemView.getContext().startActivity(intent);
+            if (listener != null) {
+                listener.onOrderClick(order);
+            }
         });
+
+        holder.btnReviewOrder.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), WriteReviewActivity.class);
+            v.getContext().startActivity(intent);
+        });
+
     }
 
 

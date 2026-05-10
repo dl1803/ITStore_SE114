@@ -9,7 +9,8 @@ import com.example.itstore.model.OrderTimeline;
 
 import java.util.List;
 
-public class OrderTimelineAdapter extends RecyclerView.Adapter<OrderTimelineAdapter.ViewHolder> {
+public class
+OrderTimelineAdapter extends RecyclerView.Adapter<OrderTimelineAdapter.ViewHolder> {
 
     private List<OrderTimeline> list;
 

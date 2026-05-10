@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.itstore.R;
@@ -28,6 +29,8 @@ import com.example.itstore.model.ProductVariant;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.example.itstore.viewmodel.OrderDetailViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.example.itstore.adapter.OrderTimelineAdapter;
 import com.example.itstore.databinding.DialogTimelineBinding;
@@ -36,6 +39,8 @@ public class OrderDetailActivity extends AppCompatActivity {
 
     private ActivityOrderDetailBinding binding;
     private Order currentOrder;
+    private OrderDetailViewModel viewModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,16 +48,73 @@ public class OrderDetailActivity extends AppCompatActivity {
         binding = ActivityOrderDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        currentOrder = (Order) getIntent().getSerializableExtra("ORDER_DATA");
+        viewModel = new ViewModelProvider(this).get(OrderDetailViewModel.class);
 
-        if (currentOrder == null) {
-            Toast.makeText(this, "Lỗi: Không tải được đơn hàng!", Toast.LENGTH_SHORT).show();
+        int orderId = getIntent().getIntExtra("ORDER_ID", -1);
+
+        if (orderId != -1) {
+            viewModel.fetchOrderDetail(orderId);
+        } else {
+            Toast.makeText(this, "Lỗi: Không tìm thấy mã đơn hàng!", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
-        setupOrderInfo();
-        updateBottomButtons();
-        setupClickListeners();
+
+        viewModel.getOrderDetail().observe(this, order -> {
+            if (order != null) {
+                this.currentOrder = order;
+                setupOrderInfo();
+                updateBottomButtons();
+                setupClickListeners();
+            } else {
+                Toast.makeText(this, "Lỗi: Đơn hàng không tồn tại!", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
+
+        viewModel.getIsCancelSuccess().observe(this, success -> {
+            if (success) {
+                Toast.makeText(this, "Đã hủy đơn hàng thành công!", Toast.LENGTH_SHORT).show();
+                viewModel.fetchOrderDetail(Integer.parseInt(currentOrder.getOrderId()));
+                Intent resultIntent = new Intent();
+                setResult(RESULT_OK, resultIntent);
+            }
+        });
+
+        viewModel.getCancelError().observe(this, error -> {
+            if (error != null) {
+                Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        viewModel.getIsConfirmSuccess().observe(this, success -> {
+            if (success) {
+                Toast.makeText(this, "Cảm ơn bạn! Hãy đánh giá sản phẩm nhé.", Toast.LENGTH_SHORT).show();
+
+                // Lưu trạng thái đơn hàng đã xác nhận vào SharedPreferences (bộ nhớ đt)
+                getSharedPreferences("ConfirmedOrders", MODE_PRIVATE)
+                        .edit()
+                        .putBoolean(currentOrder.getOrderId(), true)
+                        .apply();
+
+                binding.btnConfirmReceived.setVisibility(View.GONE);
+                binding.btnRefundOrderDetail.setVisibility(View.GONE);
+                binding.btnReviewDetail.setVisibility(View.VISIBLE);
+
+                Intent resultIntent = new Intent();
+                setResult(RESULT_OK, resultIntent);
+            }
+        });
+    }
+
+
+    private int getStatusColor(String statusVN) {
+        switch (statusVN) {
+            case "Đã hủy": return Color.parseColor("#FF3B30"); // Đỏ
+            case "Đã giao": return Color.parseColor("#4CAF50"); // Xanh lá
+            case "Đang giao": return Color.parseColor("#2196F3"); // Xanh dương
+            default: return Color.parseColor("#F57C00"); // Cam
+        }
     }
 
     private void setupOrderInfo() {
@@ -62,16 +124,30 @@ public class OrderDetailActivity extends AppCompatActivity {
         binding.tvOrderId.setText("Mã đơn hàng: #" + currentOrder.getOrderId());
         binding.tvOrderDate.setText("Ngày đặt: " + currentOrder.getOrderDate());
 
-        String status = currentOrder.getStatus();
-        binding.tvOrderStatus.setText("Trạng thái: " + status);
-        if (status.equalsIgnoreCase("Đã hủy")) {
-            binding.tvOrderStatus.setTextColor(Color.parseColor("#FF3B30"));
-        } else if (status.equalsIgnoreCase("Đã giao") || status.equalsIgnoreCase("Hoàn thành")) {
-            binding.tvOrderStatus.setTextColor(Color.parseColor("#4CAF50"));
+
+        String rawDate = currentOrder.getOrderDate();
+        if (rawDate != null && rawDate.contains("T")) {
+            String formattedDate = rawDate.substring(0, 16).replace("T", " ");
+            binding.tvOrderDate.setText("Ngày đặt: " + formattedDate);
         } else {
-            binding.tvOrderStatus.setTextColor(Color.parseColor("#F57C00"));
+            binding.tvOrderDate.setText("Ngày đặt: " + rawDate);
         }
 
+        String cusName = currentOrder.getCustomerName() != null ? currentOrder.getCustomerName() : "Tên khách hàng";
+        String cusPhone = currentOrder.getPhoneNumber() != null ? currentOrder.getPhoneNumber() : "SĐT";
+
+        binding.tvCustomerName.setText(cusName + " | " + cusPhone);
+
+        String address = currentOrder.getShippingAddress();
+        if (address != null && !address.isEmpty()) {
+            binding.tvAddress.setText(address);
+        } else {
+            binding.tvAddress.setText("Chưa cập nhật địa chỉ giao hàng");
+        }
+
+        String statusVN = currentOrder.getStatusVN();
+        binding.tvOrderStatus.setText("Trạng thái: " + statusVN);
+        binding.tvOrderStatus.setTextColor(getStatusColor(statusVN));
 
         List<OrderItem> itemList = currentOrder.getItems();
 
@@ -99,21 +175,27 @@ public class OrderDetailActivity extends AppCompatActivity {
         binding.btnConfirmReceived.setVisibility(View.GONE);
         binding.btnReviewDetail.setVisibility(View.GONE);
 
-        String status = currentOrder.getStatus();
 
-        switch (status) {
-            case "Chờ xác nhận":
+        String rawStatus = currentOrder.getStatus();
+        if (rawStatus == null) return;
+
+        switch (rawStatus.toLowerCase()) {
+            case "pending":
                 binding.btnCancelOrderDetail.setVisibility(View.VISIBLE);
                 break;
-            case "Đang giao":
-                binding.btnConfirmReceived.setVisibility(View.VISIBLE);
+            case "shipping":
                 break;
-            case "Đã giao":
-                binding.btnRefundOrderDetail.setVisibility(View.VISIBLE);
-                binding.btnReviewDetail.setVisibility(View.VISIBLE);
+            case "delivered":
+                boolean isConfirmed = getSharedPreferences("ConfirmedOrders", MODE_PRIVATE)
+                        .getBoolean(currentOrder.getOrderId(), false);
+                if (isConfirmed) {
+                    binding.btnReviewDetail.setVisibility(View.VISIBLE);
+                } else {
+                    binding.btnConfirmReceived.setVisibility(View.VISIBLE);
+                    binding.btnRefundOrderDetail.setVisibility(View.VISIBLE);
+                }
                 break;
-            case "Đã hủy":
-            case "Đang xử lý hoàn tiền":
+            case "cancelled":
                 break;
         }
     }
@@ -124,16 +206,8 @@ public class OrderDetailActivity extends AppCompatActivity {
         });
         binding.tvViewTimeline.setOnClickListener(v -> showTimelineDialog());
         binding.btnConfirmReceived.setOnClickListener(v -> {
-            currentOrder.setStatus("Đã giao");
-            binding.tvOrderStatus.setText("Trạng thái: Đã giao");
-            binding.tvOrderStatus.setTextColor(Color.parseColor("#4CAF50"));
-            updateBottomButtons();
-
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra("UPDATED_ORDER", currentOrder);
-            setResult(RESULT_OK, resultIntent);
-
-            Toast.makeText(this, "Chốt đơn thành công! Hãy đánh giá nhé.", Toast.LENGTH_SHORT).show();
+            int orderId = Integer.parseInt(currentOrder.getOrderId());
+            viewModel.confirmReceived(orderId);
         });
 
         binding.btnRefundOrderDetail.setOnClickListener(v -> {
@@ -183,64 +257,87 @@ public class OrderDetailActivity extends AppCompatActivity {
                 return;
             }
 
-            currentOrder.setStatus("Đã hủy");
-            binding.tvOrderStatus.setText("Trạng thái: Đã hủy");
-            binding.tvOrderStatus.setTextColor(Color.parseColor("#FF3B30"));
-            updateBottomButtons();
+            String cancelReason = "";
+            if (selectedId == R.id.rbReasonOther) {
+                cancelReason = edtOtherReason.getText().toString().trim();
+                if (cancelReason.isEmpty()) {
+                    Toast.makeText(this, "Vui lòng nhập lý do khác!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            } else {
+                android.widget.RadioButton rbSelected = dialog.findViewById(selectedId);
+                cancelReason = rbSelected.getText().toString();
+            }
 
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra("UPDATED_ORDER", currentOrder);
-            setResult(RESULT_OK, resultIntent);
-
-            Toast.makeText(this, "Đã hủy đơn hàng thành công!", Toast.LENGTH_SHORT).show();
+            int orderId = Integer.parseInt(currentOrder.getOrderId());
+            viewModel.cancelOrder(orderId, cancelReason);
             dialog.dismiss();
         });
         dialog.show();
       }
     private void showTimelineDialog() {
         BottomSheetDialog dialog = new BottomSheetDialog(this);
-        com.example.itstore.databinding.DialogTimelineBinding dialogBinding =
-                com.example.itstore.databinding.DialogTimelineBinding.inflate(getLayoutInflater());
+        DialogTimelineBinding dialogBinding = DialogTimelineBinding.inflate(getLayoutInflater());
         dialog.setContentView(dialogBinding.getRoot());
 
         List<OrderTimeline> realTimelines = new ArrayList<>();
-        String orderTime = currentOrder.getOrderDate();
-        String currentStatus = currentOrder.getStatus();
-        realTimelines.add(new OrderTimeline("Đặt hàng thành công", "Hệ thống đã ghi nhận đơn hàng của bạn.\n" + orderTime));
 
-        if (currentStatus.equalsIgnoreCase("Đã hủy")) {
-            realTimelines.add(0, new OrderTimeline("Đơn hàng đã bị hủy", "Đơn hàng đã bị hủy theo yêu cầu."));
+        List<Order.TimelineItem> apiTimelineList = currentOrder.getTimelineList();
+
+        if (apiTimelineList != null && !apiTimelineList.isEmpty()) {
+            for (Order.TimelineItem item : apiTimelineList) {
+
+                String statusTitle = getTimelineStatusVN(item.newStatus);
+
+                String timeFormatted = item.changedAt;
+                if (timeFormatted != null && timeFormatted.contains("T")) {
+                    timeFormatted = timeFormatted.substring(0, 16).replace("T", " ");
+                }
+
+                String description = (item.note != null && !item.note.isEmpty())
+                        ? item.note
+                        : getDefaultTimelineDescription(item.newStatus);
+
+                String content = description + "\n" + timeFormatted;
+
+                // Thêm vào đầu mảng (add 0) để sự kiện mới nhất nổi lên trên cùng
+                realTimelines.add(0, new OrderTimeline(statusTitle, content));
+            }
         } else {
-            if (!currentStatus.equalsIgnoreCase("Chờ xác nhận")) {
-                realTimelines.add(0, new OrderTimeline("Đã xác nhận", "Người bán đã xác nhận đơn hàng và đang chuẩn bị."));
-            }
-
-            if (currentStatus.equalsIgnoreCase("Đang chuẩn bị hàng") ||
-                    currentStatus.equalsIgnoreCase("Đã đóng gói") ||
-                    currentStatus.equalsIgnoreCase("Đang giao") ||
-                    currentStatus.equalsIgnoreCase("Đã giao")) {
-                realTimelines.add(0, new OrderTimeline("Đang chuẩn bị hàng", "Kho đang xuất linh kiện và tiến hành đóng gói."));
-            }
-
-            if (currentStatus.equalsIgnoreCase("Đã đóng gói") ||
-                    currentStatus.equalsIgnoreCase("Đang giao") ||
-                    currentStatus.equalsIgnoreCase("Đã giao")) {
-                realTimelines.add(0, new OrderTimeline("Đã đóng gói", "Đơn hàng đã được bàn giao cho đơn vị vận chuyển (Giao Hàng Tiết Kiệm)."));
-            }
-
-            if (currentStatus.equalsIgnoreCase("Đang giao") ||
-                    currentStatus.equalsIgnoreCase("Đã giao")) {
-                realTimelines.add(0, new OrderTimeline("Đang giao hàng", "Shipper đang trên đường giao hàng đến bạn. Vui lòng chú ý điện thoại."));
-            }
-
-            if (currentStatus.equalsIgnoreCase("Đã giao")) {
-                realTimelines.add(0, new OrderTimeline("Giao hàng thành công", "Kiện hàng đã được giao thành công đến người nhận."));
-            }
+            realTimelines.add(new OrderTimeline("Đặt hàng", "Hệ thống đã ghi nhận đơn hàng.\n" + currentOrder.getOrderDate()));
         }
 
         OrderTimelineAdapter adapter = new OrderTimelineAdapter(realTimelines);
         dialogBinding.rvOrderTimeline.setLayoutManager(new LinearLayoutManager(this));
         dialogBinding.rvOrderTimeline.setAdapter(adapter);
         dialog.show();
+    }
+
+    private String getTimelineStatusVN(String rawStatus) {
+        if (rawStatus == null) return "Cập nhật";
+        switch (rawStatus.toLowerCase()) {
+            case "pending": return "Tạo đơn hàng";
+            case "confirmed": return "Đã xác nhận";
+            case "preparing": return "Đang chuẩn bị hàng";
+            case "packed": return "Đã đóng gói";
+            case "shipping": return "Đang giao hàng";
+            case "delivered": return "Giao hàng thành công";
+            case "cancelled": return "Đơn hàng đã hủy";
+            default: return "Cập nhật đơn hàng";
+        }
+    }
+
+    private String getDefaultTimelineDescription(String rawStatus) {
+        if (rawStatus == null) return "Trạng thái đơn hàng đã thay đổi.";
+        switch (rawStatus.toLowerCase()) {
+            case "pending": return "Hệ thống đã ghi nhận đơn hàng của bạn.";
+            case "confirmed": return "Người bán đã xác nhận đơn hàng.";
+            case "preparing": return "Kho đang xuất linh kiện và tiến hành đóng gói.";
+            case "packed": return "Đơn hàng đã được bàn giao cho đơn vị vận chuyển.";
+            case "shipping": return "Shipper đang trên đường giao hàng đến bạn.";
+            case "delivered": return "Kiện hàng đã được giao thành công đến người nhận.";
+            case "cancelled": return "Đơn hàng đã bị hủy theo yêu cầu.";
+            default: return "Cập nhật trạng thái mới.";
+        }
     }
 }
