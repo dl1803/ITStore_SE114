@@ -28,7 +28,7 @@ public class Order implements Serializable {
     private List<TimelineItem> timelineList;
 
 
-    public static class AddressInfo {
+    public static class AddressInfo implements Serializable {
         @SerializedName("recipient")
         public String recipient;
 
@@ -47,7 +47,7 @@ public class Order implements Serializable {
         @SerializedName("province")
         public String province;
     }
-    public static class TimelineItem {
+    public static class TimelineItem implements Serializable {
         @SerializedName("new_status")
         public String newStatus;
 
