@@ -5,6 +5,8 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 public class OrderItem implements Serializable {
+    @SerializedName("id")
+    private int id;
     @SerializedName("variant_id")
     private int variantId;
     @SerializedName("quantity")
@@ -21,6 +23,8 @@ public class OrderItem implements Serializable {
     private VariantInfo variantInfo;
 
     public int getQuantity() { return quantity; }
+
+    public int getOrderItemId() { return id; }
 
     public double getPrice() { return unitPrice; }
 

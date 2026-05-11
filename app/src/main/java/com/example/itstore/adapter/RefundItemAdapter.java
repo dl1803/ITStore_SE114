@@ -6,14 +6,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.itstore.databinding.ItemProductCartBinding;
-import com.example.itstore.model.Product;
+import com.example.itstore.model.OrderItem;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class RefundItemAdapter extends RecyclerView.Adapter<RefundItemAdapter.ViewHolder> {
-    private List<Product> list;
+    private List<OrderItem> list;
     private Map<Integer, Integer> quantityMap = new HashMap<>();
     private Map<Integer, Boolean> checkedMap = new HashMap<>();
     private OnRefundAmountChangeListener listener;
@@ -22,13 +22,13 @@ public class RefundItemAdapter extends RecyclerView.Adapter<RefundItemAdapter.Vi
         void onAmountChanged(double totalRefund, int selectedCount);
     }
 
-    public RefundItemAdapter(List<Product> list, OnRefundAmountChangeListener listener) {
+    public RefundItemAdapter(List<OrderItem> list, OnRefundAmountChangeListener listener) {
         this.list = list;
         this.listener = listener;
         if (list != null) {
-            for (Product p : list) {
-                quantityMap.put(p.getId(), 1);
-                checkedMap.put(p.getId(), false);
+            for (OrderItem item : list) {
+                quantityMap.put(item.getOrderItemId(), 1);
+                checkedMap.put(item.getOrderItemId(), false);
             }
         }
     }
@@ -36,9 +36,10 @@ public class RefundItemAdapter extends RecyclerView.Adapter<RefundItemAdapter.Vi
     private void calculateTotal() {
         double total = 0;
         int count = 0;
-        for (Product p : list) {
-            if (checkedMap.get(p.getId()) != null && checkedMap.get(p.getId())) {
-                total += p.getPrice() * quantityMap.get(p.getId());
+        for (OrderItem item : list) {
+            int key = item.getOrderItemId();
+            if (checkedMap.get(key) != null && checkedMap.get(key)) {
+                total += item.getPrice() * quantityMap.get(key);
                 count++;
             }
         }
@@ -57,35 +58,37 @@ public class RefundItemAdapter extends RecyclerView.Adapter<RefundItemAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Product product = list.get(position);
-        int productId = product.getId();
+        OrderItem item = list.get(position);
+        int key = item.getOrderItemId();
 
-        holder.binding.tvProductName.setText(product.getName());
-        holder.binding.tvPrice.setText(String.format(java.util.Locale.US, "%,.0f đ", product.getPrice()));
-
-        holder.binding.tvQuantity.setText(String.valueOf(quantityMap.get(productId)));
+        holder.binding.tvProductName.setText(item.getProductName());
+        holder.binding.tvVariant.setText(item.getProductType());
+        holder.binding.tvPrice.setText(String.format(java.util.Locale.US, "%,.0f đ", item.getPrice()));
+        holder.binding.tvQuantity.setText(String.valueOf(quantityMap.get(key)));
 
         holder.binding.cbAgreeBuy.setOnCheckedChangeListener(null);
-        holder.binding.cbAgreeBuy.setChecked(checkedMap.get(productId));
+        holder.binding.cbAgreeBuy.setChecked(checkedMap.get(key));
 
         holder.binding.cbAgreeBuy.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            checkedMap.put(productId, isChecked);
+            checkedMap.put(key, isChecked);
             calculateTotal();
         });
 
         holder.binding.ivPlus.setOnClickListener(v -> {
-            int currentQty = quantityMap.get(productId);
-            currentQty++;
-            quantityMap.put(productId, currentQty);
-            holder.binding.tvQuantity.setText(String.valueOf(currentQty));
-            calculateTotal();
+            int currentQty = quantityMap.get(key);
+            if (currentQty < item.getQuantity()) {
+                currentQty++;
+                quantityMap.put(key, currentQty);
+                holder.binding.tvQuantity.setText(String.valueOf(currentQty));
+                calculateTotal();
+            }
         });
 
         holder.binding.ivMinus.setOnClickListener(v -> {
-            int currentQty = quantityMap.get(productId);
+            int currentQty = quantityMap.get(key);
             if (currentQty > 1) {
                 currentQty--;
-                quantityMap.put(productId, currentQty);
+                quantityMap.put(key, currentQty);
                 holder.binding.tvQuantity.setText(String.valueOf(currentQty));
                 calculateTotal();
             }
@@ -99,9 +102,10 @@ public class RefundItemAdapter extends RecyclerView.Adapter<RefundItemAdapter.Vi
 
     public Map<Integer, Integer> getSelectedItems() {
         Map<Integer, Integer> result = new HashMap<>();
-        for (Product p : list) {
-            if (checkedMap.get(p.getId()) != null && checkedMap.get(p.getId())) {
-                result.put(p.getId(), quantityMap.get(p.getId()));
+        for (OrderItem item : list) {
+            int key = item.getOrderItemId();
+            if (checkedMap.get(key) != null && checkedMap.get(key)) {
+                result.put(key, quantityMap.get(key));
             }
         }
         return result;

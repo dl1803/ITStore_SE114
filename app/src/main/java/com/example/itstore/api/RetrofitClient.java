@@ -51,6 +51,11 @@ import com.example.itstore.model.SingleCategoryResponse;
 import com.example.itstore.model.SingleOrderResponse;
 import com.example.itstore.model.SingleProductResponse;
 import com.example.itstore.model.UpdateProfileRequest;
+import com.example.itstore.model.ReturnRequestResponse;
+import okhttp3.RequestBody;
+import java.util.List;
+import com.example.itstore.model.ReturnRequestListResponse;
+import com.example.itstore.model.ReturnRequestDetailResponse;
 
 public class RetrofitClient {
     private static final String BASE_URL = "http://10.0.2.2:3000/";
@@ -173,5 +178,19 @@ public class RetrofitClient {
         @GET("api/products/{slug}")
         Call<SingleProductResponse> getProductBySlug(@Path("slug") String slug);
 
+        @Multipart
+        @POST("api/return-requests")
+        Call<ReturnRequestResponse> createReturnRequest(
+                @Part("order_id") RequestBody orderId,
+                @Part("reason") RequestBody reason,
+                @Part("items") RequestBody items,
+                @Part List<MultipartBody.Part> images
+        );
+
+        @GET("api/return-requests")
+        Call<ReturnRequestListResponse> getMyReturnRequests();
+
+        @GET("api/return-requests/{id}")
+        Call<ReturnRequestDetailResponse> getMyReturnRequestDetail(@Path("id") int id);
     }
 }
