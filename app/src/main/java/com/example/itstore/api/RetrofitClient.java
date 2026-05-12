@@ -56,6 +56,8 @@ import okhttp3.RequestBody;
 import java.util.List;
 import com.example.itstore.model.ReturnRequestListResponse;
 import com.example.itstore.model.ReturnRequestDetailResponse;
+import com.example.itstore.model.AddCartItemRequest;
+import com.example.itstore.model.UpdateCartItemRequest;
 
 public class RetrofitClient {
     private static final String BASE_URL = "http://10.0.2.2:3000/";
@@ -133,6 +135,17 @@ public class RetrofitClient {
 
         @GET("api/cart")
         Call<CartResponse> getCart();
+        @POST("api/cart/items")
+        Call<CartResponse> addCartItem(@Body AddCartItemRequest request);
+
+        @PUT("api/cart/items/{variant_id}")
+        Call<CartResponse> updateCartItem(@Path("variant_id") int variantId, @Body UpdateCartItemRequest request);
+
+        @DELETE("api/cart/items/{variant_id}")
+        Call<CartResponse> removeCartItem(@Path("variant_id") int variantId);
+
+        @DELETE("api/cart")
+        Call<CartResponse> clearCart();
 
         @POST("api/orders")
         Call<OrderCreateResponse> createOrder(@Body CreateOrderRequest request);

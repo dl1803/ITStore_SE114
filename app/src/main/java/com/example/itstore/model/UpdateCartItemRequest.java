@@ -1,0 +1,12 @@
+package com.example.itstore.model;
+
+import com.google.gson.annotations.SerializedName;
+
+public class UpdateCartItemRequest {
+    @SerializedName("quantity")
+    private int quantity;
+
+    public UpdateCartItemRequest(int quantity) {
+        this.quantity = quantity;
+    }
+}
