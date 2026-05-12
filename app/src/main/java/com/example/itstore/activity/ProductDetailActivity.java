@@ -107,7 +107,6 @@ public class ProductDetailActivity extends AppCompatActivity {
                 startActivity(intentLogin);
             } else {
                 detailViewModel.addToCart(fullProductData, currentVariantId, currentVariantName, 1);
-                Toast.makeText(ProductDetailActivity.this, "Đã thêm bản " + currentVariantName + " vào giỏ!", Toast.LENGTH_SHORT).show();
             }
         });
 

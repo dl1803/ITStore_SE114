@@ -4,90 +4,66 @@ import com.google.gson.annotations.SerializedName;
 
 public class CartItem {
     private int id;
-    private int cartId;
     @SerializedName("variant_id")
     private int variantId;
     private int quantity;
-
-    private Product product;
-    private String variantName;
     private double price;
+    @SerializedName("image_url")
+    private String imageUrl;
+    @SerializedName("product")
+    private Product product;
+    @SerializedName("variant")
+    private CartVariantInfo variantInfo;
     private boolean isSelected = false;
 
-    public CartItem() {
+    public static class CartVariantInfo {
+        private String version;
+        private String color;
+
+        public String getVersion() { return version; }
+        public String getColor() { return color; }
     }
+
+    public CartItem() {}
 
     public CartItem(int id, int cartId, int variantId, int quantity, Product product, String variantName, double price) {
         this.id = id;
-        this.cartId = cartId;
         this.variantId = variantId;
         this.quantity = quantity;
         this.product = product;
-        this.variantName = variantName;
         this.price = price;
     }
 
-    public int getId() {
-        return id;
-    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public int getVariantId() { return variantId; }
+    public void setVariantId(int variantId) { this.variantId = variantId; }
 
-    public int getCartId() {
-        return cartId;
-    }
+    public int getQuantity() { return quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
 
-    public void setCartId(int cartId) {
-        this.cartId = cartId;
-    }
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
 
-    public int getVariantId() {
-        return variantId;
-    }
+    public String getImageUrl() { return imageUrl; }
 
-    public void setVariantId(int variantId) {
-        this.variantId = variantId;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
-    }
+    public Product getProduct() { return product; }
+    public void setProduct(Product product) { this.product = product; }
 
     public String getVariantName() {
-        return variantName;
+        if (variantInfo == null) return "Mặc định";
+        String version = variantInfo.getVersion();
+        String color = variantInfo.getColor();
+        StringBuilder sb = new StringBuilder();
+        if (version != null && !version.isEmpty()) sb.append(version);
+        if (color != null && !color.isEmpty()) {
+            if (sb.length() > 0) sb.append(" - ");
+            sb.append(color);
+        }
+        return sb.length() > 0 ? sb.toString() : "Mặc định";
     }
 
-    public void setVariantName(String variantName) {
-        this.variantName = variantName;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public boolean isSelected() {
-        return isSelected;
-    }
-
-    public void setSelected(boolean selected) {
-        isSelected = selected;
-    }
+    public boolean isSelected() { return isSelected; }
+    public void setSelected(boolean selected) { isSelected = selected; }
 }

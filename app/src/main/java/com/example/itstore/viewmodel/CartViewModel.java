@@ -1,7 +1,5 @@
 package com.example.itstore.viewmodel;
 
-import static androidx.lifecycle.AndroidViewModel_androidKt.getApplication;
-
 import android.app.Application;
 import android.widget.Toast;
 
@@ -9,13 +7,14 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.example.itstore.api.RetrofitClient;
+import com.example.itstore.model.AddCartItemRequest;
 import com.example.itstore.model.CartItem;
 import com.example.itstore.model.CartResponse;
 import com.example.itstore.model.Coupon;
 import com.example.itstore.model.CouponResponse;
+import com.example.itstore.model.UpdateCartItemRequest;
 import com.example.itstore.utils.CartManager;
 
 import java.util.ArrayList;
@@ -37,18 +36,11 @@ public class CartViewModel extends AndroidViewModel {
         super(application);
     }
 
-    public MutableLiveData<Boolean> getIsAllSelectedLiveData() {
-        return isAllSelectedLiveData;
-    }
-    public MutableLiveData<List<CartItem>> getCartItems() {
-        return cartItemsLiveData;
-    }
-    public MutableLiveData<Double> getTotalPrice() {
-        return totalPriceLiveData;
-    }
+    public MutableLiveData<Boolean> getIsAllSelectedLiveData() { return isAllSelectedLiveData; }
+    public MutableLiveData<List<CartItem>> getCartItems() { return cartItemsLiveData; }
+    public MutableLiveData<Double> getTotalPrice() { return totalPriceLiveData; }
     public LiveData<List<Coupon>> getCouponList() { return couponList; }
     public LiveData<String> getCouponError() { return couponError; }
-
 
     public void calculateTotal() {
         double total = 0;
@@ -62,34 +54,112 @@ public class CartViewModel extends AndroidViewModel {
         }
         totalPriceLiveData.setValue(total);
     }
+
     public void increaseQuantity(CartItem item, int position) {
-        List<CartItem> currentList = cartItemsLiveData.getValue();
-        if (currentList != null) {
-            item.setQuantity(item.getQuantity() + 1);
-            cartItemsLiveData.setValue(currentList);
-            calculateTotal();
-        }
+        int newQuantity = item.getQuantity() + 1;
+        RetrofitClient.getApiService(getApplication())
+                .updateCartItem(item.getVariantId(), new UpdateCartItemRequest(newQuantity))
+                .enqueue(new Callback<CartResponse>() {
+                    @Override
+                    public void onResponse(Call<CartResponse> call, Response<CartResponse> response) {
+                        if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                            List<CartItem> currentList = cartItemsLiveData.getValue();
+                            if (currentList != null) {
+                                item.setQuantity(newQuantity);
+                                cartItemsLiveData.setValue(currentList);
+                                calculateTotal();
+                            }
+                        } else {
+                            Toast.makeText(getApplication(), "Không thể cập nhật số lượng", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CartResponse> call, Throwable t) {
+                        Toast.makeText(getApplication(), "Lỗi mạng", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
+
     public void decreaseQuantity(CartItem item, int position) {
-        List<CartItem> currentList = cartItemsLiveData.getValue();
-        if (currentList != null) {
-            if (item.getQuantity() > 1) {
-                item.setQuantity(item.getQuantity() - 1);
-            } else {
-                currentList.remove(position);
-            }
-            calculateTotal();
-            cartItemsLiveData.setValue(currentList);
+        if (item.getQuantity() > 1) {
+            int newQuantity = item.getQuantity() - 1;
+            RetrofitClient.getApiService(getApplication())
+                    .updateCartItem(item.getVariantId(), new UpdateCartItemRequest(newQuantity))
+                    .enqueue(new Callback<CartResponse>() {
+                        @Override
+                        public void onResponse(Call<CartResponse> call, Response<CartResponse> response) {
+                            if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                                List<CartItem> currentList = cartItemsLiveData.getValue();
+                                if (currentList != null) {
+                                    item.setQuantity(newQuantity);
+                                    cartItemsLiveData.setValue(currentList);
+                                    calculateTotal();
+                                }
+                            } else {
+                                Toast.makeText(getApplication(), "Không thể cập nhật số lượng", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<CartResponse> call, Throwable t) {
+                            Toast.makeText(getApplication(), "Lỗi mạng", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        } else {
+            RetrofitClient.getApiService(getApplication())
+                    .removeCartItem(item.getVariantId())
+                    .enqueue(new Callback<CartResponse>() {
+                        @Override
+                        public void onResponse(Call<CartResponse> call, Response<CartResponse> response) {
+                            if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                                List<CartItem> currentList = cartItemsLiveData.getValue();
+                                if (currentList != null) {
+                                    currentList.removeIf(cartItem -> cartItem.getVariantId() == item.getVariantId());
+                                    cartItemsLiveData.setValue(currentList);
+                                    calculateTotal();
+                                }
+                            } else {
+                                Toast.makeText(getApplication(), "Không thể xóa sản phẩm", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<CartResponse> call, Throwable t) {
+                            Toast.makeText(getApplication(), "Lỗi mạng", Toast.LENGTH_SHORT).show();
+                        }
+                    });
         }
     }
+
     public void removeItem(int position) {
         List<CartItem> currentList = cartItemsLiveData.getValue();
-        if (currentList != null && position < currentList.size()) {
-            currentList.remove(position);
-            cartItemsLiveData.setValue(currentList);
-            calculateTotal();
-        }
+        if (currentList == null || position >= currentList.size()) return;
+        CartItem item = currentList.get(position);
+        RetrofitClient.getApiService(getApplication())
+                .removeCartItem(item.getVariantId())
+                .enqueue(new Callback<CartResponse>() {
+                    @Override
+                    public void onResponse(Call<CartResponse> call, Response<CartResponse> response) {
+                        if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                            List<CartItem> list = cartItemsLiveData.getValue();
+                            if (list != null) {
+                                list.removeIf(cartItem -> cartItem.getVariantId() == item.getVariantId());
+                                cartItemsLiveData.setValue(list);
+                                calculateTotal();
+                            }
+                        } else {
+                            Toast.makeText(getApplication(), "Không thể xóa sản phẩm", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CartResponse> call, Throwable t) {
+                        Toast.makeText(getApplication(), "Lỗi mạng", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
+
     public void toggleSelectAll(boolean isSelectAll) {
         List<CartItem> currentList = cartItemsLiveData.getValue();
         if (currentList != null) {
@@ -101,12 +171,10 @@ public class CartViewModel extends AndroidViewModel {
             isAllSelectedLiveData.setValue(isSelectAll);
         }
     }
+
     public void checkAllSelectedStatus() {
         List<CartItem> currentList = cartItemsLiveData.getValue();
-        if (currentList == null || currentList.isEmpty()) {
-            return;
-        }
-
+        if (currentList == null || currentList.isEmpty()) return;
         boolean allChecked = true;
         for (CartItem item : currentList) {
             if (!item.isSelected()) {
@@ -116,6 +184,7 @@ public class CartViewModel extends AndroidViewModel {
         }
         isAllSelectedLiveData.setValue(allChecked);
     }
+
     public void loadCartFromManager() {
         List<CartItem> realCart = CartManager.getInstance().getCartList();
         if (realCart != null) {
@@ -123,6 +192,7 @@ public class CartViewModel extends AndroidViewModel {
             calculateTotal();
         }
     }
+
     public void loadCartFromApi(List<CartItem> itemsFromApi) {
         cartItemsLiveData.setValue(itemsFromApi);
         calculateTotal();
@@ -145,10 +215,9 @@ public class CartViewModel extends AndroidViewModel {
             }
         });
     }
-    
+
     public void fetchCart() {
         RetrofitClient.getApiService(getApplication()).getCart().enqueue(new Callback<CartResponse>() {
-
             @Override
             public void onResponse(Call<CartResponse> call, Response<CartResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
