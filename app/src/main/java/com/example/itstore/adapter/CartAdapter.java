@@ -44,6 +44,9 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         holder.binding.tvVariant.setText(item.getVariantName());
         holder.binding.tvPrice.setText(String.format(java.util.Locale.US, "%,.0f đ", item.getPrice()));
         holder.binding.tvQuantity.setText(String.valueOf(item.getQuantity()));
+        com.bumptech.glide.Glide.with(holder.itemView.getContext())
+                .load(item.getImageUrl())
+                .into(holder.binding.imgProduct);
         holder.binding.ivPlus.setOnClickListener(v -> {
             if (listener != null) listener.onIncrease(item, position);
         });

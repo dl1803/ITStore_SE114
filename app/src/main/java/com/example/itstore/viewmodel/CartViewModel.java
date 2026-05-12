@@ -115,7 +115,7 @@ public class CartViewModel extends AndroidViewModel {
                             if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                                 List<CartItem> currentList = cartItemsLiveData.getValue();
                                 if (currentList != null) {
-                                    currentList.remove(position);
+                                    currentList.removeIf(cartItem -> cartItem.getVariantId() == item.getVariantId());
                                     cartItemsLiveData.setValue(currentList);
                                     calculateTotal();
                                 }
@@ -144,7 +144,7 @@ public class CartViewModel extends AndroidViewModel {
                         if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                             List<CartItem> list = cartItemsLiveData.getValue();
                             if (list != null) {
-                                list.remove(position);
+                                list.removeIf(cartItem -> cartItem.getVariantId() == item.getVariantId());
                                 cartItemsLiveData.setValue(list);
                                 calculateTotal();
                             }
