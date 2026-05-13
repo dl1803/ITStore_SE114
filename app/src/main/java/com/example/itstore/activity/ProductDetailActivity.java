@@ -219,6 +219,8 @@ public class ProductDetailActivity extends AppCompatActivity {
             currentFinalPrice = var1.getPrice();
             updatePriceDisplay(currentFinalPrice, var1.getCompareAtPrice());
 
+            updateStockStatusUI(var1);
+
             binding.cardChoice1.setVisibility(View.VISIBLE);
             binding.cardChoice1.setText(currentVariantName);
 
@@ -232,6 +234,8 @@ public class ProductDetailActivity extends AppCompatActivity {
                 currentVariantName = var1.getVersion();
                 currentFinalPrice = var1.getPrice();
                 updatePriceDisplay(currentFinalPrice, var1.getCompareAtPrice());
+
+                updateStockStatusUI(var1);
             });
 
             // Nếu có bản thứ 2
@@ -251,6 +255,8 @@ public class ProductDetailActivity extends AppCompatActivity {
                     currentVariantName = var2.getVersion();
                     currentFinalPrice = var2.getPrice();
                     updatePriceDisplay(currentFinalPrice, var2.getCompareAtPrice());
+
+                    updateStockStatusUI(var2);
                 });
             } else {
                 binding.cardChoice2.setVisibility(View.GONE);
@@ -282,6 +288,42 @@ public class ProductDetailActivity extends AppCompatActivity {
         } else {
 
             binding.layoutHighlightSpecs.setVisibility(View.GONE);
+        }
+        binding.tvSoldCount.setText("Đã bán " + fullProductData.getSoldCount());
+    }
+    private void updateStockStatusUI(ProductVariant variant) {
+        // kiểm tra xem sản phẩm có bị ngừng bán k
+        if ("discontinued".equals(fullProductData.getStatus())) {
+            binding.tvStockStatus.setText("Ngừng kinh doanh");
+            binding.tvStockStatus.setTextColor(ContextCompat.getColor(this, R.color.dark_gray));
+
+            binding.btnAddToCart.setEnabled(false);
+            binding.btnAddToCart.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.dark_gray));
+            binding.btnBuyNow.setEnabled(false);
+            binding.btnBuyNow.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.dark_gray));
+            return;
+        }
+
+        // nếu còn bán
+        int currentStock = variant.getStock();
+        if (currentStock > 0) {
+            binding.tvStockStatus.setText("Còn hàng");
+            binding.tvStockStatus.setText("Còn hàng (" + currentStock + ")");
+
+            binding.tvStockStatus.setTextColor(ContextCompat.getColor(this, R.color.orange_primary));
+
+            binding.btnAddToCart.setEnabled(true);
+            binding.btnAddToCart.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.orange_primary));
+            binding.btnBuyNow.setEnabled(true);
+            binding.btnBuyNow.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.orange_primary));
+        } else {
+            binding.tvStockStatus.setText("Hết hàng");
+            binding.tvStockStatus.setTextColor(ContextCompat.getColor(this, android.R.color.holo_red_dark));
+
+            binding.btnAddToCart.setEnabled(false);
+            binding.btnAddToCart.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.dark_gray));
+            binding.btnBuyNow.setEnabled(false);
+            binding.btnBuyNow.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.dark_gray));
         }
     }
     private void setupReview(){
