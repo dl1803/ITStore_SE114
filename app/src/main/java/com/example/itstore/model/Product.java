@@ -30,6 +30,10 @@ public class Product implements Serializable {
     private String slug;
     @SerializedName("specifications")
     private Map<String, String> specificationsMap;
+    @SerializedName("status")
+    private String status;
+    @SerializedName("sold_count")
+    private int soldCount;
 
     public Product(int id, int categoryId, String name, String description, List<ProductVariant> variants, List<ProductImage> images, int brandId) {
         this.id = id;
@@ -138,6 +142,14 @@ public class Product implements Serializable {
 
     public void setPriceMax(double priceMax) {
         this.priceMax = priceMax;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public int getSoldCount() {
+        return soldCount;
     }
 
     public double getPrice() {

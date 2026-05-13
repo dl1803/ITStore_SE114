@@ -8,6 +8,7 @@ public class ProductVariant implements Serializable{
     private double price;
     @SerializedName("compare_at_price")
     private double compareAtPrice;
+    @SerializedName("stock")
     private int stock;
 
 
