@@ -59,7 +59,6 @@ public class CheckoutViewModel extends AndroidViewModel {
     public LiveData<Integer> getSelectedCouponId() { return selectedCouponId; }
 
 
-
     public void loadCheckoutData(List<CartItem> items) {
         checkoutItems.setValue(items);
         calculateMoney(items);

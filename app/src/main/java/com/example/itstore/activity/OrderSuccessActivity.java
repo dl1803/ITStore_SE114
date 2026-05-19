@@ -39,7 +39,7 @@ public class OrderSuccessActivity extends AppCompatActivity {
         });
 
         binding.tvViewDetail.setOnClickListener(v -> {
-            Intent intent = new Intent(this, OrderDetailActivity.class);
+            Intent intent = new Intent(this, OrderHistoryActivity.class);
             intent.putExtra("TAB_TO_OPEN", "PENDING");
             startActivity(intent);
             finish();

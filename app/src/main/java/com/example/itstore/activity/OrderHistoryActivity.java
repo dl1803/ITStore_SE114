@@ -40,6 +40,13 @@ public class OrderHistoryActivity extends AppCompatActivity {
                 (tab, position) -> tab.setText(tabTitles[position])
         ).attach();
 
+        String tabToOpen = getIntent().getStringExtra("TAB_TO_OPEN");
+        if (tabToOpen != null) {
+            if (tabToOpen.equals("PENDING")) {
+                binding.tabLayoutOrderStatus.getTabAt(1).select();
+            }
+        }
+
     }
 
     private class OrderPagerAdapter extends FragmentStateAdapter {

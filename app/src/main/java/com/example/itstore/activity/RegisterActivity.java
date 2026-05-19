@@ -54,7 +54,11 @@ public class RegisterActivity extends AppCompatActivity {
             String passwd = binding.edtPassword.getText().toString().trim();
             String confirmPasswd = binding.edtConfirmPassword.getText().toString().trim();
 
-            registerViewModel.register(fullName, email, phone, passwd, confirmPasswd);
+//            registerViewModel.register(fullName, email, phone, passwd, confirmPasswd);
+
+            Intent intent = new Intent(RegisterActivity.this, VerifyOtpActivity.class);
+            intent.putExtra("USER_EMAIL", email);
+            startActivity(intent);
         });
 
     }
@@ -127,7 +131,14 @@ public class RegisterActivity extends AppCompatActivity {
         registerViewModel.getRegisterSuccessMessage().observe(this, message -> {
             if (message != null) {
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(RegisterActivity.this, VerifyEmailActivity.class);
+
+                String userEmail = binding.edtEmail.getText().toString().trim();
+
+                Intent intent = new Intent(RegisterActivity.this, VerifyOtpActivity.class);
+
+                intent.putExtra("USER_EMAIL", userEmail);
+
+                startActivity(intent);
                 startActivity(intent);
                 finish();
             }
@@ -135,5 +146,3 @@ public class RegisterActivity extends AppCompatActivity {
 
     }
 }
-
-//}

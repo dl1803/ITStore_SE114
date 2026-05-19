@@ -61,4 +61,7 @@ dependencies {
 
     // support google func
     implementation("com.google.android.gms:play-services-auth:20.7.0")
+
+    // support otp pinview
+    implementation("io.github.chaosleung:pinview:1.4.4")
 }

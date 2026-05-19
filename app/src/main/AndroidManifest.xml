@@ -15,6 +15,9 @@
         android:theme="@style/Theme.ITStore"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".activity.VerifyOtpActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.OrderSuccessActivity"
             android:exported="false" />
         <activity
