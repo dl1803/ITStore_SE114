@@ -288,10 +288,11 @@ public class CheckoutActivity extends AppCompatActivity {
 
         checkoutViewModel.getIsOrderSuccess().observe(this, isSuccess -> {
             if (isSuccess != null && isSuccess) {
-                Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
                 CartManager.getInstance().clearPurchasedItems();
 
                 if (binding.rbCod.isChecked()){
+                    Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
+
                     Intent intent = new Intent(this, OrderSuccessActivity.class);
                     startActivity(intent);
                     finish();

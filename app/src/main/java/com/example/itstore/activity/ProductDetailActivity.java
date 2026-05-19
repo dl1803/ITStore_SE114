@@ -111,7 +111,10 @@ public class ProductDetailActivity extends AppCompatActivity {
         });
 
         binding.btnBuyNow.setOnClickListener(v -> {
-            if (fullProductData == null || currentVariantId == 0) return;
+            if (fullProductData == null || currentVariantId == 0) {
+                Toast.makeText(this, "Lỗi mạng! Không thể mua", Toast.LENGTH_SHORT).show();
+                return;
+            }
             CartItem buyNowItem = new CartItem(
                     0,
                     0,
@@ -180,23 +183,29 @@ public class ProductDetailActivity extends AppCompatActivity {
         binding.tvProductContent.setOnClickListener(toggleDescriptionListener);
         setupReview();
     }
-    private void fetchFullProductDetail(String slug) {
-        RetrofitClient.getApiService(this).getProductBySlug(slug)
-                .enqueue(new Callback<SingleProductResponse>() {
-                    @Override
-                    public void onResponse(Call<SingleProductResponse> call, Response<SingleProductResponse> response) {
-                        if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                            fullProductData = response.body().getData();
-                            setupDynamicData(); // lấy data từ api xong thì cập nhật lại giao diện
-                        }
-                    }
 
-                    @Override
-                    public void onFailure(Call<SingleProductResponse> call, Throwable t) {
-                        Log.e("API_ERR", "Lỗi tải chi tiết sản phẩm: " + t.getMessage());
-                    }
-                });
-    }
+private void fetchFullProductDetail(String slug) {
+    RetrofitClient.getApiService(this).getProductBySlug(slug)
+            .enqueue(new Callback<SingleProductResponse>() {
+                @Override
+                public void onResponse(Call<SingleProductResponse> call, Response<SingleProductResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        if (response.body().isSuccess()) {
+                            fullProductData = response.body().getData();
+                            setupDynamicData();
+                        } else {
+                            Toast.makeText(ProductDetailActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        Toast.makeText(ProductDetailActivity.this, "Lỗi server!", Toast.LENGTH_LONG).show();                    }
+                }
+
+                @Override
+                public void onFailure(Call<SingleProductResponse> call, Throwable t) {
+                    Toast.makeText(ProductDetailActivity.this, "Lỗi kết nối mạng!", Toast.LENGTH_LONG).show();
+                }
+            });
+}
     private void setupDynamicData() {
         if (fullProductData.getDescription() != null ) {
             binding.tvProductContent.setText(fullProductData.getDescription());

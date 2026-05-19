@@ -174,7 +174,6 @@ public class CartFragment extends Fragment {
         });
 
         cartViewModel.getTotalPrice().observe(getViewLifecycleOwner(), rawTotal -> {
-
             validateVoucherWithTotal(rawTotal);
 
             updateTotalPriceUI(rawTotal);

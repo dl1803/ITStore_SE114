@@ -3,6 +3,8 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.itstore.R;
 import com.example.itstore.databinding.ItemProductCartBinding;
 import com.example.itstore.model.CartItem;
 import com.example.itstore.model.Product;
@@ -40,12 +42,18 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
         CartItem item = cartList.get(position);
         if (item == null) return;
-        holder.binding.tvProductName.setText(item.getProduct().getName());
+        if (item.getProduct() != null) {
+            holder.binding.tvProductName.setText(item.getProduct().getName());
+        } else {
+            holder.binding.tvProductName.setText("Lỗi! Sản phẩm không hợp lệ");
+        }
         holder.binding.tvVariant.setText(item.getVariantName());
         holder.binding.tvPrice.setText(String.format(java.util.Locale.US, "%,.0f đ", item.getPrice()));
         holder.binding.tvQuantity.setText(String.valueOf(item.getQuantity()));
         com.bumptech.glide.Glide.with(holder.itemView.getContext())
                 .load(item.getImageUrl())
+                .placeholder(R.drawable.ic_search)
+                .error(R.drawable.ic_search)
                 .into(holder.binding.imgProduct);
         holder.binding.ivPlus.setOnClickListener(v -> {
             if (listener != null) listener.onIncrease(item, position);
