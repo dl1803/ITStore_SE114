@@ -89,6 +89,9 @@ public class AddressActivity extends AppCompatActivity {
                 intent.putExtra("WARD", address.getWard());
                 intent.putExtra("STREET", address.getStreet());
                 intent.putExtra("IS_DEFAULT", address.isDefault());
+                intent.putExtra("PROVINCE_ID", address.getProvinceId());
+                intent.putExtra("DISTRICT_ID", address.getDistrictId());
+                intent.putExtra("WARD_CODE", address.getWardCode());
                 startActivity(intent);
             }
 

@@ -43,11 +43,11 @@ public class GhnApiClient {
         @GET("master-data/ward")
         Call<GhnResponse<List<GhnWard>>> getWards(@Header("Token") String token, @Query("district_id") int districtId);
 
-        @POST("v2/shipping-order/fee")
-        Call<GhnResponse<GhnFeeData>> getShippingFee(
-                @retrofit2.http.Header("Token") String token,
-                @retrofit2.http.Header("ShopId") int shopId,
-                @retrofit2.http.Body GhnFeeRequest request
-        );
+//        @POST("v2/shipping-order/fee")
+//        Call<GhnResponse<GhnFeeData>> getShippingFee(
+//                @retrofit2.http.Header("Token") String token,
+//                @retrofit2.http.Header("ShopId") int shopId,
+//                @retrofit2.http.Body GhnFeeRequest request
+//        );
     }
 }
