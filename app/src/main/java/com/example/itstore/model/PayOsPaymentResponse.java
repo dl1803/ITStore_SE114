@@ -1,26 +1,21 @@
 package com.example.itstore.model;
 
-import com.google.gson.annotations.SerializedName;
-
 public class PayOsPaymentResponse {
-    @SerializedName("success")
     private boolean success;
-
-    @SerializedName("message")
+    private PaymentData data;
     private String message;
 
-    @SerializedName("data")
-    private MoMoData data;
-
     public boolean isSuccess() { return success; }
-    public MoMoData getData() { return data; }
+    public PaymentData getData() { return data; }
     public String getMessage() { return message; }
 
+    public static class PaymentData {
+        private int payment_id;
+        private int order_id;
+        private String paymentUrl;
 
-    public static class MoMoData {
-        @SerializedName("payUrl")
-        private String payUrl;
-
-        public String getPayUrl() { return payUrl; }
+        public int getPaymentId() { return payment_id; }
+        public int getOrderId() { return order_id; }
+        public String getPaymentUrl() { return paymentUrl; }
     }
 }

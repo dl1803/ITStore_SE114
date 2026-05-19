@@ -101,7 +101,16 @@ public class AddEditAddressActivity extends AppCompatActivity {
                 String district = binding.edtDistrict.getText().toString().trim();
                 String ward = binding.edtWard.getText().toString().trim();
                 String street = binding.edtStreet.getText().toString().trim();
-                AddressRequest request = new AddressRequest(name, phone, province, district, ward, street);
+
+                if (selectedProvinceId == -1 || selectedDistrictId == -1 || selectedWardCode.isEmpty()) {
+                    Toast.makeText(this, "Vui lòng chọn lại Tỉnh, Quận, Phường từ danh sách!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                AddressRequest request = new AddressRequest(
+                        name, phone, province, district, ward, street,
+                        selectedProvinceId, selectedDistrictId, selectedWardCode
+                );
 
                 if (isEditMode){
                     addEditAddressViewModel.updateAddress(this, curAddressId, request);
@@ -129,6 +138,10 @@ public class AddEditAddressActivity extends AppCompatActivity {
             String ward = intent.getStringExtra("WARD");
             String street = intent.getStringExtra("STREET");
             boolean isDefault = intent.getBooleanExtra("IS_DEFAULT", false);
+            selectedProvinceId = intent.getIntExtra("PROVINCE_ID", -1);
+            selectedDistrictId = intent.getIntExtra("DISTRICT_ID", -1);
+            selectedWardCode = intent.getStringExtra("WARD_CODE");
+            if (selectedWardCode == null) selectedWardCode = "";
 
             if ("Chưa cập nhật".equals(province)){
                 binding.edtName.setText("");

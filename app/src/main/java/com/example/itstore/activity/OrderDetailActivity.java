@@ -160,13 +160,23 @@ public class OrderDetailActivity extends AppCompatActivity {
         binding.rvProducts.setAdapter(adapter);
 
         // Tính tiền tổng
-        long subTotal = currentOrder.getTotalPrice();
-        long shippingFee = 30000;
-        long totalAmount = subTotal + shippingFee;
+        long shippingFee = currentOrder.getShippingFee();
+        long discount = currentOrder.getDiscount();
+        long finalTotal = currentOrder.getTotalPrice();
+
+        long subTotal = finalTotal - shippingFee + discount;
+
 
         binding.tvSubTotal.setText(formatter.format(subTotal) + "đ");
         binding.tvShippingFee.setText(formatter.format(shippingFee) + "đ");
-        binding.tvTotal.setText(formatter.format(totalAmount) + "đ");
+        binding.tvTotal.setText(formatter.format(finalTotal) + "đ");
+
+        if (discount > 0) {
+            binding.layoutVoucher.setVisibility(View.VISIBLE);
+            binding.tvVoucherDiscount.setText("-" + formatter.format(discount) + "đ");
+        } else {
+            binding.layoutVoucher.setVisibility(View.GONE);
+        }
     }
 
     private void updateBottomButtons() {

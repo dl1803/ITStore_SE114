@@ -229,18 +229,18 @@
                     android:layout_height="wrap_content"></RadioButton>
 
                 <RadioButton
-                    android:id="@+id/rbMomo"
-                    android:text="Ví điện tử Momo"
+                    android:id="@+id/rbPayOs"
+                    android:text="Thanh toán qua ngân hàng (PayOs)"
                     android:layout_marginTop="12dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"></RadioButton>
 
-                <RadioButton
-                    android:id="@+id/rbBankTransfer"
-                    android:text="Chuyển khoản / Thẻ tín dụng"
-                    android:layout_marginTop="12dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"></RadioButton>
+<!--                <RadioButton-->
+<!--                    android:id="@+id/rbBankTransfer"-->
+<!--                    android:text="Chuyển khoản / Thẻ tín dụng"-->
+<!--                    android:layout_marginTop="12dp"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"></RadioButton>-->
             </RadioGroup>
 
             <LinearLayout

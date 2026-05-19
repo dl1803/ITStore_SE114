@@ -27,4 +27,8 @@ public class CreateOrderRequest {
         this.note = note;
         this.items = items;
     }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
 }
