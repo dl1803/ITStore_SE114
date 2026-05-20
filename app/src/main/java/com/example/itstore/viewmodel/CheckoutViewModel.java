@@ -166,23 +166,8 @@ public class CheckoutViewModel extends AndroidViewModel {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     payosPaymentUrl.setValue(response.body().getData().getPaymentUrl());
                 }
-//                } else {
-//                    orderError.setValue("Lỗi! Không thể tạo link thanh toán PayOS");
-//                }
-                else {
-                    // 👉 RADAR BÓC PHỐT BACKEND: Lấy chi tiết lỗi từ Server in thẳng ra Toast
-                    try {
-                        String errDetail = response.errorBody() != null ? response.errorBody().string() : "Lỗi không xác định";
-                        android.util.Log.e("PAYOS_ERROR", "Lỗi BE: " + errDetail);
-
-                        // Cắt ngắn bớt nếu cục JSON lỗi quá dài
-                        if (errDetail.length() > 100)
-                            errDetail = errDetail.substring(0, 100) + "...";
-
-                        orderError.setValue("BE Lỗi PayOS: " + errDetail);
-                    } catch (Exception e) {
-                        orderError.setValue("Lỗi! Không thể tạo link thanh toán PayOS");
-                    }
+                 else {
+                    orderError.setValue("Lỗi! Không thể tạo link thanh toán PayOS");
                 }
             }
 
