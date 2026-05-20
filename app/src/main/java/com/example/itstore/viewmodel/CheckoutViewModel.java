@@ -98,10 +98,8 @@ public class CheckoutViewModel extends AndroidViewModel {
         RetrofitClient.getApiService(getApplication()).createOrder(request).enqueue(new Callback<CreateOrderResponse>() {
             @Override
             public void onResponse(Call<CreateOrderResponse> call, Response<CreateOrderResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    if (response.body().isSuccess()) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                         int newOrderId = response.body().getData().getOrderId().getId();
-
                         createdOrderId.setValue(newOrderId);
                         isOrderSuccess.setValue(true);
                         if ("bank_transfer".equals(request.getPaymentMethod())) {
@@ -111,7 +109,6 @@ public class CheckoutViewModel extends AndroidViewModel {
                         orderError.setValue("Lỗi khi tạo đơn hàng!");
                     }
                 }
-            }
 
             @Override
             public void onFailure(Call<CreateOrderResponse> call, Throwable t) {
@@ -168,8 +165,24 @@ public class CheckoutViewModel extends AndroidViewModel {
             public void onResponse(Call<PayOsPaymentResponse> call, Response<PayOsPaymentResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     payosPaymentUrl.setValue(response.body().getData().getPaymentUrl());
-                } else {
-                    orderError.setValue("Lỗi! Không thể tạo link thanh toán PayOS");
+                }
+//                } else {
+//                    orderError.setValue("Lỗi! Không thể tạo link thanh toán PayOS");
+//                }
+                else {
+                    // 👉 RADAR BÓC PHỐT BACKEND: Lấy chi tiết lỗi từ Server in thẳng ra Toast
+                    try {
+                        String errDetail = response.errorBody() != null ? response.errorBody().string() : "Lỗi không xác định";
+                        android.util.Log.e("PAYOS_ERROR", "Lỗi BE: " + errDetail);
+
+                        // Cắt ngắn bớt nếu cục JSON lỗi quá dài
+                        if (errDetail.length() > 100)
+                            errDetail = errDetail.substring(0, 100) + "...";
+
+                        orderError.setValue("BE Lỗi PayOS: " + errDetail);
+                    } catch (Exception e) {
+                        orderError.setValue("Lỗi! Không thể tạo link thanh toán PayOS");
+                    }
                 }
             }
 
