@@ -209,7 +209,7 @@ public class RetrofitClient {
         @GET("api/return-requests/{id}")
         Call<ReturnRequestDetailResponse> getMyReturnRequestDetail(@Path("id") int id);
 
-        @POST("payment/orders/{orderId}")
+        @POST("api/payments/orders/{orderId}")
         Call<PayOsPaymentResponse> createPayOsPaymentLink(@Path("orderId") int orderId);
 
         @POST("api/orders/shipment-fee")

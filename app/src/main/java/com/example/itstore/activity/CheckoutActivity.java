@@ -356,4 +356,14 @@ public class CheckoutActivity extends AppCompatActivity {
         if (checkoutViewModel != null) {
             checkoutViewModel.calculateShippingFee(address.getId());        }
     }
+
+    // Auto gọi khi mở lại màn hình
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (binding != null && binding.btnCheckout != null) {
+            binding.btnCheckout.setEnabled(true);
+            binding.btnCheckout.setText("Đặt hàng");
+        }
+    }
 }

@@ -98,10 +98,8 @@ public class CheckoutViewModel extends AndroidViewModel {
         RetrofitClient.getApiService(getApplication()).createOrder(request).enqueue(new Callback<CreateOrderResponse>() {
             @Override
             public void onResponse(Call<CreateOrderResponse> call, Response<CreateOrderResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    if (response.body().isSuccess()) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                         int newOrderId = response.body().getData().getOrderId().getId();
-
                         createdOrderId.setValue(newOrderId);
                         isOrderSuccess.setValue(true);
                         if ("bank_transfer".equals(request.getPaymentMethod())) {
@@ -111,7 +109,6 @@ public class CheckoutViewModel extends AndroidViewModel {
                         orderError.setValue("Lỗi khi tạo đơn hàng!");
                     }
                 }
-            }
 
             @Override
             public void onFailure(Call<CreateOrderResponse> call, Throwable t) {
@@ -168,7 +165,8 @@ public class CheckoutViewModel extends AndroidViewModel {
             public void onResponse(Call<PayOsPaymentResponse> call, Response<PayOsPaymentResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     payosPaymentUrl.setValue(response.body().getData().getPaymentUrl());
-                } else {
+                }
+                 else {
                     orderError.setValue("Lỗi! Không thể tạo link thanh toán PayOS");
                 }
             }
