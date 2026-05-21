@@ -395,5 +395,7 @@ private void fetchFullProductDetail(String slug) {
     private void updatePriceDisplay(double newPrice, double oldPrice) {
         binding.tvPriceNew.setText(String.format(Locale.US, "%,.0f VNĐ", newPrice));
         binding.tvPriceOld.setText(String.format(Locale.US, "%,.0f VNĐ", oldPrice));
+        int percent = (int)((oldPrice - newPrice) * 100 / oldPrice);
+        binding.tvDiscountTag.setText(percent + "%");
     }
 }
