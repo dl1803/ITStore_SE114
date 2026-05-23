@@ -11,8 +11,10 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.itstore.api.RetrofitClient;
+import com.example.itstore.model.AuthMessageResponse;
 import com.example.itstore.model.RegisterRequest;
 import com.example.itstore.model.RegisterResponse;
+import com.example.itstore.model.ResendOtpRequest;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -25,10 +27,12 @@ public class RegisterViewModel extends AndroidViewModel {
     private MutableLiveData <String> phoneError = new MutableLiveData<>();
     private MutableLiveData <String> passwordError = new MutableLiveData<>();
     private MutableLiveData <String> confirmPasswordError = new MutableLiveData<>();
-    private MutableLiveData <String> registerSuccessMessage = new MutableLiveData<>();
 
     private MutableLiveData <String> apiError =new MutableLiveData<>();
     private MutableLiveData <Boolean> isLoading = new MutableLiveData<>();
+    private MutableLiveData <String> registerSuccess = new MutableLiveData<>();
+    private MutableLiveData <String> registerMailFailed = new MutableLiveData<>();
+
 
     public LiveData<String> getFullNameError() {
         return fullNameError;
@@ -54,13 +58,11 @@ public class RegisterViewModel extends AndroidViewModel {
         return isLoading;
     }
 
-    public LiveData<String> getRegisterSuccessMessage(){
-        return registerSuccessMessage;
-    }
-
     public LiveData<String> getApiError (){
         return apiError;
     }
+    public LiveData<String> getRegisterSuccess() { return registerSuccess; }
+    public LiveData<String> getRegisterMailFailed() { return registerMailFailed; }
 
 
     public RegisterViewModel (Application application){
@@ -75,7 +77,6 @@ public class RegisterViewModel extends AndroidViewModel {
         phoneError.setValue(null);
         passwordError.setValue(null);
         confirmPasswordError.setValue(null);
-        registerSuccessMessage.setValue(null);
         apiError.setValue(null);
 
 
@@ -137,23 +138,52 @@ public class RegisterViewModel extends AndroidViewModel {
                     fullName, phone, "Chưa cập nhật", "Chưa cập nhật", "Chưa cập nhật", "Chưa cập nhật", true
             );
 
-            RegisterRequest request = new RegisterRequest(fullName, email, phone, passwd, address);
+            RegisterRequest request = new RegisterRequest(fullName, email, phone, passwd, null);
 
             RetrofitClient.getApiService(getApplication()).register(request).enqueue(new Callback<RegisterResponse>() {
                 @Override
                 public void onResponse(Call<RegisterResponse> call, Response<RegisterResponse> response) {
-                    isLoading.setValue(false);
-
+                    String message = "";
                     if (response.isSuccessful() && response.body() != null) {
-                        registerSuccessMessage.setValue(response.body().getMessage());
+                        message = response.body().getMessage();
                     } else {
                         try {
                             String errorStr = response.errorBody().string();
                             org.json.JSONObject jsonObject = new org.json.JSONObject(errorStr);
-                            apiError.setValue(jsonObject.getString("message"));
+                            message = jsonObject.getString("message");
                         } catch (Exception e) {
+                            isLoading.setValue(false);
                             apiError.setValue("Đăng ký thất bại! Vui lòng thử lại.");
+                            return;
                         }
+                    }
+
+                    if (message != null && message.contains("Đăng ký thành công")) {
+                        if (message.contains("thất bại")) {
+                            ResendOtpRequest resendRequest = new ResendOtpRequest(email);
+                            RetrofitClient.getApiService(getApplication()).resendVerifyEmailOtp(resendRequest).enqueue(new Callback<AuthMessageResponse>() {
+                                @Override
+                                public void onResponse(Call<AuthMessageResponse> callResend, Response<AuthMessageResponse> responseResend) {
+                                    isLoading.setValue(false);
+                                    if (responseResend.isSuccessful()) {
+                                        registerSuccess.setValue(email);
+                                    } else {
+                                        registerMailFailed.setValue(email);
+                                    }
+                                }
+                                @Override
+                                public void onFailure(Call<AuthMessageResponse> callResend, Throwable t) {
+                                    isLoading.setValue(false);
+                                    registerMailFailed.setValue(email);
+                                }
+                            });
+                        } else {
+                            isLoading.setValue(false);
+                            registerSuccess.setValue(email);
+                        }
+                    } else {
+                        isLoading.setValue(false);
+                        apiError.setValue(message);
                     }
                 }
 

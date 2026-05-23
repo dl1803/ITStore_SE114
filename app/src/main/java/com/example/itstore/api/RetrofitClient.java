@@ -20,6 +20,7 @@ import retrofit2.http.Query;
 
 import com.example.itstore.model.AddressRequest;
 import com.example.itstore.model.AddressResponse;
+import com.example.itstore.model.AuthMessageResponse;
 import com.example.itstore.model.BrandResponse;
 import com.example.itstore.model.CancelOrderRequest;
 import com.example.itstore.model.CartResponse;
@@ -44,6 +45,7 @@ import com.example.itstore.model.RefreshTokenRequest;
 import com.example.itstore.model.RefreshTokenResponse;
 import com.example.itstore.model.RegisterRequest;
 import com.example.itstore.model.RegisterResponse;
+import com.example.itstore.model.ResendOtpRequest;
 import com.example.itstore.model.ResetPasswordRequest;
 import com.example.itstore.model.ResetPasswordResponse;
 import com.example.itstore.model.ShipmentFeeRequest;
@@ -61,6 +63,7 @@ import com.example.itstore.model.ReturnRequestListResponse;
 import com.example.itstore.model.ReturnRequestDetailResponse;
 import com.example.itstore.model.AddCartItemRequest;
 import com.example.itstore.model.UpdateCartItemRequest;
+import com.example.itstore.model.VerifyOtpRequest;
 
 public class RetrofitClient {
     private static final String BASE_URL = "http://10.0.2.2:3000/";
@@ -215,5 +218,10 @@ public class RetrofitClient {
         @POST("api/orders/shipment-fee")
         Call<ShipmentFeeResponse> calculateShippingFee(@Body ShipmentFeeRequest request);
 
+        @POST("api/auth/verify-email")
+        Call<AuthMessageResponse> verifyEmailOtp(@Body VerifyOtpRequest request);
+
+        @POST("api/auth/resend-verify-email")
+        Call<AuthMessageResponse> resendVerifyEmailOtp(@Body ResendOtpRequest request);
     }
 }

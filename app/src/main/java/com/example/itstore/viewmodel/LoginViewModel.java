@@ -10,9 +10,11 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.itstore.api.RetrofitClient;
+import com.example.itstore.model.AuthMessageResponse;
 import com.example.itstore.model.GoogleLoginRequest;
 import com.example.itstore.model.LoginRequest;
 import com.example.itstore.model.LoginResponse;
+import com.example.itstore.model.ResendOtpRequest;
 import com.example.itstore.utils.SharedPrefsManager;
 
 import retrofit2.Call;
@@ -27,12 +29,18 @@ public class LoginViewModel extends AndroidViewModel {
     private MutableLiveData<LoginResponse> loginSuccessData = new MutableLiveData<>();
     private MutableLiveData<String> apiError = new MutableLiveData<>();
 
+    private MutableLiveData<String> unverifiedEmailSuccess = new MutableLiveData<>();
+    private MutableLiveData<String> unverifiedEmailFailed = new MutableLiveData<>();
+
 
     public LiveData<String> getEmailError () {return emailError;}
     public LiveData<String> getPasswordError () {return passwordError;}
     public LiveData<Boolean> getIsLoading () {return isLoading;}
     public LiveData<LoginResponse> getLoginSuccessData () {return loginSuccessData;}
     public LiveData<String> getApiError () {return apiError;}
+
+    public LiveData<String> getUnverifiedEmailSuccess() { return unverifiedEmailSuccess; }
+    public LiveData<String> getUnverifiedEmailFailed() { return unverifiedEmailFailed; }
 
 
     public LoginViewModel(Application application){
@@ -85,19 +93,43 @@ public class LoginViewModel extends AndroidViewModel {
                 RetrofitClient.getApiService(getApplication()).login(request).enqueue(new Callback<LoginResponse>() {
                     @Override
                     public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                        isLoading.setValue(false);
-
-                        if (response.isSuccessful() && response.body() != null) {
-                            loginSuccessData.setValue(response.body());
-                        } else {
-                            try {
-                                String errorStr = response.errorBody().string();
+                        try {
+                            String errorStr = response.errorBody() != null ? response.errorBody().string() : "";
+                            String serverError = "";
+                            if (!errorStr.isEmpty()) {
                                 org.json.JSONObject jsonObject = new org.json.JSONObject(errorStr);
-                                String serverError = jsonObject.getString("message");
-                                apiError.setValue(serverError);
-                            } catch (Exception e) {
-                                apiError.setValue("Email hoặc mật khẩu không đúng!");
+                                serverError = jsonObject.has("message") ? jsonObject.getString("message") : jsonObject.getString("error");
                             }
+
+
+                            if (response.code() == 401 && serverError.contains("chưa được xác thực")) {
+                                ResendOtpRequest resendRequest = new ResendOtpRequest(email);
+                                RetrofitClient.getApiService(getApplication()).resendVerifyEmailOtp(resendRequest).enqueue(new Callback<AuthMessageResponse>() {
+                                    @Override
+                                    public void onResponse(Call<AuthMessageResponse> callResend, Response<AuthMessageResponse> responseResend) {
+                                        isLoading.setValue(false);
+                                        if (responseResend.isSuccessful()) {
+                                            unverifiedEmailSuccess.setValue(email);
+                                        } else {
+                                            unverifiedEmailFailed.setValue(email);
+                                        }
+                                    }
+                                    @Override
+                                    public void onFailure(Call<AuthMessageResponse> callResend, Throwable t) {
+                                        isLoading.setValue(false);
+                                        unverifiedEmailFailed.setValue(email);
+                                    }
+                                });
+                            } else if (response.isSuccessful() && response.body() != null) {
+                                isLoading.setValue(false);
+                                loginSuccessData.setValue(response.body());
+                            } else {
+                                isLoading.setValue(false);
+                                apiError.setValue(serverError);
+                            }
+                        } catch (Exception e) {
+                            isLoading.setValue(false);
+                            apiError.setValue("Email hoặc mật khẩu không đúng!");
                         }
                     }
                     @Override
