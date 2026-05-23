@@ -179,23 +179,22 @@ public class ProductDetailActivity extends AppCompatActivity {
         binding.XemThem.setOnClickListener(toggleDescriptionListener);
         binding.tvProductContent.setOnClickListener(toggleDescriptionListener);
         setupReview();
+
+        detailViewModel.getProductDetailLiveData().observe(this, product -> {
+            if (product != null) {
+                fullProductData = product;
+                setupDynamicData();
+            }
+        });
+
+        detailViewModel.getToastMessageLiveData().observe(this, message -> {
+            if (message != null) {
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
     private void fetchFullProductDetail(String slug) {
-        RetrofitClient.getApiService(this).getProductBySlug(slug)
-                .enqueue(new Callback<SingleProductResponse>() {
-                    @Override
-                    public void onResponse(Call<SingleProductResponse> call, Response<SingleProductResponse> response) {
-                        if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                            fullProductData = response.body().getData();
-                            setupDynamicData(); // lấy data từ api xong thì cập nhật lại giao diện
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<SingleProductResponse> call, Throwable t) {
-                        Log.e("API_ERR", "Lỗi tải chi tiết sản phẩm: " + t.getMessage());
-                    }
-                });
+        detailViewModel.fetchProductDetail(slug);
     }
     private void setupDynamicData() {
         if (fullProductData.getDescription() != null ) {
