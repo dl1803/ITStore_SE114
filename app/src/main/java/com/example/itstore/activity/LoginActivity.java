@@ -168,5 +168,26 @@ public class LoginActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        loginViewModel.getUnverifiedEmailSuccess().observe(this, email -> {
+            if (email != null) {
+                Toast.makeText(this, "Tài khoản chưa xác thực. Đã gửi mã kích hoạt vào email của bạn!", Toast.LENGTH_LONG).show();
+
+                Intent intent = new Intent(LoginActivity.this, VerifyOtpActivity.class);
+                intent.putExtra("USER_EMAIL", email);
+                startActivity(intent);
+            }
+        });
+
+        loginViewModel.getUnverifiedEmailFailed().observe(this, email -> {
+            if (email != null) {
+                Toast.makeText(this, "Hệ thống đang nghẽn. Vui lòng tự bấm Gửi lại mã!", Toast.LENGTH_LONG).show();
+
+                Intent intent = new Intent(LoginActivity.this, VerifyOtpActivity.class);
+                intent.putExtra("USER_EMAIL", email);
+                intent.putExtra("EMAIL_FAILED", true);
+                startActivity(intent);
+            }
+        });
     }
 }

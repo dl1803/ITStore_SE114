@@ -54,11 +54,7 @@ public class RegisterActivity extends AppCompatActivity {
             String passwd = binding.edtPassword.getText().toString().trim();
             String confirmPasswd = binding.edtConfirmPassword.getText().toString().trim();
 
-//            registerViewModel.register(fullName, email, phone, passwd, confirmPasswd);
-
-            Intent intent = new Intent(RegisterActivity.this, VerifyOtpActivity.class);
-            intent.putExtra("USER_EMAIL", email);
-            startActivity(intent);
+            registerViewModel.register(fullName, email, phone, passwd, confirmPasswd);
         });
 
     }
@@ -128,21 +124,25 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        registerViewModel.getRegisterSuccessMessage().observe(this, message -> {
-            if (message != null) {
-                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-
-                String userEmail = binding.edtEmail.getText().toString().trim();
-
+        registerViewModel.getRegisterSuccess().observe(this, email -> {
+            if (email != null) {
+                Toast.makeText(this, "Đăng ký thành công! Đã gửi mã vào email.", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(RegisterActivity.this, VerifyOtpActivity.class);
-
-                intent.putExtra("USER_EMAIL", userEmail);
-
-                startActivity(intent);
+                intent.putExtra("USER_EMAIL", email);
                 startActivity(intent);
                 finish();
             }
         });
 
+        registerViewModel.getRegisterMailFailed().observe(this, email -> {
+            if (email != null) {
+                Toast.makeText(this, "Đăng ký thành công nhưng lỗi kết nối. Vui lòng bấm Gửi lại mã!", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(RegisterActivity.this, VerifyOtpActivity.class);
+                intent.putExtra("USER_EMAIL", email);
+                intent.putExtra("EMAIL_FAILED", true);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 }

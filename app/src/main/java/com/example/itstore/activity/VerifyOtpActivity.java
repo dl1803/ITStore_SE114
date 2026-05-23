@@ -1,20 +1,17 @@
 package com.example.itstore.activity;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.itstore.R;
 import com.example.itstore.databinding.ActivityVerifyOtpBinding;
+import com.example.itstore.viewmodel.VerifyOtpViewModel;
 
 public class VerifyOtpActivity extends AppCompatActivity {
 
@@ -22,6 +19,7 @@ public class VerifyOtpActivity extends AppCompatActivity {
     private String userEmail = "";
     private CountDownTimer timer;
     private boolean isTimerRunning = false;
+    private VerifyOtpViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,14 +28,30 @@ public class VerifyOtpActivity extends AppCompatActivity {
         binding = ActivityVerifyOtpBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        viewModel = new ViewModelProvider(this).get(VerifyOtpViewModel.class);
+
         Intent intent = getIntent();
-        if (intent != null && intent.hasExtra("USER_EMAIL")) {
-            userEmail = intent.getStringExtra("USER_EMAIL");
+        boolean isEmailFailed = false;
+        if (intent != null) {
+            if (intent.hasExtra("USER_EMAIL")) { userEmail = intent.getStringExtra("USER_EMAIL"); }
+            isEmailFailed = intent.getBooleanExtra("EMAIL_FAILED", false);
+        }
+
+        setupObservers();
+
+        if (isEmailFailed) {
+            binding.tvSubtitle.setText("Server chưa gửi được mail. Vui lòng bấm 'Gửi lại mã'.");
+            isTimerRunning = false;
+            binding.tvResend.setEnabled(true);
+            binding.tvResend.setText("Gửi lại mã");
+            binding.tvResend.setTextColor(ContextCompat.getColor(this, R.color.orange_primary));
+        } else {
+            binding.tvSubtitle.setText("Vui lòng nhập mã xác thực gửi đến " + userEmail);
+            startCountDownTimer();
         }
 
         binding.tvSubtitle.setText("Vui lòng nhập mã xác thực 6 ký tự đã được gửi đến " + userEmail);
 
-        startCountDownTimer();
 
         binding.btnBack.setOnClickListener(v -> finish());
 
@@ -45,15 +59,15 @@ public class VerifyOtpActivity extends AppCompatActivity {
             String otp = binding.pinViewOtp.getText().toString();
             if (otp.length() < 6) {
                 Toast.makeText(this, "Vui lòng nhập đủ 6 kí tự xác thực!", Toast.LENGTH_SHORT).show();
+                viewModel.verifyOtp(userEmail, otp);
                 return;
             }
-
-            verifyOtpApi(userEmail, otp);
+            viewModel.verifyOtp(userEmail, otp);
         });
 
         binding.tvResend.setOnClickListener(v -> {
             if (!isTimerRunning) {
-                resendOtpApi(userEmail);
+                viewModel.resendOtp(userEmail);
                 startCountDownTimer();
             } else {
                 Toast.makeText(this, "Vui lòng đợi hết thời gian để gửi lại mã!", Toast.LENGTH_SHORT).show();
@@ -61,20 +75,44 @@ public class VerifyOtpActivity extends AppCompatActivity {
         });
     }
 
+    private void setupObservers() {
+        viewModel.getIsVerifying().observe(this, isVerifying -> {
+            binding.btnVerify.setEnabled(!isVerifying);
+            binding.btnVerify.setText(isVerifying ? "Đang xác thực..." : "Xác nhận");
+        });
 
-    private void verifyOtpApi(String userEmail,String otpCode){
-        binding.btnVerify.setEnabled(false);
-        binding.btnVerify.setText("Đang xác thực...");
-    }
+        viewModel.getVerifySuccess().observe(this, message -> {
+            if (message != null) {
+                Toast.makeText(this, "Xác thực thành công!", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(VerifyOtpActivity.this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }
+        });
 
-    private void resendOtpApi(String email) {
-        binding.tvResend.setEnabled(false);
-        binding.tvResend.setText("Đang gửi lại...");
+        viewModel.getVerifyError().observe(this, error -> {
+            if (error != null) { Toast.makeText(this, error, Toast.LENGTH_SHORT).show(); }
+        });
+
+        viewModel.getResendSuccess().observe(this, message -> {
+            if (message != null) {
+                Toast.makeText(this, "Đã gửi lại mã xác thực!", Toast.LENGTH_SHORT).show();
+                binding.tvSubtitle.setText("Vui lòng nhập mã xác thực gửi đến " + userEmail);
+            }
+        });
+
+        viewModel.getResendError().observe(this, error -> {
+            if (error != null) { Toast.makeText(this, error, Toast.LENGTH_SHORT).show(); }
+        });
     }
 
     private void startCountDownTimer() {
         isTimerRunning = true;
+        binding.tvResend.setEnabled(false);
         binding.tvResend.setTextColor(android.graphics.Color.parseColor("#9E9E9E"));
+
+        if (timer != null) timer.cancel();
 
          timer = new CountDownTimer(60000, 1000) {
             @Override
@@ -87,7 +125,7 @@ public class VerifyOtpActivity extends AppCompatActivity {
                 isTimerRunning = false;
                 binding.tvResend.setText("Gửi lại mã");
                 binding.tvResend.setTextColor(ContextCompat.getColor(VerifyOtpActivity.this, R.color.orange_primary));
-
+                binding.tvResend.setEnabled(true);
             }
         }.start();
     }

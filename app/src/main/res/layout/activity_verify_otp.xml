@@ -59,7 +59,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:cursorVisible="true"
-        android:inputType="textCapCharacters|textNoSuggestions"
+        android:inputType="textVisiblePassword|textNoSuggestions"
         android:textColor="#212121"
         android:textSize="20sp"
         app:itemCount="6"
