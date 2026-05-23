@@ -107,8 +107,9 @@ public class CheckoutActivity extends AppCompatActivity {
 
         binding.btnCheckout.setOnClickListener(v -> {
             String paymentMethod = "cod";
-            if (binding.rbMomo.isChecked()) paymentMethod = "momo";
-            if (binding.rbBankTransfer.isChecked()) paymentMethod = "bank";
+            if (binding.rbPayOs.isChecked()) {
+                paymentMethod = "bank_transfer";
+            }
 
             List<CartItem> purchasedItems = checkoutViewModel.getCheckoutItems().getValue();
             if (purchasedItems == null || purchasedItems.isEmpty()) {
@@ -137,6 +138,7 @@ public class CheckoutActivity extends AppCompatActivity {
             );
 
             binding.btnCheckout.setEnabled(false);
+            binding.btnCheckout.setText("Đang xử lý...");
             checkoutViewModel.placeOrder(request);
         });
         addressViewModel.fetchAddresses(this);
@@ -288,15 +290,20 @@ public class CheckoutActivity extends AppCompatActivity {
 
         checkoutViewModel.getIsOrderSuccess().observe(this, isSuccess -> {
             if (isSuccess != null && isSuccess) {
-                Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
-                CartManager.getInstance().clearPurchasedItems();
-
                 if (binding.rbCod.isChecked()){
+                    // Luồng 1: Tiền mặt -> Xóa giỏ hàng và sang trang Success
+                    CartManager.getInstance().clearPurchasedItems();
+                    Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
+
+                    int orderId = checkoutViewModel.getCreatedOrderId().getValue();
+
                     Intent intent = new Intent(this, OrderSuccessActivity.class);
+                    intent.putExtra("ORDER_ID", orderId);
                     startActivity(intent);
                     finish();
                 } else {
-                    Toast.makeText(this, "Đang chuyển hướng sang MoMo...", Toast.LENGTH_SHORT).show();
+                    // Luồng 2: PayOS -> KHÔNG XÓA GIỎ HÀNG Ở ĐÂY!
+                    Toast.makeText(this, "Đang khởi tạo cổng thanh toán...", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -328,6 +335,15 @@ public class CheckoutActivity extends AppCompatActivity {
                 }
             }
         });
+
+        checkoutViewModel.getPayosPaymentUrl().observe(this, url -> {
+            if (url != null && !url.isEmpty()) {
+                Toast.makeText(this, "Đang chuyển hướng sang cổng thanh toán...", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url));
+                startActivity(intent);
+            }
+        });
     }
 
     private void updateAddressUI(Address address) {
@@ -338,7 +354,16 @@ public class CheckoutActivity extends AppCompatActivity {
         binding.tvAddress.setText(fullAddress);
 
         if (checkoutViewModel != null) {
-            checkoutViewModel.calculateShippingFee(address.getDistrictId(), address.getWardCode());
+            checkoutViewModel.calculateShippingFee(address.getId());        }
+    }
+
+    // Auto gọi khi mở lại màn hình
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (binding != null && binding.btnCheckout != null) {
+            binding.btnCheckout.setEnabled(true);
+            binding.btnCheckout.setText("Đặt hàng");
         }
     }
 }

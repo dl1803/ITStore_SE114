@@ -42,6 +42,8 @@ public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.
 
         Glide.with(holder.itemView.getContext())
                 .load(item.getImageUrl())
+                .placeholder(R.drawable.ic_search)
+                .error(R.drawable.ic_search)
                 .into(holder.binding.imgProduct);
 
         holder.itemView.setOnClickListener(v -> {

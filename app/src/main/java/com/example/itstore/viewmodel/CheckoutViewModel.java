@@ -1,14 +1,11 @@
 package com.example.itstore.viewmodel;
 
-import static androidx.lifecycle.AndroidViewModel_androidKt.getApplication;
-
 import android.app.Application;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.example.itstore.api.GhnApiClient;
 import com.example.itstore.api.RetrofitClient;
@@ -19,7 +16,10 @@ import com.example.itstore.model.CreateOrderRequest;
 import com.example.itstore.model.GhnFeeData;
 import com.example.itstore.model.GhnFeeRequest;
 import com.example.itstore.model.GhnResponse;
-import com.example.itstore.model.OrderCreateResponse;
+import com.example.itstore.model.CreateOrderResponse;
+import com.example.itstore.model.PayOsPaymentResponse;
+import com.example.itstore.model.ShipmentFeeRequest;
+import com.example.itstore.model.ShipmentFeeResponse;
 
 import java.util.List;
 
@@ -43,6 +43,10 @@ public class CheckoutViewModel extends AndroidViewModel {
 
     private final MutableLiveData<List<Coupon>> couponList = new MutableLiveData<>();
     private final MutableLiveData<Integer> selectedCouponId = new MutableLiveData<>(null);
+    private final MutableLiveData<String> payosPaymentUrl = new MutableLiveData<>();
+    private final MutableLiveData<Integer> createdOrderId = new MutableLiveData<>();
+
+
     public CheckoutViewModel(@NonNull Application application) {
         super(application);
     }
@@ -58,8 +62,8 @@ public class CheckoutViewModel extends AndroidViewModel {
     public LiveData<List<Coupon>> getCouponList() { return couponList; }
     public LiveData<Integer> getSelectedCouponId() { return selectedCouponId; }
 
-
-
+    public LiveData<Integer> getCreatedOrderId() { return createdOrderId; }
+    public LiveData<String> getPayosPaymentUrl() { return payosPaymentUrl; }
     public void loadCheckoutData(List<CartItem> items) {
         checkoutItems.setValue(items);
         calculateMoney(items);
@@ -91,60 +95,48 @@ public class CheckoutViewModel extends AndroidViewModel {
     }
 
     public void placeOrder(CreateOrderRequest request) {
-        RetrofitClient.getApiService(getApplication()).createOrder(request).enqueue(new Callback<OrderCreateResponse>() {
+        RetrofitClient.getApiService(getApplication()).createOrder(request).enqueue(new Callback<CreateOrderResponse>() {
             @Override
-            public void onResponse(Call<OrderCreateResponse> call, Response<OrderCreateResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    if (response.body().isSuccess()) {
+            public void onResponse(Call<CreateOrderResponse> call, Response<CreateOrderResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        int newOrderId = response.body().getData().getOrderId().getId();
+                        createdOrderId.setValue(newOrderId);
                         isOrderSuccess.setValue(true);
+                        if ("bank_transfer".equals(request.getPaymentMethod())) {
+                            createPayOsLink(newOrderId);
+                        }
                     } else {
-                        orderError.setValue(response.body().getMessage());
+                        orderError.setValue("Lỗi khi tạo đơn hàng!");
                     }
-                } else {
-                    orderError.setValue("Lỗi khi tạo đơn hàng!");
                 }
-            }
 
             @Override
-            public void onFailure(Call<OrderCreateResponse> call, Throwable t) {
+            public void onFailure(Call<CreateOrderResponse> call, Throwable t) {
                 orderError.setValue("Lỗi kết nối mạng!");
             }
         });
     }
 
-    public void calculateShippingFee(int toDistrictId, String toWardCode) {
-        int totalWeight = 0;
-        List<CartItem> items = checkoutItems.getValue();
-        if (items != null) {
-            for (CartItem item : items) {
-                totalWeight += (item.getQuantity() * 500);  // Giả sử 500g/sản phẩm
-            }
-        }
+    public void calculateShippingFee(int addressId) {
+        ShipmentFeeRequest request = new ShipmentFeeRequest(addressId);
 
-        if (totalWeight == 0)
-        {return;}
-
-        int fromDistrictId = 3695; // ID của kho Thủ đức (dựa theo địa chỉ của của hàng)
-
-        GhnFeeRequest request = new GhnFeeRequest(fromDistrictId, toDistrictId, toWardCode, totalWeight);
-
-        GhnApiClient.getApiService().getShippingFee(GHN_TOKEN, GHN_SHOP_ID, request)
-                .enqueue(new retrofit2.Callback<GhnResponse<GhnFeeData>>() {
+        RetrofitClient.getApiService(getApplication()).calculateShippingFee(request)
+                .enqueue(new Callback<ShipmentFeeResponse>() {
                     @Override
-                    public void onResponse(Call<GhnResponse<GhnFeeData>> call, Response<GhnResponse<GhnFeeData>> response) {
-                        if (response.isSuccessful() && response.body() != null && response.body().getCode() == 200) {
-                            double realFee = response.body().getData().getTotalFee();
+                    public void onResponse(Call<ShipmentFeeResponse> call, Response<ShipmentFeeResponse> response) {
+                        if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                            double realFee = response.body().getData().getShippingFee();
                             shippingFee.setValue(realFee);
 
                             calculateMoney(checkoutItems.getValue());
                         } else {
                             shippingFee.setValue(30000.0);
                             calculateMoney(checkoutItems.getValue());
-                    }
                         }
+                    }
 
                     @Override
-                    public void onFailure(Call<GhnResponse<GhnFeeData>> call, Throwable t) {
+                    public void onFailure(Call<ShipmentFeeResponse> call, Throwable t) {
                         shippingFee.setValue(30000.0);
                         calculateMoney(checkoutItems.getValue());
                     }
@@ -163,6 +155,25 @@ public class CheckoutViewModel extends AndroidViewModel {
             @Override
             public void onFailure(Call<CouponResponse> call, Throwable t) {
 
+            }
+        });
+    }
+
+    public void createPayOsLink(int orderId) {
+        RetrofitClient.getApiService(getApplication()).createPayOsPaymentLink(orderId).enqueue(new Callback<PayOsPaymentResponse>() {
+            @Override
+            public void onResponse(Call<PayOsPaymentResponse> call, Response<PayOsPaymentResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    payosPaymentUrl.setValue(response.body().getData().getPaymentUrl());
+                }
+                 else {
+                    orderError.setValue("Lỗi! Không thể tạo link thanh toán PayOS");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PayOsPaymentResponse> call, Throwable t) {
+                orderError.setValue("Lỗi mạng! Không thể kết nối đến hệ thống thanh toán");
             }
         });
     }

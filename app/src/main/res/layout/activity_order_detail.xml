@@ -223,6 +223,29 @@
                         android:gravity="end"></TextView>
                 </LinearLayout>
 
+                <LinearLayout
+                    android:id="@+id/layoutVoucher"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Voucher giảm giá"
+                        android:textColor="@color/orange_primary" ></TextView>
+                    <TextView
+                        android:id="@+id/tvVoucherDiscount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="-0đ"
+                        android:textColor="@color/orange_primary"
+                        android:gravity="end"></TextView>
+                </LinearLayout>
+
+
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"

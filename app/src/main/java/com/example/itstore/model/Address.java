@@ -23,6 +23,10 @@ public class Address {
     @SerializedName("ward_code")
     private String wardCode;
 
+    @SerializedName("province_id")
+    private int provinceId;
+
+
     @SerializedName("is_default")
     private boolean isDefault;
 
@@ -71,6 +75,7 @@ public class Address {
         return wardCode;
     }
 
+    public int getProvinceId() { return provinceId; }
 
     public Address(int id, int userId, String recipient, String phoneNumber, String province, String district, String ward, String street, boolean isDefault) {
         this.id = id;

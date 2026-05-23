@@ -111,7 +111,10 @@ public class ProductDetailActivity extends AppCompatActivity {
         });
 
         binding.btnBuyNow.setOnClickListener(v -> {
-            if (fullProductData == null || currentVariantId == 0) return;
+            if (fullProductData == null || currentVariantId == 0) {
+                Toast.makeText(this, "Lỗi mạng! Không thể mua", Toast.LENGTH_SHORT).show();
+                return;
+            }
             CartItem buyNowItem = new CartItem(
                     0,
                     0,

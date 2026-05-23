@@ -27,6 +27,11 @@ public class Order implements Serializable {
     @SerializedName("timeline")
     private List<TimelineItem> timelineList;
 
+    @SerializedName("shipping_fee")
+    private long shippingFee;
+
+    @SerializedName("discount_amount")
+    private long discount;
 
     public static class AddressInfo implements Serializable {
         @SerializedName("recipient")
@@ -138,6 +143,13 @@ public class Order implements Serializable {
 
     public List<TimelineItem> getTimelineList() {
         return timelineList;
+    }
+    public long getShippingFee() {
+        return shippingFee;
+    }
+
+    public long getDiscount() {
+        return discount;
     }
 
     public String getStatusVN() {

@@ -15,8 +15,18 @@
         android:theme="@style/Theme.ITStore"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".activity.OrderSuccessActivity"
+            android:name=".activity.VerifyOtpActivity"
             android:exported="false" />
+        <activity
+            android:name=".activity.OrderSuccessActivity"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="itstore" android:host="payment" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activity.WriteReviewActivity"
             android:exported="false" />

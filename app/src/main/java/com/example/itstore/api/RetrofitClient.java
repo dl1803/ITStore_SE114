@@ -35,8 +35,9 @@ import com.example.itstore.model.LoginRequest;
 import com.example.itstore.model.LoginResponse;
 import com.example.itstore.model.LogoutRequest;
 import com.example.itstore.model.LogoutResponse;
-import com.example.itstore.model.OrderCreateResponse;
+import com.example.itstore.model.CreateOrderResponse;
 import com.example.itstore.model.OrderHistoryResponse;
+import com.example.itstore.model.PayOsPaymentResponse;
 import com.example.itstore.model.ProductResponse;
 import com.example.itstore.model.ProfileResponse;
 import com.example.itstore.model.RefreshTokenRequest;
@@ -45,6 +46,8 @@ import com.example.itstore.model.RegisterRequest;
 import com.example.itstore.model.RegisterResponse;
 import com.example.itstore.model.ResetPasswordRequest;
 import com.example.itstore.model.ResetPasswordResponse;
+import com.example.itstore.model.ShipmentFeeRequest;
+import com.example.itstore.model.ShipmentFeeResponse;
 import com.example.itstore.model.SingleAddressResponse;
 import com.example.itstore.model.SingleBrandResponse;
 import com.example.itstore.model.SingleCategoryResponse;
@@ -148,7 +151,7 @@ public class RetrofitClient {
         Call<CartResponse> clearCart();
 
         @POST("api/orders")
-        Call<OrderCreateResponse> createOrder(@Body CreateOrderRequest request);
+        Call<CreateOrderResponse> createOrder(@Body CreateOrderRequest request);
 
         @GET("api/orders")
         Call<OrderHistoryResponse> getOrderHistory();
@@ -205,5 +208,12 @@ public class RetrofitClient {
 
         @GET("api/return-requests/{id}")
         Call<ReturnRequestDetailResponse> getMyReturnRequestDetail(@Path("id") int id);
+
+        @POST("api/payments/orders/{orderId}")
+        Call<PayOsPaymentResponse> createPayOsPaymentLink(@Path("orderId") int orderId);
+
+        @POST("api/orders/shipment-fee")
+        Call<ShipmentFeeResponse> calculateShippingFee(@Body ShipmentFeeRequest request);
+
     }
 }
