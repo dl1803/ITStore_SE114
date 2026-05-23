@@ -182,30 +182,23 @@ public class ProductDetailActivity extends AppCompatActivity {
         binding.XemThem.setOnClickListener(toggleDescriptionListener);
         binding.tvProductContent.setOnClickListener(toggleDescriptionListener);
         setupReview();
+
+        detailViewModel.getProductDetailLiveData().observe(this, product -> {
+            if (product != null) {
+                fullProductData = product;
+                setupDynamicData();
+            }
+        });
+
+        detailViewModel.getToastMessageLiveData().observe(this, message -> {
+            if (message != null) {
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
-
-private void fetchFullProductDetail(String slug) {
-    RetrofitClient.getApiService(this).getProductBySlug(slug)
-            .enqueue(new Callback<SingleProductResponse>() {
-                @Override
-                public void onResponse(Call<SingleProductResponse> call, Response<SingleProductResponse> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        if (response.body().isSuccess()) {
-                            fullProductData = response.body().getData();
-                            setupDynamicData();
-                        } else {
-                            Toast.makeText(ProductDetailActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    } else {
-                        Toast.makeText(ProductDetailActivity.this, "Lỗi server!", Toast.LENGTH_LONG).show();                    }
-                }
-
-                @Override
-                public void onFailure(Call<SingleProductResponse> call, Throwable t) {
-                    Toast.makeText(ProductDetailActivity.this, "Lỗi kết nối mạng!", Toast.LENGTH_LONG).show();
-                }
-            });
-}
+    private void fetchFullProductDetail(String slug) {
+        detailViewModel.fetchProductDetail(slug);
+    }
     private void setupDynamicData() {
         if (fullProductData.getDescription() != null ) {
             binding.tvProductContent.setText(fullProductData.getDescription());
