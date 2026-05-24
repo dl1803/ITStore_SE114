@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.itstore.api.RetrofitClient;
+import com.example.itstore.model.AuthMessageResponse;
 import com.example.itstore.model.ResetPasswordRequest;
 import com.example.itstore.model.ResetPasswordResponse;
 
@@ -81,36 +82,27 @@ public class ResetPasswordViewModel extends AndroidViewModel {
         }
 
         if (token == null || token.isEmpty()) {
-            apiError.setValue("Lỗi Token. Vui lòng mở lại link từ Email!");
+            apiError.setValue("Lỗi phiên người dùng. Vui lòng nhập lại mã từ Email!");
             isValid = false;
         }
 
         if (isValid) {
             isLoading.setValue(true);
-            ResetPasswordRequest request = new ResetPasswordRequest(token, newPass);
-
-            RetrofitClient.getApiService(getApplication()).resetPassword(request).enqueue(new Callback<ResetPasswordResponse>() {
+            ResetPasswordRequest request = new ResetPasswordRequest(newPass);
+            RetrofitClient.getApiService(getApplication()).resetPassword(token, request).enqueue(new Callback<AuthMessageResponse>() {
                 @Override
-                public void onResponse(Call<ResetPasswordResponse> call, Response<ResetPasswordResponse> response) {
+                public void onResponse(Call<AuthMessageResponse> call, Response<AuthMessageResponse> response) {
                     isLoading.setValue(false);
-
                     if (response.isSuccessful() && response.body() != null) {
                         successMessage.setValue(response.body().getMessage());
                     } else {
-                        try {
-                            String errorStr = response.errorBody().string();
-                            JSONObject jsonObject = new JSONObject(errorStr);
-                            apiError.setValue(jsonObject.getString("error"));
-                        } catch (Exception e) {
-                            apiError.setValue("Lỗi xác thực. Link có thể đã hết hạn!");
-                        }
+                        apiError.setValue("Phiên người dùng không hợp lệ hoặc đã hết hạn!");
                     }
                 }
-
                 @Override
-                public void onFailure(Call<ResetPasswordResponse> call, Throwable t) {
+                public void onFailure(Call<AuthMessageResponse> call, Throwable t) {
                     isLoading.setValue(false);
-                    apiError.setValue("Lỗi kết nối Server! Vui lòng thử lại.");
+                    apiError.setValue("Lỗi kết nối mạng! Vui lòng thử lại.");
                 }
             });
         }

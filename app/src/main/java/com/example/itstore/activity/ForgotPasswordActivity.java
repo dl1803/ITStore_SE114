@@ -53,16 +53,22 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         forgotPasswordViewModel.getIsLoading().observe(this, isLoading -> {
             if (isLoading) {
                 binding.btnSendResetLink.setEnabled(false);
-                binding.btnSendResetLink.setText("Đang gửi liên kết...");
+                binding.btnSendResetLink.setText("Đang gửi mã...");
             } else {
                 binding.btnSendResetLink.setEnabled(true);
-                binding.btnSendResetLink.setText("Gửi liên kết khôi phục");
+                binding.btnSendResetLink.setText("Gửi mã khôi phục");
             }
         });
 
         forgotPasswordViewModel.getSuccessMessage().observe(this, message -> {
             if (message != null) {
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+
+                String userEmail = binding.edtEmail.getText().toString().trim();
+
+                Intent intent = new Intent(ForgotPasswordActivity.this, VerifyResetOtpActivity.class);
+                intent.putExtra("USER_EMAIL", userEmail);
+                startActivity(intent);
                 finish();
             }
         });
