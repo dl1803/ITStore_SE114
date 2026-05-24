@@ -64,6 +64,8 @@ import com.example.itstore.model.ReturnRequestDetailResponse;
 import com.example.itstore.model.AddCartItemRequest;
 import com.example.itstore.model.UpdateCartItemRequest;
 import com.example.itstore.model.VerifyOtpRequest;
+import com.example.itstore.model.VerifyResetOtpRequest;
+import com.example.itstore.model.VerifyResetOtpResponse;
 
 public class RetrofitClient {
     private static final String BASE_URL = "http://10.0.2.2:3000/";
@@ -94,11 +96,14 @@ public class RetrofitClient {
         @POST("api/auth/forgot-password")
         Call<ForgotPasswordResponse> forgotPassword(@Body ForgotPasswordRequest request);
 
-        @POST("api/auth/logout")
-        Call<LogoutResponse> logout(@Body LogoutRequest request);
+        @POST("api/auth/verify-reset-password-code")
+        Call<VerifyResetOtpResponse> verifyResetPasswordOtp(@Body VerifyResetOtpRequest request);
 
         @POST("api/auth/reset-password")
-        Call<ResetPasswordResponse> resetPassword(@Body ResetPasswordRequest request);
+        Call<AuthMessageResponse> resetPassword(@Query("token") String token, @Body ResetPasswordRequest request);
+
+        @POST("api/auth/logout")
+        Call<LogoutResponse> logout(@Body LogoutRequest request);
 
         @POST("api/auth/refresh")
         Call<RefreshTokenResponse> refreshToken(@Body RefreshTokenRequest request);

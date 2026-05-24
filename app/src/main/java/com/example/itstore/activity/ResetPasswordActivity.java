@@ -26,7 +26,9 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
         viewModel = new ViewModelProvider(this).get(ResetPasswordViewModel.class);
 
-        handleLink(getIntent());
+        if (getIntent() != null && getIntent().hasExtra("RESET_TOKEN")) {
+            resetToken = getIntent().getStringExtra("RESET_TOKEN");
+        }
 
         setupObservers();
 
@@ -39,54 +41,23 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
         binding.btnBack.setOnClickListener(v -> finish());
     }
-    private void handleLink(Intent intent) {
-        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
-            Uri uri = intent.getData();
-            if (uri != null) {
-                String errorMsg = uri.getQueryParameter("error");
-
-                if (errorMsg != null) {
-                    new AlertDialog.Builder(this)
-                            .setTitle("Thông báo lỗi")
-                            .setMessage(errorMsg)
-                            .setPositiveButton("Đóng", (dialog, which) -> {
-                                Intent loginIntent = new Intent(ResetPasswordActivity.this, LoginActivity.class);
-                                loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(loginIntent);
-                                finish();
-                            })
-                            .setCancelable(false)
-                            .show();
-
-                    return;
-                }
-
-                resetToken = uri.getQueryParameter("token");
-
-                if (resetToken == null || resetToken.isEmpty()) {
-                    new AlertDialog.Builder(this)
-                            .setTitle("Lỗi đường dẫn")
-                            .setMessage("Link không hợp lệ!")
-                            .setPositiveButton("Đóng", (dialog, which) -> {
-                                Intent loginIntent = new Intent(ResetPasswordActivity.this, LoginActivity.class);
-                                loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(loginIntent);
-                                finish();
-                            })
-                            .setCancelable(false)
-                            .show();
-                }
-            }
-        }
-    }
-
     private void setupObservers() {
         viewModel.getPasswordError().observe(this, error -> {
-            binding.tilNewPassword.setError(error);
+            if (error != null) {
+                binding.tilNewPassword.setError(error);
+                binding.tilNewPassword.requestFocus();
+            } else {
+                binding.tilNewPassword.setErrorEnabled(false);
+            }
         });
 
         viewModel.getConfirmPasswordError().observe(this, error -> {
-            binding.tilConfirmPassword.setError(error);
+            if (error != null) {
+                binding.tilConfirmPassword.setError(error);
+                binding.tilConfirmPassword.requestFocus();
+            } else {
+                binding.tilConfirmPassword.setErrorEnabled(false);
+            }
         });
 
         viewModel.getApiError().observe(this, error -> {
@@ -113,6 +84,11 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
         viewModel.getIsLoading().observe(this, isLoading -> {
             binding.btnSubmitReset.setEnabled(!isLoading);
+            if (isLoading) {
+                binding.btnSubmitReset.setText("Đang xử lý...");
+            } else {
+                binding.btnSubmitReset.setText("Cập nhật mật khẩu");
+            }
         });
     }
 }

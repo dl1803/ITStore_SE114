@@ -40,7 +40,7 @@ public class VerifyOtpActivity extends AppCompatActivity {
         setupObservers();
 
         if (isEmailFailed) {
-            binding.tvSubtitle.setText("Server chưa gửi được mail. Vui lòng bấm 'Gửi lại mã'.");
+            binding.tvSubtitle.setText("Hiện chưa gửi được mail. Vui lòng bấm 'Gửi lại mã'.");
             isTimerRunning = false;
             binding.tvResend.setEnabled(true);
             binding.tvResend.setText("Gửi lại mã");
@@ -92,7 +92,11 @@ public class VerifyOtpActivity extends AppCompatActivity {
         });
 
         viewModel.getVerifyError().observe(this, error -> {
-            if (error != null) { Toast.makeText(this, error, Toast.LENGTH_SHORT).show(); }
+            if (error != null) {
+                Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+                binding.pinViewOtp.setText("");
+                binding.pinViewOtp.requestFocus();
+            }
         });
 
         viewModel.getResendSuccess().observe(this, message -> {
