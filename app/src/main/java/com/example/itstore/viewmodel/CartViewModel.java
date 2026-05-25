@@ -1,6 +1,7 @@
 package com.example.itstore.viewmodel;
 
 import android.app.Application;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,7 @@ import com.example.itstore.model.CartResponse;
 import com.example.itstore.model.Coupon;
 import com.example.itstore.model.CouponResponse;
 import com.example.itstore.model.UpdateCartItemRequest;
+import com.example.itstore.repository.CartRepository;
 import com.example.itstore.utils.CartManager;
 
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class CartViewModel extends AndroidViewModel {
+    private final CartRepository repository;
     private MutableLiveData<List<CartItem>> cartItemsLiveData = new MutableLiveData<>(new ArrayList<>());
     private MutableLiveData<Double> totalPriceLiveData = new MutableLiveData<>(0.0);
     private MutableLiveData<Boolean> isAllSelectedLiveData = new MutableLiveData<>(false);
@@ -34,6 +37,7 @@ public class CartViewModel extends AndroidViewModel {
 
     public CartViewModel(@NonNull Application application) {
         super(application);
+        this.repository = CartRepository.getInstance(application);
     }
 
     public MutableLiveData<Boolean> getIsAllSelectedLiveData() { return isAllSelectedLiveData; }
@@ -57,36 +61,32 @@ public class CartViewModel extends AndroidViewModel {
 
     public void increaseQuantity(CartItem item, int position) {
         int newQuantity = item.getQuantity() + 1;
-        RetrofitClient.getApiService(getApplication())
-                .updateCartItem(item.getVariantId(), new UpdateCartItemRequest(newQuantity))
-                .enqueue(new Callback<CartResponse>() {
-                    @Override
-                    public void onResponse(Call<CartResponse> call, Response<CartResponse> response) {
-                        if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                            List<CartItem> currentList = cartItemsLiveData.getValue();
-                            if (currentList != null) {
-                                item.setQuantity(newQuantity);
-                                cartItemsLiveData.setValue(currentList);
-                                calculateTotal();
-                            }
-                        } else {
-                            Toast.makeText(getApplication(), "Không thể cập nhật số lượng", Toast.LENGTH_SHORT).show();
-                        }
+        repository.updateCartItem(item.getVariantId(), newQuantity, new Callback<CartResponse>() {
+            @Override
+            public void onResponse(Call<CartResponse> call, Response<CartResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    List<CartItem> currentList = cartItemsLiveData.getValue();
+                    if (currentList != null) {
+                        item.setQuantity(newQuantity);
+                        cartItemsLiveData.setValue(currentList);
+                        calculateTotal();
                     }
+                } else {
+                    Toast.makeText(getApplication(), "Không thể cập nhật số lượng", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-                    @Override
-                    public void onFailure(Call<CartResponse> call, Throwable t) {
-                        Toast.makeText(getApplication(), "Lỗi mạng", Toast.LENGTH_SHORT).show();
-                    }
-                });
+            @Override
+            public void onFailure(Call<CartResponse> call, Throwable t) {
+                Toast.makeText(getApplication(), "Lỗi mạng", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void decreaseQuantity(CartItem item, int position) {
         if (item.getQuantity() > 1) {
             int newQuantity = item.getQuantity() - 1;
-            RetrofitClient.getApiService(getApplication())
-                    .updateCartItem(item.getVariantId(), new UpdateCartItemRequest(newQuantity))
-                    .enqueue(new Callback<CartResponse>() {
+            repository.updateCartItem(item.getVariantId(), newQuantity, new Callback<CartResponse>() {
                         @Override
                         public void onResponse(Call<CartResponse> call, Response<CartResponse> response) {
                             if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
@@ -107,9 +107,7 @@ public class CartViewModel extends AndroidViewModel {
                         }
                     });
         } else {
-            RetrofitClient.getApiService(getApplication())
-                    .removeCartItem(item.getVariantId())
-                    .enqueue(new Callback<CartResponse>() {
+            repository.removeCartItem(item.getVariantId(), new Callback<CartResponse>() {
                         @Override
                         public void onResponse(Call<CartResponse> call, Response<CartResponse> response) {
                             if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
@@ -136,9 +134,7 @@ public class CartViewModel extends AndroidViewModel {
         List<CartItem> currentList = cartItemsLiveData.getValue();
         if (currentList == null || position >= currentList.size()) return;
         CartItem item = currentList.get(position);
-        RetrofitClient.getApiService(getApplication())
-                .removeCartItem(item.getVariantId())
-                .enqueue(new Callback<CartResponse>() {
+        repository.removeCartItem(item.getVariantId(), new Callback<CartResponse>() {
                     @Override
                     public void onResponse(Call<CartResponse> call, Response<CartResponse> response) {
                         if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
@@ -199,7 +195,7 @@ public class CartViewModel extends AndroidViewModel {
     }
 
     public void fetchActiveCoupons() {
-        RetrofitClient.getApiService(getApplication()).getCoupons().enqueue(new Callback<CouponResponse>() {
+        repository.getCoupons(new Callback<CouponResponse>() {
             @Override
             public void onResponse(Call<CouponResponse> call, Response<CouponResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -217,7 +213,7 @@ public class CartViewModel extends AndroidViewModel {
     }
 
     public void fetchCart() {
-        RetrofitClient.getApiService(getApplication()).getCart().enqueue(new Callback<CartResponse>() {
+        repository.getCart(new Callback<CartResponse>() {
             @Override
             public void onResponse(Call<CartResponse> call, Response<CartResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {

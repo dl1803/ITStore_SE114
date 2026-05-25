@@ -213,7 +213,13 @@ public class CartFragment extends Fragment {
             binding.tvCartDiscount.setVisibility(View.GONE);
             return;
         }
-
+        if (appliedCoupon != null) {
+            if ("percent".equals(appliedCoupon.getDiscountType())) {
+                selectedVoucherAmount = rawTotal * (appliedCoupon.getDiscountValue() / 100.0);
+            } else {
+                selectedVoucherAmount = appliedCoupon.getDiscountValue();
+            }
+        }
         double finalTotal = rawTotal - selectedVoucherAmount;
         if (finalTotal < 0) finalTotal = 0;
 
