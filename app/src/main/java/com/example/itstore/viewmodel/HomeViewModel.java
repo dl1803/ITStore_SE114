@@ -1,8 +1,12 @@
 package com.example.itstore.viewmodel;
 
+import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import java.util.ArrayList;
@@ -18,25 +22,29 @@ import com.example.itstore.model.Product;
 import com.example.itstore.model.ProductImage;
 import com.example.itstore.model.ProductResponse;
 import com.example.itstore.model.ProductVariant;
+import com.example.itstore.repository.ProductRepository;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class HomeViewModel extends ViewModel {
+public class HomeViewModel extends AndroidViewModel {
+    private final ProductRepository repository;
     private final MutableLiveData<List<Category>> categoryListLiveData = new MutableLiveData<>();
     private final MutableLiveData<List<Product>> productListLiveData = new MutableLiveData<>();
 
     private List<Product> allProducts = new ArrayList<>();
-    public HomeViewModel() {
+    public HomeViewModel(@NonNull Application application) {
+        super(application);
+        this.repository = ProductRepository.getInstance(application);
         allProducts = MockDataRepository.getInstance().getAllProducts();
         categoryListLiveData.setValue(MockDataRepository.getInstance().getAllCategories());
         productListLiveData.setValue(new ArrayList<>(allProducts));
     }
-    public MutableLiveData<List<Category>> getCategoryListLiveData() {
+    public LiveData<List<Category>> getCategoryListLiveData() {
         return categoryListLiveData;
     }
-    public MutableLiveData<List<Product>> getProductListLiveData() {
+    public LiveData<List<Product>> getProductListLiveData() {
         return productListLiveData;
     }
 
@@ -72,10 +80,8 @@ public class HomeViewModel extends ViewModel {
         }
         productListLiveData.setValue(filteredList);
     }
-    public void fetchCategories(Context context) {
-        RetrofitClient.ApiService apiService = RetrofitClient.getApiService(context);
-
-        apiService.getCategories().enqueue(new Callback<CategoryResponse>() {
+    public void fetchCategories() {
+        repository.getCategories(new Callback<CategoryResponse>() {
             @Override
             public void onResponse(Call<CategoryResponse> call, Response<CategoryResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
@@ -92,20 +98,16 @@ public class HomeViewModel extends ViewModel {
             }
         });
     }
-    public void fetchSuggestedProducts(Context context) {
-        RetrofitClient.getApiService(context).getProducts(
-                1, 20, null, null, null, null, null, "newest"
-        ).enqueue(new Callback<ProductResponse>() {
+    public void fetchSuggestedProducts() {
+        repository.getProducts(1, 20, null, null, null, null, null, "newest", new Callback<ProductResponse>() {
             @Override
             public void onResponse(Call<ProductResponse> call, Response<ProductResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     List<Product> apiProducts = response.body().getData();
                     productListLiveData.setValue(apiProducts);
-
                     allProducts = apiProducts;
                 }
             }
-
             @Override
             public void onFailure(Call<ProductResponse> call, Throwable t) {
                 Log.e("API_ERR", "Lỗi lấy sản phẩm Gợi ý: " + t.getMessage());
