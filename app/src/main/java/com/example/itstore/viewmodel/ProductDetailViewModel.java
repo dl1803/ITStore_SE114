@@ -54,9 +54,7 @@ public class ProductDetailViewModel extends AndroidViewModel {
         });
     }
     public void addToCart(Product product, int variantId, String variantName, double finalPrice) {
-        RetrofitClient.getApiService(getApplication())
-                .addCartItem(new AddCartItemRequest(variantId, 1))
-                .enqueue(new retrofit2.Callback<CartResponse>() {
+        repository.addCartItem(variantId, 1, new Callback<CartResponse>() {
                     @Override
                     public void onResponse(retrofit2.Call<CartResponse> call, retrofit2.Response<CartResponse> response) {
                         if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
