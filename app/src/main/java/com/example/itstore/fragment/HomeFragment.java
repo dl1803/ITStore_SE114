@@ -209,9 +209,6 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        // lấy data từ api
-        homeViewModel.fetchCategories(requireContext());
-
         binding.tvSeeAll.setOnClickListener(v -> {
             androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_search);
         });
@@ -219,8 +216,8 @@ public class HomeFragment extends Fragment {
             androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_search);
         });
         // goi ham lay san pham tu api
-        homeViewModel.fetchCategories(requireContext());
-        homeViewModel.fetchSuggestedProducts(requireContext());
+        homeViewModel.fetchCategories();
+        homeViewModel.fetchSuggestedProducts();
         return view;
 
     }
