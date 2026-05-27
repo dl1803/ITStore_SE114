@@ -20,6 +20,7 @@ import com.example.itstore.model.CreateOrderResponse;
 import com.example.itstore.model.PayOsPaymentResponse;
 import com.example.itstore.model.ShipmentFeeRequest;
 import com.example.itstore.model.ShipmentFeeResponse;
+import com.example.itstore.repository.OrderRepository;
 
 import java.util.List;
 
@@ -28,10 +29,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class CheckoutViewModel extends AndroidViewModel {
+    private final OrderRepository repository;
 
     private final String GHN_TOKEN = "5369cdb2-3fd4-11f1-b84f-e215adfdd13e";
     private final int GHN_SHOP_ID = 6403105;
-
     private final MutableLiveData<List<CartItem>> checkoutItems = new MutableLiveData<>();
     private final MutableLiveData<Double> subtotalPrice = new MutableLiveData<>(0.0);
     private final MutableLiveData<Double> shippingFee = new MutableLiveData<>(0.0);
@@ -49,6 +50,7 @@ public class CheckoutViewModel extends AndroidViewModel {
 
     public CheckoutViewModel(@NonNull Application application) {
         super(application);
+        repository = OrderRepository.getInstance(application);
     }
 
     public LiveData<List<CartItem>> getCheckoutItems() { return checkoutItems; }
@@ -95,7 +97,7 @@ public class CheckoutViewModel extends AndroidViewModel {
     }
 
     public void placeOrder(CreateOrderRequest request) {
-        RetrofitClient.getApiService(getApplication()).createOrder(request).enqueue(new Callback<CreateOrderResponse>() {
+        repository.createOrder(request, new Callback<CreateOrderResponse>() {
             @Override
             public void onResponse(Call<CreateOrderResponse> call, Response<CreateOrderResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
@@ -120,8 +122,7 @@ public class CheckoutViewModel extends AndroidViewModel {
     public void calculateShippingFee(int addressId) {
         ShipmentFeeRequest request = new ShipmentFeeRequest(addressId);
 
-        RetrofitClient.getApiService(getApplication()).calculateShippingFee(request)
-                .enqueue(new Callback<ShipmentFeeResponse>() {
+        repository.calculateShippingFee(request, new Callback<ShipmentFeeResponse>() {
                     @Override
                     public void onResponse(Call<ShipmentFeeResponse> call, Response<ShipmentFeeResponse> response) {
                         if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
@@ -143,8 +144,7 @@ public class CheckoutViewModel extends AndroidViewModel {
                 });
     }
     public void fetchActiveCoupons() {
-        RetrofitClient.getApiService(getApplication()).getCoupons().enqueue(new Callback<CouponResponse>() {
-
+        repository.getCoupons(new Callback<CouponResponse>() {
             @Override
             public void onResponse(Call<CouponResponse> call, Response<CouponResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -160,7 +160,7 @@ public class CheckoutViewModel extends AndroidViewModel {
     }
 
     public void createPayOsLink(int orderId) {
-        RetrofitClient.getApiService(getApplication()).createPayOsPaymentLink(orderId).enqueue(new Callback<PayOsPaymentResponse>() {
+        repository.createPayOsPaymentLink(orderId, new Callback<PayOsPaymentResponse>() {
             @Override
             public void onResponse(Call<PayOsPaymentResponse> call, Response<PayOsPaymentResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {

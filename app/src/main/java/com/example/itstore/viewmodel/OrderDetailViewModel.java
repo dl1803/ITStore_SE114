@@ -11,13 +11,14 @@ import com.example.itstore.api.RetrofitClient;
 import com.example.itstore.model.CancelOrderRequest;
 import com.example.itstore.model.Order;
 import com.example.itstore.model.SingleOrderResponse;
+import com.example.itstore.repository.OrderRepository;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class OrderDetailViewModel extends AndroidViewModel {
-
+    private final OrderRepository repository;
     private final MutableLiveData<Order> orderDetail = new MutableLiveData<>();
     private final MutableLiveData<String> error = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
@@ -29,6 +30,7 @@ public class OrderDetailViewModel extends AndroidViewModel {
 
     public OrderDetailViewModel(@NonNull Application application) {
         super(application);
+        repository = OrderRepository.getInstance(application);
     }
 
     public LiveData<Order> getOrderDetail() { return orderDetail; }
@@ -38,7 +40,7 @@ public class OrderDetailViewModel extends AndroidViewModel {
     public LiveData<String> getCancelError() { return cancelError; }
     public void fetchOrderDetail(int orderId) {
         isLoading.setValue(true);
-        RetrofitClient.getApiService(getApplication()).getOrderById(orderId).enqueue(new Callback<SingleOrderResponse>() {
+        repository.getOrderById(orderId, new Callback<SingleOrderResponse>() {
             @Override
             public void onResponse(Call<SingleOrderResponse> call, Response<SingleOrderResponse> response) {
                 isLoading.setValue(false);
@@ -60,11 +62,10 @@ public class OrderDetailViewModel extends AndroidViewModel {
     public void cancelOrder(int orderId, String reason) {
         isLoading.setValue(true);
         CancelOrderRequest request = new CancelOrderRequest(reason);
-        RetrofitClient.getApiService(getApplication()).cancelOrder(orderId, request).enqueue(new Callback<SingleOrderResponse>() {
-
+        repository.cancelOrder(orderId, request, new Callback<SingleOrderResponse>() {
             @Override
             public void onResponse(Call<SingleOrderResponse> call, Response<SingleOrderResponse> response) {
-                isLoading.setValue(true);
+                isLoading.setValue(false);
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     isCancelSuccess.setValue(true);
                 } else {
@@ -81,7 +82,7 @@ public class OrderDetailViewModel extends AndroidViewModel {
     }
 
     public void confirmReceived(int orderId) {
-        RetrofitClient.getApiService(getApplication()).confirmReceived(orderId).enqueue(new Callback<SingleOrderResponse>() {
+        repository.confirmReceived(orderId, new Callback<SingleOrderResponse>() {
             @Override
             public void onResponse(Call<SingleOrderResponse> call, Response<SingleOrderResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {

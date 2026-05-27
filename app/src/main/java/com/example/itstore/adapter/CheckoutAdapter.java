@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.itstore.R;
 import com.example.itstore.model.CartItem;
 
@@ -51,7 +52,11 @@ public class CheckoutAdapter extends RecyclerView.Adapter<CheckoutAdapter.Checko
             holder.tvOldPrice.setVisibility(View.GONE);
         }
 
-        holder.imgProduct.setImageResource(R.drawable.ram1);
+        Glide.with(holder.itemView.getContext())
+                .load(item.getProduct().getImageUrl())
+                .placeholder(R.drawable.ic_search)
+                .error(R.drawable.ic_launcher_background)
+                .into(holder.imgProduct);
     }
 
     @Override

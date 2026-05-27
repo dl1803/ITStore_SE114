@@ -8,10 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
+import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.itstore.R;
 import com.example.itstore.activity.OrderDetailActivity;
 import com.example.itstore.activity.WriteReviewActivity;
@@ -76,6 +77,11 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
         DecimalFormat formatter = new DecimalFormat("###,###,###");
         holder.tvTotalPrice.setText("Thành tiền: " + formatter.format(order.getTotalPrice() + 30000) + "đ");
+        Glide.with(holder.itemView.getContext())
+                .load(order.getImageUrl())
+                .placeholder(R.drawable.ic_search)
+                .error(R.drawable.ic_search)
+                .into(holder.imgProductOrder);
 
         if (statusVN.equalsIgnoreCase("Đã giao")) {
             // Kiểm tra trạng thái đơn hàng trong bộ nhớ SharedPreferences đã xác nhận hay chưa
@@ -120,6 +126,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
     public static class OrderViewHolder extends RecyclerView.ViewHolder {
         TextView tvOrderId, tvOrderStatus, tvProductName, tvProductType;
         TextView tvQuantity, tvTotalItems, tvTotalPrice, btnOrderDetail, btnReviewOrder;
+        ImageView imgProductOrder;
 
         public OrderViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -132,6 +139,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             tvTotalPrice = itemView.findViewById(R.id.tvTotalPriceOrder);
             btnOrderDetail = itemView.findViewById(R.id.btnOrderDetail);
             btnReviewOrder = itemView.findViewById(R.id.btnReviewOrder);
+            imgProductOrder = itemView.findViewById(R.id.imgProductOrder);
         }
     }
 }
