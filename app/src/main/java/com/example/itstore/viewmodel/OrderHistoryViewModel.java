@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.itstore.api.RetrofitClient;
 import com.example.itstore.model.Order;
 import com.example.itstore.model.OrderHistoryResponse;
+import com.example.itstore.repository.OrderRepository;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class OrderHistoryViewModel extends AndroidViewModel {
-
+    private final OrderRepository repository;
     private final MutableLiveData<List<Order>> orderList = new MutableLiveData<>();
 
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
@@ -28,6 +29,7 @@ public class OrderHistoryViewModel extends AndroidViewModel {
 
     public OrderHistoryViewModel(@NonNull Application application) {
         super(application);
+        repository = OrderRepository.getInstance(application);
     }
 
     public LiveData<List<Order>> getOrderList() { return orderList; }
@@ -36,7 +38,7 @@ public class OrderHistoryViewModel extends AndroidViewModel {
 
     public void fetchOrderHistory() {
         isLoading.setValue(true);
-        RetrofitClient.getApiService(getApplication()).getOrderHistory().enqueue(new Callback<OrderHistoryResponse>() {
+        repository.getOrderHistory(new Callback<OrderHistoryResponse>() {
             @Override
             public void onResponse(Call<OrderHistoryResponse> call, Response<OrderHistoryResponse> response) {
                 isLoading.setValue(false);
