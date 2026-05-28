@@ -15,6 +15,7 @@ import com.example.itstore.model.GoogleLoginRequest;
 import com.example.itstore.model.LoginRequest;
 import com.example.itstore.model.LoginResponse;
 import com.example.itstore.model.ResendOtpRequest;
+import com.example.itstore.repository.AuthRepository;
 import com.example.itstore.utils.SharedPrefsManager;
 
 import retrofit2.Call;
@@ -23,6 +24,7 @@ import retrofit2.Response;
 
 
 public class LoginViewModel extends AndroidViewModel {
+    private final AuthRepository repository;
     private MutableLiveData<String> emailError = new MutableLiveData<>();
     private MutableLiveData<String> passwordError = new MutableLiveData<>();
     private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
@@ -45,6 +47,7 @@ public class LoginViewModel extends AndroidViewModel {
 
     public LoginViewModel(Application application){
         super(application);
+        repository = AuthRepository.getInstance(application);
     }
     public void login(String email, String passwd) {
         boolean isValid = true;
@@ -90,7 +93,7 @@ public class LoginViewModel extends AndroidViewModel {
 
                 LoginRequest request = new LoginRequest(email, passwd);
 
-                RetrofitClient.getApiService(getApplication()).login(request).enqueue(new Callback<LoginResponse>() {
+                repository.login(request, new Callback<LoginResponse>() {
                     @Override
                     public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                         try {
@@ -104,7 +107,7 @@ public class LoginViewModel extends AndroidViewModel {
 
                             if (response.code() == 401 && serverError.contains("chưa được xác thực")) {
                                 ResendOtpRequest resendRequest = new ResendOtpRequest(email);
-                                RetrofitClient.getApiService(getApplication()).resendVerifyEmailOtp(resendRequest).enqueue(new Callback<AuthMessageResponse>() {
+                                repository.resendVerifyEmailOtp(resendRequest, new Callback<AuthMessageResponse>() {
                                     @Override
                                     public void onResponse(Call<AuthMessageResponse> callResend, Response<AuthMessageResponse> responseResend) {
                                         isLoading.setValue(false);
@@ -146,7 +149,7 @@ public class LoginViewModel extends AndroidViewModel {
 
         GoogleLoginRequest request = new GoogleLoginRequest(id_token);
 
-        RetrofitClient.getApiService(getApplication()).googleLogin(request).enqueue(new Callback<LoginResponse>() {
+        repository.googleLogin(request, new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 isLoading.setValue(false);

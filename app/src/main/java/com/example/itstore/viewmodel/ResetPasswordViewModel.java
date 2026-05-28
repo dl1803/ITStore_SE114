@@ -11,6 +11,7 @@ import com.example.itstore.api.RetrofitClient;
 import com.example.itstore.model.AuthMessageResponse;
 import com.example.itstore.model.ResetPasswordRequest;
 import com.example.itstore.model.ResetPasswordResponse;
+import com.example.itstore.repository.AuthRepository;
 
 import org.json.JSONObject;
 
@@ -19,6 +20,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ResetPasswordViewModel extends AndroidViewModel {
+    private final AuthRepository repository;
     private MutableLiveData<String> passwordError = new MutableLiveData<>();
     private MutableLiveData<String> confirmPasswordError = new MutableLiveData<>();
     private MutableLiveData<String> apiError = new MutableLiveData<>();
@@ -44,6 +46,7 @@ public class ResetPasswordViewModel extends AndroidViewModel {
 
     public ResetPasswordViewModel(@NonNull Application application) {
         super(application);
+        repository = AuthRepository.getInstance(application);
     }
 
     public void resetPassword(String token, String newPass, String confirmPass){
@@ -89,7 +92,7 @@ public class ResetPasswordViewModel extends AndroidViewModel {
         if (isValid) {
             isLoading.setValue(true);
             ResetPasswordRequest request = new ResetPasswordRequest(newPass);
-            RetrofitClient.getApiService(getApplication()).resetPassword(token, request).enqueue(new Callback<AuthMessageResponse>() {
+            repository.resetPassword(token, request, new Callback<AuthMessageResponse>() {
                 @Override
                 public void onResponse(Call<AuthMessageResponse> call, Response<AuthMessageResponse> response) {
                     isLoading.setValue(false);

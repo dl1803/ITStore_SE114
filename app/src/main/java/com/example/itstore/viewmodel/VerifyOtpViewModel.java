@@ -11,6 +11,7 @@ import com.example.itstore.api.RetrofitClient;
 import com.example.itstore.model.AuthMessageResponse;
 import com.example.itstore.model.ResendOtpRequest;
 import com.example.itstore.model.VerifyOtpRequest;
+import com.example.itstore.repository.AuthRepository;
 
 import org.json.JSONObject;
 
@@ -19,6 +20,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class VerifyOtpViewModel extends AndroidViewModel {
+    private final AuthRepository repository;
     private final MutableLiveData<Boolean> isResending = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isResendSuccess = new MutableLiveData<>();
 
@@ -38,14 +40,14 @@ public class VerifyOtpViewModel extends AndroidViewModel {
     public LiveData<Boolean> getIsResendSuccess() { return isResendSuccess; }
     public VerifyOtpViewModel(@NonNull Application application) {
         super(application);
+        repository = AuthRepository.getInstance(application);
     }
-
 
     public void verifyOtp(String email, String code) {
         isVerifying.setValue(true);
         VerifyOtpRequest request = new VerifyOtpRequest(email, code);
 
-        RetrofitClient.getApiService(getApplication()).verifyEmailOtp(request).enqueue(new Callback<AuthMessageResponse>() {
+        repository.verifyEmailOtp(request, new Callback<AuthMessageResponse>() {
             @Override
             public void onResponse(Call<AuthMessageResponse> call, Response<AuthMessageResponse> response) {
                 isVerifying.setValue(false);
@@ -71,7 +73,7 @@ public class VerifyOtpViewModel extends AndroidViewModel {
         isResending.setValue(true);
         ResendOtpRequest request = new ResendOtpRequest(email);
 
-        RetrofitClient.getApiService(getApplication()).resendVerifyEmailOtp(request).enqueue(new Callback<AuthMessageResponse>() {
+        repository.resendVerifyEmailOtp(request, new Callback<AuthMessageResponse>() {
             @Override
             public void onResponse(Call<AuthMessageResponse> call, Response<AuthMessageResponse> response) {
                 isResending.setValue(false);

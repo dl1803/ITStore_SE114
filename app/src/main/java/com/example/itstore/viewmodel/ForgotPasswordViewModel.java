@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel;
 import com.example.itstore.api.RetrofitClient;
 import com.example.itstore.model.ForgotPasswordRequest;
 import com.example.itstore.model.ForgotPasswordResponse;
+import com.example.itstore.repository.AuthRepository;
 
 import org.json.JSONObject;
 
@@ -20,6 +21,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ForgotPasswordViewModel extends AndroidViewModel {
+    private final AuthRepository repository;
     private final MutableLiveData<String> emailError = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     private final MutableLiveData<String> successMessage = new MutableLiveData<>();
@@ -35,6 +37,7 @@ public class ForgotPasswordViewModel extends AndroidViewModel {
 
     public ForgotPasswordViewModel(Application application) {
         super(application);
+        repository = AuthRepository.getInstance(application);
     }
 
     public void sendResetLink(String email) {
@@ -55,7 +58,7 @@ public class ForgotPasswordViewModel extends AndroidViewModel {
         if (isValid) {
             isLoading.setValue(true);
             ForgotPasswordRequest request = new ForgotPasswordRequest(email);
-            RetrofitClient.getApiService(getApplication()).forgotPassword(request).enqueue(new Callback<ForgotPasswordResponse>() {
+            repository.forgotPassword(request, new Callback<ForgotPasswordResponse>() {
                 @Override
                 public void onResponse(Call<ForgotPasswordResponse> call, Response<ForgotPasswordResponse> response) {
                     isLoading.setValue(false);
