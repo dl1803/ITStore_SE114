@@ -15,6 +15,7 @@ import com.example.itstore.model.AuthMessageResponse;
 import com.example.itstore.model.RegisterRequest;
 import com.example.itstore.model.RegisterResponse;
 import com.example.itstore.model.ResendOtpRequest;
+import com.example.itstore.repository.AuthRepository;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -22,6 +23,7 @@ import retrofit2.Response;
 
 
 public class RegisterViewModel extends AndroidViewModel {
+    private final AuthRepository repository;
     private MutableLiveData <String> fullNameError = new MutableLiveData<>();
     private MutableLiveData <String> emailError = new MutableLiveData<>();
     private MutableLiveData <String> phoneError = new MutableLiveData<>();
@@ -67,6 +69,7 @@ public class RegisterViewModel extends AndroidViewModel {
 
     public RegisterViewModel (Application application){
         super(application);
+        repository = AuthRepository.getInstance(application);
     }
 
     public void register (String fullName, String email, String phone, String passwd, String confirmPasswd){
@@ -140,7 +143,7 @@ public class RegisterViewModel extends AndroidViewModel {
 
             RegisterRequest request = new RegisterRequest(fullName, email, phone, passwd, null);
 
-            RetrofitClient.getApiService(getApplication()).register(request).enqueue(new Callback<RegisterResponse>() {
+            repository.register(request, new Callback<RegisterResponse>() {
                 @Override
                 public void onResponse(Call<RegisterResponse> call, Response<RegisterResponse> response) {
                     String message = "";
@@ -161,7 +164,7 @@ public class RegisterViewModel extends AndroidViewModel {
                     if (message != null && message.contains("Đăng ký thành công")) {
                         if (message.contains("thất bại")) {
                             ResendOtpRequest resendRequest = new ResendOtpRequest(email);
-                            RetrofitClient.getApiService(getApplication()).resendVerifyEmailOtp(resendRequest).enqueue(new Callback<AuthMessageResponse>() {
+                            repository.resendVerifyEmailOtp(resendRequest, new Callback<AuthMessageResponse>() {
                                 @Override
                                 public void onResponse(Call<AuthMessageResponse> callResend, Response<AuthMessageResponse> responseResend) {
                                     isLoading.setValue(false);

@@ -12,6 +12,7 @@ import com.example.itstore.model.ForgotPasswordRequest;
 import com.example.itstore.model.ForgotPasswordResponse;
 import com.example.itstore.model.VerifyResetOtpRequest;
 import com.example.itstore.model.VerifyResetOtpResponse;
+import com.example.itstore.repository.AuthRepository;
 
 import org.json.JSONObject;
 
@@ -20,6 +21,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class VerifyResetOtpViewModel extends AndroidViewModel {
+    private final AuthRepository repository;
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
     private final MutableLiveData<String> apiError = new MutableLiveData<>();
     private final MutableLiveData<String> tokenSuccessData = new MutableLiveData<>();
@@ -29,6 +31,7 @@ public class VerifyResetOtpViewModel extends AndroidViewModel {
     private final MutableLiveData<String> resendError = new MutableLiveData<>();
     public VerifyResetOtpViewModel(@NonNull Application application) {
         super(application);
+        repository = AuthRepository.getInstance(application);
     }
 
     public LiveData<Boolean> getIsLoading() { return isLoading; }
@@ -43,7 +46,7 @@ public class VerifyResetOtpViewModel extends AndroidViewModel {
         isLoading.setValue(true);
         VerifyResetOtpRequest request = new VerifyResetOtpRequest(email, code);
 
-        RetrofitClient.getApiService(getApplication()).verifyResetPasswordOtp(request).enqueue(new Callback<VerifyResetOtpResponse>() {
+        repository.verifyResetPasswordOtp(request, new Callback<VerifyResetOtpResponse>() {
             @Override
             public void onResponse(Call<VerifyResetOtpResponse> call, Response<VerifyResetOtpResponse> response) {
                 isLoading.setValue(false);
@@ -69,7 +72,7 @@ public class VerifyResetOtpViewModel extends AndroidViewModel {
         isResending.setValue(true);
         ForgotPasswordRequest request = new ForgotPasswordRequest(email);
 
-        RetrofitClient.getApiService(getApplication()).forgotPassword(request).enqueue(new Callback<ForgotPasswordResponse>() {
+        repository.forgotPassword(request, new Callback<ForgotPasswordResponse>() {
             @Override
             public void onResponse(Call<ForgotPasswordResponse> call, Response<ForgotPasswordResponse> response) {
                 isResending.setValue(false);
