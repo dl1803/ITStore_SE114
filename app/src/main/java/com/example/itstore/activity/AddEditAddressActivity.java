@@ -38,8 +38,6 @@ public class AddEditAddressActivity extends AppCompatActivity {
     private boolean isEditMode = false;
     private int curAddressId = -1;
 
-    private final String GHN_TOKEN = "5369cdb2-3fd4-11f1-b84f-e215adfdd13e";
-
     private List<GhnProvince> provinceList = new ArrayList<>();
     private List<GhnDistrict> districtList = new ArrayList<>();
     private List<GhnWard> wardList = new ArrayList<>();
@@ -58,7 +56,6 @@ public class AddEditAddressActivity extends AppCompatActivity {
         binding.btnBack.setOnClickListener(v -> finish());
 
         addEditAddressViewModel = new ViewModelProvider(this).get(AddEditAddressViewModel.class);
-
         addEditAddressViewModel.getMessage().observe(this, message -> {
             if (message != null) {
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
@@ -86,10 +83,20 @@ public class AddEditAddressActivity extends AppCompatActivity {
                 finish();
             }
         });
+        addEditAddressViewModel.getProvinceList().observe(this, provinces -> {
+            if (provinces != null) this.provinceList = provinces;
+        });
 
+        addEditAddressViewModel.getDistrictList().observe(this, districts -> {
+            if (districts != null) this.districtList = districts;
+        });
+
+        addEditAddressViewModel.getWardList().observe(this, wards -> {
+            if (wards != null) this.wardList = wards;
+        });
 
         setupUI();
-        fetchProvinces();
+        addEditAddressViewModel.fetchProvinces();
 
         handleDropdownClick();
 
@@ -188,7 +195,7 @@ public class AddEditAddressActivity extends AppCompatActivity {
                         wardList.clear();
 
                         selectedProvinceId = selected.getProvinceID();
-                        fetchDistricts(selectedProvinceId);
+                        addEditAddressViewModel.fetchDistricts(selectedProvinceId);
                     }).show();
         });
 
@@ -210,7 +217,7 @@ public class AddEditAddressActivity extends AppCompatActivity {
                         wardList.clear();
 
                         selectedDistrictId = selected.getDistrictID();
-                        fetchWards(selectedDistrictId);
+                        addEditAddressViewModel.fetchWards(selectedDistrictId);
                     }).show();
         });
 
@@ -266,47 +273,4 @@ public class AddEditAddressActivity extends AppCompatActivity {
         return isValid;
     }
 
-    private void fetchProvinces() {
-        GhnApiClient.getApiService().getProvinces(GHN_TOKEN).enqueue(new retrofit2.Callback<GhnResponse<List<GhnProvince>>>() {
-            @Override
-            public void onResponse(Call<GhnResponse<List<GhnProvince>>> call, retrofit2.Response<GhnResponse<List<GhnProvince>>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    provinceList = response.body().getData();
-
-                    // Collator là công cụ so sánh chuỗi theo ngôn ngữ xác định
-                    Collator collator = Collator.getInstance(new Locale("vi", "VN"));
-                    Collections.sort(provinceList, (p1, p2) -> collator.compare(p1.getProvinceName(), p2.getProvinceName()));
-                }
-            }
-            @Override public void onFailure(Call<GhnResponse<List<GhnProvince>>> call, Throwable t) {}
-        });
-    }
-
-    private void fetchDistricts(int provinceId) {
-        GhnApiClient.getApiService().getDistricts(GHN_TOKEN, provinceId).enqueue(new retrofit2.Callback<GhnResponse<List<GhnDistrict>>>() {
-            @Override
-            public void onResponse(Call<GhnResponse<List<GhnDistrict>>> call, retrofit2.Response<GhnResponse<List<GhnDistrict>>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    districtList = response.body().getData();
-                    Collator collator = Collator.getInstance(new Locale("vi", "VN"));
-                    Collections.sort(districtList, (d1, d2) -> collator.compare(d1.getDistrictName(), d2.getDistrictName()));
-                }
-            }
-            @Override public void onFailure(Call<GhnResponse<List<GhnDistrict>>> call, Throwable t) {}
-        });
-    }
-
-    private void fetchWards(int districtId) {
-        GhnApiClient.getApiService().getWards(GHN_TOKEN, districtId).enqueue(new retrofit2.Callback<GhnResponse<List<GhnWard>>>() {
-            @Override
-            public void onResponse(Call<GhnResponse<List<GhnWard>>> call, retrofit2.Response<GhnResponse<List<GhnWard>>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    wardList = response.body().getData();
-                    Collator collator = Collator.getInstance(new Locale("vi", "VN"));
-                    Collections.sort(wardList, (w1, w2) -> collator.compare(w1.getWardName(), w2.getWardName()));
-                }
-            }
-            @Override public void onFailure(Call<GhnResponse<List<GhnWard>>> call, Throwable t) {}
-        });
-    }
 }
