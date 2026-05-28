@@ -70,7 +70,7 @@ public class AddressActivity extends AppCompatActivity {
 
         addressViewModel.getDeleteSuccess().observe(this, isSuccess -> {
             if (isSuccess != null && isSuccess) {
-                addressViewModel.getAddressList();
+                addressViewModel.fetchAddresses(AddressActivity.this);
             }
         });
 
