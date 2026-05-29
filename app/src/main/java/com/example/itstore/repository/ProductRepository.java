@@ -39,4 +39,7 @@ public class ProductRepository {
     public void addCartItem(int variantId, int quantity, Callback<CartResponse> callback) {
         apiService.addCartItem(new AddCartItemRequest(variantId, quantity)).enqueue(callback);
     }
+    public void getBrands(Callback<com.example.itstore.model.BrandResponse> callback) {
+        apiService.getBrands().enqueue(callback);
+    }
 }
