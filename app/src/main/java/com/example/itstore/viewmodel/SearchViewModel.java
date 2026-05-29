@@ -1,9 +1,12 @@
 package com.example.itstore.viewmodel;
 
+import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -14,6 +17,7 @@ import com.example.itstore.model.Category;
 import com.example.itstore.model.MockDataRepository;
 import com.example.itstore.model.Product;
 import com.example.itstore.model.ProductResponse;
+import com.example.itstore.repository.ProductRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +26,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SearchViewModel extends ViewModel {
+public class SearchViewModel extends AndroidViewModel {
+    private final ProductRepository productRepository;
     private MutableLiveData<List<Product>> _searchResults = new MutableLiveData<>();
     public LiveData<List<Product>> searchResults = _searchResults;
     private List<Product> allProducts;
@@ -33,18 +38,17 @@ public class SearchViewModel extends ViewModel {
         return listBrandsLiveData;
     }
 
-    public SearchViewModel() {
+    public SearchViewModel(@NonNull Application application) {
+        super(application);
+        productRepository = ProductRepository.getInstance(application);
     }
-    public void searchProducts(Context context, String query, int categoryId, double minPrice, double maxPrice, List<Integer> brandIds) {
+    public void searchProducts(String query, int categoryId, double minPrice, double maxPrice, List<Integer> brandIds) {
 
         Integer apiCategoryId = (categoryId == -1) ? null : categoryId;
         Double apiMinPrice = (minPrice <= 0) ? null : minPrice;
         Double apiMaxPrice = (maxPrice == Double.MAX_VALUE) ? null : maxPrice;
-
         Integer apiBrandId = (brandIds != null && !brandIds.isEmpty()) ? brandIds.get(0) : null;
-        RetrofitClient.getApiService(context).getProducts(
-                1, 20, query, apiCategoryId, apiBrandId, apiMinPrice, apiMaxPrice, null
-        ).enqueue(new Callback<ProductResponse>() {
+        productRepository.getProducts(1, 20, query, apiCategoryId, apiBrandId, apiMinPrice, apiMaxPrice, null, new Callback<ProductResponse>() {
             @Override
             public void onResponse(Call<ProductResponse> call, Response<ProductResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
@@ -54,14 +58,12 @@ public class SearchViewModel extends ViewModel {
 
             @Override
             public void onFailure(Call<ProductResponse> call, Throwable t) {
-                android.util.Log.e("API_ERR", "Lỗi tìm kiếm sản phẩm: " + t.getMessage());
+                Log.e("API_ERR", "Lỗi tìm kiếm sản phẩm: " + t.getMessage());
             }
         });
     }
-    public void fetchBrands(Context context) {
-        RetrofitClient.ApiService apiService = RetrofitClient.getApiService(context);
-
-        apiService.getBrands().enqueue(new Callback<BrandResponse>() {
+    public void fetchBrands() {
+        productRepository.getBrands(new Callback<BrandResponse>() {
             @Override
             public void onResponse(Call<BrandResponse> call, Response<BrandResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {

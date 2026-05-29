@@ -15,6 +15,7 @@ import com.example.itstore.model.LogoutResponse;
 import com.example.itstore.model.ProfileResponse;
 import com.example.itstore.model.UpdateProfileRequest;
 import com.example.itstore.model.User;
+import com.example.itstore.repository.UserRepository;
 import com.example.itstore.utils.SharedPrefsManager;
 
 import org.json.JSONObject;
@@ -29,7 +30,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ProfileViewModel extends AndroidViewModel {
-
+    private final UserRepository userRepository;
     private final MutableLiveData<User> userProfile = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLogout = new MutableLiveData<>();
@@ -88,11 +89,12 @@ public class ProfileViewModel extends AndroidViewModel {
 
     public ProfileViewModel(@NonNull Application application) {
         super(application);
+        userRepository = UserRepository.getInstance(application);
     }
 
     public void fetchProfile() {
 
-        RetrofitClient.getApiService(getApplication()).getProfile().enqueue(new Callback<ProfileResponse>() {
+        userRepository.getProfile(new Callback<ProfileResponse>() {
             @Override
             public void onResponse(Call<ProfileResponse> call, Response<ProfileResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -122,7 +124,7 @@ public class ProfileViewModel extends AndroidViewModel {
         }
 
         LogoutRequest request = new LogoutRequest(refreshToken);
-        RetrofitClient.getApiService(getApplication()).logout(request).enqueue(new Callback<LogoutResponse>() {
+        userRepository.logout(request, new Callback<LogoutResponse>() {
             @Override
             public void onResponse(Call<LogoutResponse> call, Response<LogoutResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -172,7 +174,7 @@ public class ProfileViewModel extends AndroidViewModel {
 
 
         UpdateProfileRequest request = new UpdateProfileRequest(newName, newPhone);
-        RetrofitClient.getApiService(getApplication()).updateProfile(request).enqueue(new Callback<ProfileResponse>() {
+        userRepository.updateProfile(request, new Callback<ProfileResponse>() {
             @Override
             public void onResponse(Call<ProfileResponse> call, Response<ProfileResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -246,7 +248,7 @@ public class ProfileViewModel extends AndroidViewModel {
 
         ChangePasswordRequest request = new ChangePasswordRequest(oldPassword, newPassword);
 
-        RetrofitClient.getApiService(getApplication()).changePassword(request).enqueue(new Callback<ChangePasswordResponse>() {
+        userRepository.changePassword(request, new Callback<ChangePasswordResponse>() {
 
             @Override
             public void onResponse(Call<ChangePasswordResponse> call, Response<ChangePasswordResponse> response) {
@@ -283,7 +285,7 @@ public class ProfileViewModel extends AndroidViewModel {
 
         MultipartBody.Part body = MultipartBody.Part.createFormData("avatar", imgFile.getName(), requestFile);
 
-        RetrofitClient.getApiService(getApplication()).updateAvatar(body).enqueue(new Callback<Void>() {
+        userRepository.updateAvatar(body, new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {

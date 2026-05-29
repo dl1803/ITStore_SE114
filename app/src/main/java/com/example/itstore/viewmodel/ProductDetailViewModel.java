@@ -56,7 +56,7 @@ public class ProductDetailViewModel extends AndroidViewModel {
     public void addToCart(Product product, int variantId, String variantName, double finalPrice) {
         repository.addCartItem(variantId, 1, new Callback<CartResponse>() {
                     @Override
-                    public void onResponse(retrofit2.Call<CartResponse> call, retrofit2.Response<CartResponse> response) {
+                    public void onResponse(Call<CartResponse> call, Response<CartResponse> response) {
                         if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                             android.widget.Toast.makeText(getApplication(), "Đã thêm vào giỏ hàng!", android.widget.Toast.LENGTH_SHORT).show();
                         } else {

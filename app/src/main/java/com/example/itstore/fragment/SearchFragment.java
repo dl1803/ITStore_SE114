@@ -17,16 +17,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import com.example.itstore.R;
+import com.example.itstore.activity.LoginActivity;
 import com.example.itstore.activity.ProductDetailActivity;
 import com.example.itstore.adapter.ProductAdapter;
 import com.example.itstore.databinding.FragmentSearchBinding;
 import com.example.itstore.dialog.FilterProductDialog;
 import com.example.itstore.model.Brand;
 import com.example.itstore.model.Category;
+import com.example.itstore.model.MockDataRepository;
 import com.example.itstore.model.Product;
+import com.example.itstore.utils.SharedPrefsManager;
 import com.example.itstore.viewmodel.HomeViewModel;
+import com.example.itstore.viewmodel.ProductDetailViewModel;
 import com.example.itstore.viewmodel.SearchViewModel;
 import com.google.android.material.chip.Chip;
 
@@ -59,7 +64,7 @@ public class SearchFragment extends Fragment {
                 fetchedBrands = brands;
             }
         });
-        viewModel.fetchBrands(requireContext());
+        viewModel.fetchBrands();
         productAdapter = new ProductAdapter(requireContext(), new ArrayList<>());
         productAdapter.setOnProductInteractionListener(new ProductAdapter.OnProductInteractionListener() {
             @Override
@@ -70,12 +75,42 @@ public class SearchFragment extends Fragment {
             }
             @Override
             public void onFavoriteClick(Product product, int position) {
-                // Code xử lý bấm nút Tim ở đây
+                String token = SharedPrefsManager.getInstance(requireContext()).getAccessToken();
+                if (token == null || token.isEmpty()) {
+                    Toast.makeText(requireContext(), "Vui lòng đăng nhập để lưu yêu thích!", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(requireContext(), LoginActivity.class));
+                } else {
+                    boolean newStatus = !product.isFavorite();
+                    product.setFavorite(newStatus);
+                    MockDataRepository.getInstance().updateProduct(product);
+                    productAdapter.notifyItemChanged(position);
+                    Toast.makeText(requireContext(), newStatus ? "Đã thêm vào yêu thích" : "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
             public void onAddToCartClick(Product product) {
-                // Code xử lý bấm nút Giỏ hàng ở đây
+                String token = SharedPrefsManager.getInstance(requireContext()).getAccessToken();
+                if (token == null || token.isEmpty()) {
+                    Toast.makeText(requireContext(), "Vui lòng đăng nhập để thêm vào giỏ!", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(requireContext(), LoginActivity.class));
+                    return;
+                }
+
+                if (product.getVariants() == null || product.getVariants().isEmpty() || product.getVariants().size() > 1) {
+                    Toast.makeText(requireContext(), "Vui lòng chọn phiên bản bạn muốn mua ở trang chi tiết", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(requireContext(), ProductDetailActivity.class);
+                    intent.putExtra("PRODUCT_INFO", product);
+                    startActivity(intent);
+                } else {
+                    ProductDetailViewModel detailViewModel = new ViewModelProvider(requireActivity()).get(ProductDetailViewModel.class);
+
+                    int realVariantId = product.getVariants().get(0).getId();
+                    String realVariantName = product.getVariants().get(0).getVersion();
+
+                    detailViewModel.addToCart(product, realVariantId, realVariantName, 1);
+                    Toast.makeText(requireContext(), "Đã thêm vào giỏ hàng thành công!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         binding.rvSearchRecommend.setLayoutManager(new GridLayoutManager(requireContext(), 2));
@@ -186,7 +221,7 @@ public class SearchFragment extends Fragment {
             binding.tvResultRecommend.setText("Gợi ý tìm kiếm");
             binding.btnOpenFilter.setVisibility(View.GONE);
         }
-        viewModel.searchProducts(requireContext(), query, currentCategoryId, currentMinPrice, currentMaxPrice, currentBrandIds);
+        viewModel.searchProducts(query, currentCategoryId, currentMinPrice, currentMaxPrice, currentBrandIds);
     }
     private void hideKeyboard(View view) {
         InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);

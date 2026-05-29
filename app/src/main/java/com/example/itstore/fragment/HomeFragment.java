@@ -166,23 +166,19 @@ public class HomeFragment extends Fragment {
                         return;
                     }
 
-                    if (product.getVariants() != null && product.getVariants().size() > 1) {
-                        // Nhiều phiên bản thì qua chi tiết sản phẩm chọn
-                        Toast.makeText(requireContext(), "Vui lòng chọn phiên bản bạn muốn mua", Toast.LENGTH_SHORT).show();
+                    if (product.getVariants() == null || product.getVariants().isEmpty() || product.getVariants().size() > 1) {
+                        Toast.makeText(requireContext(), "Vui lòng chọn phiên bản bạn muốn mua ở trang chi tiết", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(requireContext(), ProductDetailActivity.class);
                         intent.putExtra("PRODUCT_INFO", product);
-                        detailLauncher.launch(intent);
+                        startActivity(intent);
                     } else {
                         ProductDetailViewModel detailViewModel = new ViewModelProvider(requireActivity()).get(ProductDetailViewModel.class);
 
-                        int defaultVariantId = 1;
-                        String defaultVariantName = "Mặc định";
-                        if (product.getVariants() != null && !product.getVariants().isEmpty()) {
-                            defaultVariantId = product.getVariants().get(0).getId();
-                            defaultVariantName = product.getVariants().get(0).getVersion();
-                        }
+                        int realVariantId = product.getVariants().get(0).getId();
+                        String realVariantName = product.getVariants().get(0).getVersion();
 
-                        detailViewModel.addToCart(product, defaultVariantId, defaultVariantName, 1);
+                        detailViewModel.addToCart(product, realVariantId, realVariantName, 1);
+                        Toast.makeText(requireContext(), "Đã thêm vào giỏ hàng thành công!", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
