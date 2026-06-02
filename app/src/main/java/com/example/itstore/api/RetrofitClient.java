@@ -66,6 +66,9 @@ import com.example.itstore.model.UpdateCartItemRequest;
 import com.example.itstore.model.VerifyOtpRequest;
 import com.example.itstore.model.VerifyResetOtpRequest;
 import com.example.itstore.model.VerifyResetOtpResponse;
+import com.example.itstore.model.WishlistResponse;
+import com.example.itstore.model.WishlistMessageResponse;
+import com.example.itstore.model.AddWishlistRequest;
 
 public class RetrofitClient {
     private static final String BASE_URL = "http://10.0.2.2:3000/";
@@ -228,5 +231,14 @@ public class RetrofitClient {
 
         @POST("api/auth/resend-verify-email")
         Call<AuthMessageResponse> resendVerifyEmailOtp(@Body ResendOtpRequest request);
+
+        @GET("api/wishlist")
+        Call<WishlistResponse> getWishlist();
+
+        @POST("api/wishlist")
+        Call<WishlistMessageResponse> addToWishlist(@Body AddWishlistRequest request);
+
+        @DELETE("api/wishlist/{product_id}")
+        Call<WishlistMessageResponse> removeFromWishlist(@Path("product_id") int productId);
     }
 }

@@ -1,0 +1,36 @@
+package com.example.itstore.repository;
+
+import android.content.Context;
+import com.example.itstore.api.RetrofitClient;
+import com.example.itstore.model.AddWishlistRequest;
+import com.example.itstore.model.WishlistMessageResponse;
+import com.example.itstore.model.WishlistResponse;
+import retrofit2.Callback;
+
+public class WishlistRepository {
+    private static WishlistRepository instance;
+    private final RetrofitClient.ApiService apiService;
+
+    private WishlistRepository(Context context) {
+        this.apiService = RetrofitClient.getApiService(context);
+    }
+
+    public static synchronized WishlistRepository getInstance(Context context) {
+        if (instance == null) {
+            instance = new WishlistRepository(context.getApplicationContext());
+        }
+        return instance;
+    }
+
+    public void getWishlist(Callback<WishlistResponse> callback) {
+        apiService.getWishlist().enqueue(callback);
+    }
+
+    public void addToWishlist(int productId, Callback<WishlistMessageResponse> callback) {
+        apiService.addToWishlist(new AddWishlistRequest(productId)).enqueue(callback);
+    }
+
+    public void removeFromWishlist(int productId, Callback<WishlistMessageResponse> callback) {
+        apiService.removeFromWishlist(productId).enqueue(callback);
+    }
+}

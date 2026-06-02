@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.itstore.R;
@@ -26,6 +27,7 @@ import com.example.itstore.model.Specification;
 import com.example.itstore.utils.CartManager;
 import com.example.itstore.utils.SharedPrefsManager;
 import com.example.itstore.viewmodel.ProductDetailViewModel;
+import com.example.itstore.viewmodel.WishlistViewModel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -47,14 +49,14 @@ public class ProductDetailActivity extends AppCompatActivity {
     private int currentVariantId = 0;
     private String currentVariantName = "";
     private double currentFinalPrice;
-
+    private WishlistViewModel wishlistViewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityProductDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         detailViewModel = new androidx.lifecycle.ViewModelProvider(this).get(ProductDetailViewModel.class);
-
+        wishlistViewModel = new ViewModelProvider(this).get(WishlistViewModel.class);
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("PRODUCT_INFO")) {
             currentProduct = (Product) intent.getSerializableExtra("PRODUCT_INFO");
@@ -87,7 +89,18 @@ public class ProductDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Sản phẩm không có dữ liệu chi tiết!", Toast.LENGTH_SHORT).show();
         }
 
-        updateFavoriteIcon(currentProduct.isFavorite());
+        wishlistViewModel.fetchWishlist();
+
+        wishlistViewModel.getWishlistProductIds().observe(this, productIds -> {
+            updateFavoriteIcon(productIds.contains(currentProduct.getId()));
+        });
+
+        wishlistViewModel.getToastMessage().observe(this, message -> {
+            if (message != null) {
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                wishlistViewModel.clearToastMessage();
+            }
+        });
 
         binding.ivBack.setOnClickListener(v -> finish());
         binding.ivCart.setOnClickListener(v ->{
@@ -138,20 +151,16 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         binding.imgFavoriteItem.setOnClickListener(v -> {
             String token = SharedPrefsManager.getInstance(this).getAccessToken();
-
             if (token == null || token.isEmpty()) {
                 Toast.makeText(this, "Vui lòng đăng nhập để lưu sản phẩm yêu thích!", Toast.LENGTH_SHORT).show();
                 Intent intentLogin = new Intent(this, LoginActivity.class);
                 startActivity(intentLogin);
             } else {
-                boolean newStatus = !currentProduct.isFavorite();
-                currentProduct.setFavorite(newStatus);
-                updateFavoriteIcon(newStatus);
-                MockDataRepository.getInstance().updateProduct(currentProduct);
-                Intent returnIntent = new Intent();
-                returnIntent.putExtra("UPDATED_PRODUCT", currentProduct);
-                setResult(RESULT_OK, returnIntent);
-                Toast.makeText(this, newStatus ? "Đã thêm vào yêu thích" : "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show();
+                if (wishlistViewModel.isInWishlist(currentProduct.getId())) {
+                    wishlistViewModel.removeFromWishlist(currentProduct.getId());
+                } else {
+                    wishlistViewModel.addToWishlist(currentProduct.getId());
+                }
             }
         });
         binding.tvXemCauHinhChiTiet.setOnClickListener(v -> {
