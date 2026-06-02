@@ -94,6 +94,7 @@
                     android:id="@+id/ivCartItem"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
+                    android:visibility="gone"
                     app:cardCornerRadius="6dp"
                     app:cardBackgroundColor="@color/orange_primary"
                     app:cardElevation="0dp">

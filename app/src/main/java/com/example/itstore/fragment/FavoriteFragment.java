@@ -2,36 +2,33 @@ package com.example.itstore.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
 import com.example.itstore.R;
 import com.example.itstore.activity.LoginActivity;
 import com.example.itstore.activity.ProductDetailActivity;
 import com.example.itstore.adapter.FavoriteAdapter;
 import com.example.itstore.databinding.FragmentFavoriteBinding;
 import com.example.itstore.model.Product;
+import com.example.itstore.model.WishlistItem;
 import com.example.itstore.utils.SharedPrefsManager;
-import com.example.itstore.viewmodel.HomeViewModel;
 import com.example.itstore.viewmodel.ProductDetailViewModel;
-
+import com.example.itstore.viewmodel.WishlistViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FavoriteFragment extends Fragment {
     private FragmentFavoriteBinding binding;
     private FavoriteAdapter adapter;
-    private HomeViewModel homeViewModel;
+    private WishlistViewModel wishlistViewModel;
 
     @Nullable
     @Override
@@ -56,40 +53,39 @@ public class FavoriteFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        homeViewModel = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
+        wishlistViewModel = new ViewModelProvider(this).get(WishlistViewModel.class);
 
         FavoriteAdapter.OnFavoriteClickListener favoriteListener = new FavoriteAdapter.OnFavoriteClickListener() {
             @Override
             public void onRemoveFavorite(Product product) {
-                com.example.itstore.model.MockDataRepository.getInstance().updateProduct(product);
-                Toast.makeText(requireContext(), "Đã xóa khỏi danh sách yêu thích", Toast.LENGTH_SHORT).show();
+                wishlistViewModel.removeFromWishlist(product.getId());
             }
 
             @Override
             public void onAddToCart(Product product) {
-                // Kiểm tra xem có nhiều phiên bản k
                 if (product.getVariants() != null && product.getVariants().size() > 1) {
-                    // Có từ 2 phiên bản thì sang chi tiết sản phẩm chọn
                     Toast.makeText(requireContext(), "Vui lòng chọn phiên bản bạn muốn mua", Toast.LENGTH_SHORT).show();
-
                     Intent intent = new Intent(requireContext(), ProductDetailActivity.class);
                     intent.putExtra("PRODUCT_INFO", product);
                     startActivity(intent);
                 } else {
-                    // Có 1 phiên bản
                     ProductDetailViewModel detailViewModel = new ViewModelProvider(requireActivity()).get(ProductDetailViewModel.class);
-
                     int defaultVariantId = 1;
                     String defaultVariantName = "Mặc định";
-
                     if (product.getVariants() != null && !product.getVariants().isEmpty()) {
                         defaultVariantId = product.getVariants().get(0).getId();
                         defaultVariantName = product.getVariants().get(0).getVersion();
                     }
-
                     detailViewModel.addToCart(product, defaultVariantId, defaultVariantName, 1);
                     Toast.makeText(requireContext(), "Đã thêm " + product.getName() + " vào giỏ", Toast.LENGTH_SHORT).show();
                 }
+            }
+
+            @Override
+            public void onProductClick(Product product) {
+                Intent intent = new Intent(requireContext(), ProductDetailActivity.class);
+                intent.putExtra("PRODUCT_INFO", product);
+                startActivity(intent);
             }
         };
 
@@ -97,14 +93,21 @@ public class FavoriteFragment extends Fragment {
         binding.rvFavorite.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvFavorite.setAdapter(adapter);
 
-        homeViewModel.getProductListLiveData().observe(getViewLifecycleOwner(), products -> {
-            List<Product> favList = new ArrayList<>();
-            for (Product p : products) {
-                if (p.isFavorite()) {
-                    favList.add(p);
+        wishlistViewModel.getWishlistItems().observe(getViewLifecycleOwner(), wishlistItems -> {
+            List<Product> productList = new ArrayList<>();
+            if (wishlistItems != null) {
+                for (WishlistItem item : wishlistItems) {
+                    productList.add(item.getProduct());
                 }
             }
-            adapter.updateList(favList);
+            adapter.updateList(productList);
+        });
+
+        wishlistViewModel.getToastMessage().observe(getViewLifecycleOwner(), message -> {
+            if (message != null) {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+                wishlistViewModel.clearToastMessage();
+            }
         });
 
         binding.imgBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
@@ -114,16 +117,8 @@ public class FavoriteFragment extends Fragment {
     public void onResume() {
         super.onResume();
         String token = SharedPrefsManager.getInstance(requireContext()).getAccessToken();
-
-        if (adapter != null && token != null && !token.isEmpty()) {
-            List<Product> freshProducts = com.example.itstore.model.MockDataRepository.getInstance().getAllProducts();
-            List<Product> favList = new ArrayList<>();
-            for (Product p : freshProducts) {
-                if (p.isFavorite()) {
-                    favList.add(p);
-                }
-            }
-            adapter.updateList(favList);
+        if (token != null && !token.isEmpty()) {
+            wishlistViewModel.fetchWishlist();
         }
     }
 }

@@ -38,6 +38,7 @@ import com.example.itstore.model.Product;
 import com.example.itstore.utils.SharedPrefsManager;
 import com.example.itstore.viewmodel.HomeViewModel;
 import com.example.itstore.viewmodel.ProductDetailViewModel;
+import com.example.itstore.viewmodel.WishlistViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,7 @@ import retrofit2.Response;
 public class HomeFragment extends Fragment {
 
     private HomeViewModel homeViewModel;
+    private WishlistViewModel wishlistViewModel;
     private FragmentHomeBinding binding;
 
     private RecyclerView rcvProducts;
@@ -75,6 +77,7 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         homeViewModel = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
+        wishlistViewModel = new ViewModelProvider(this).get(WishlistViewModel.class);
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
         layoutIndicators = binding.layoutIndicators;
@@ -148,11 +151,11 @@ public class HomeFragment extends Fragment {
                         Toast.makeText(requireContext(), "Vui lòng đăng nhập để lưu yêu thích!", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(requireContext(), LoginActivity.class));
                     } else {
-                        boolean newStatus = !product.isFavorite();
-                        product.setFavorite(newStatus);
-                        MockDataRepository.getInstance().updateProduct(product);
-                        productAdapter.notifyItemChanged(position);
-                        Toast.makeText(requireContext(), newStatus ? "Đã thêm vào yêu thích" : "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show();
+                        if (wishlistViewModel.isInWishlist(product.getId())) {
+                            wishlistViewModel.removeFromWishlist(product.getId());
+                        } else {
+                            wishlistViewModel.addToWishlist(product.getId());
+                        }
                     }
                 }
 
@@ -189,6 +192,23 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        wishlistViewModel.getWishlistProductIds().observe(getViewLifecycleOwner(), productIds -> {
+            List<Product> products = homeViewModel.getProductListLiveData().getValue();
+            if (products != null) {
+                for (Product p : products) {
+                    p.setFavorite(productIds.contains(p.getId()));
+                }
+                productAdapter.notifyDataSetChanged();
+            }
+        });
+
+        wishlistViewModel.getToastMessage().observe(getViewLifecycleOwner(), message -> {
+            if (message != null) {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+                wishlistViewModel.clearToastMessage();
+            }
+        });
+
         categoryAdapter = new CategoryAdapter(requireContext(), new ArrayList<>(), new CategoryAdapter.OnCategoryClickListener() {
             @Override
             public void onCategoryClick(Category category) {
@@ -220,6 +240,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        wishlistViewModel.fetchWishlist();
     }
     @Override
     public void onDestroyView() {
