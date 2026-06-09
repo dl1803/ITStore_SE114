@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -90,7 +91,7 @@ public class FavoriteFragment extends Fragment {
         };
 
         adapter = new FavoriteAdapter(requireContext(), new ArrayList<>(), favoriteListener);
-        binding.rvFavorite.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.rvFavorite.setLayoutManager(new GridLayoutManager(requireContext(), 2));
         binding.rvFavorite.setAdapter(adapter);
 
         wishlistViewModel.getWishlistItems().observe(getViewLifecycleOwner(), wishlistItems -> {
