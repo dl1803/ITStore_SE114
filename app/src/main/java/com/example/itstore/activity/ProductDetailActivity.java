@@ -84,7 +84,15 @@ public class ProductDetailActivity extends AppCompatActivity {
         binding.imgProductDetail.setAdapter(imageAdapter);
 
         if (currentProduct.getSlug() != null && !currentProduct.getSlug().isEmpty()) {
-            fetchFullProductDetail(currentProduct.getSlug());
+            // Nếu chuỗi slug truyền sang từ order chỉ toàn là số
+            if (currentProduct.getSlug().matches("\\d+")) {
+                int realId = Integer.parseInt(currentProduct.getSlug());
+                // Tìm slug thật bằng tên và id sản phẩm
+                detailViewModel.fetchProductDetailByIdFallback(realId, currentProduct.getName());
+            } else {
+                fetchFullProductDetail(currentProduct.getSlug());
+            }
+
         } else {
             Toast.makeText(this, "Sản phẩm không có dữ liệu chi tiết!", Toast.LENGTH_SHORT).show();
         }

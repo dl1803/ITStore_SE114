@@ -148,6 +148,10 @@ public class Product implements Serializable {
         return status;
     }
 
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
     public int getSoldCount() {
         return soldCount;
     }
