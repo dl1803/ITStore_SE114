@@ -17,6 +17,7 @@ import java.util.List;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotiViewHolder> {
     private List<ItemNotification> notiList;
+    private OnItemClickListener listener;
 
     public void setNotiList(List<ItemNotification> notiList) {
         this.notiList = notiList;
@@ -24,8 +25,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         // reset toàn bộ UI list : gọi lại getItemCount() gọi lại onBindViewHolder() cho toàn bộ
         notifyDataSetChanged();
     }
-
-
+    public interface OnItemClickListener {
+        void onItemClick(ItemNotification notification);
+    }
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
     @Override
     public NotiViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_notification, parent, false);
@@ -40,8 +45,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.tvNotiTitle.setText(noti.getTitle());
         holder.tvNotiContent.setText(noti.getContent());
         holder.tvNotiTime.setText(noti.getTime());
-
-
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(noti);
+            }
+        });
         if (!noti.isRead()) {
             holder.viewUnreadDot.setVisibility(View.VISIBLE);
             holder.layoutNotiContainer.setBackgroundColor(Color.parseColor("#FFF8E1"));
@@ -82,4 +90,5 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             tvNotiTime = itemView.findViewById(R.id.tvNotiTime);
         }
     }
+
 }

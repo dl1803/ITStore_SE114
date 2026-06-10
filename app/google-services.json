@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1043784001168",
+    "project_id": "pc-hardware-ecommerce-96792",
+    "storage_bucket": "pc-hardware-ecommerce-96792.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1043784001168:android:a9be56534dca13b3e89a15",
+        "android_client_info": {
+          "package_name": "com.example.itstore"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBP880co-GgPRsQq1JUgnFN0Gq6f1ofqm8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

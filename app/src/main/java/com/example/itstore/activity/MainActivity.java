@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 
 import androidx.activity.EdgeToEdge;
@@ -13,6 +14,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.NavGraph;
 import androidx.navigation.NavInflater;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
@@ -25,14 +27,25 @@ import com.example.itstore.R;
 import com.example.itstore.adapter.BannerAdapter;
 import com.example.itstore.adapter.CategoryAdapter;
 import com.example.itstore.adapter.ProductAdapter;
+import com.example.itstore.api.RetrofitClient;
 import com.example.itstore.databinding.ActivityMainBinding;
+import com.example.itstore.model.NotificationResponse;
+import com.example.itstore.model.TokenRegistrationRequest;
 import com.example.itstore.viewmodel.HomeViewModel;
+import com.example.itstore.viewmodel.NotificationViewModel;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
+    private NotificationViewModel notificationViewModel;
     private NavController navController;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
                     .findFragmentById(R.id.nav_host_fragment);
             navController = navHostFragment.getNavController();
         NavInflater inflater = navController.getNavInflater();
-        androidx.navigation.NavGraph graph = inflater.inflate(R.navigation.nav_graph);
+        NavGraph graph = inflater.inflate(R.navigation.nav_graph);
 
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("navigate_to")) {
@@ -66,6 +79,9 @@ public class MainActivity extends AppCompatActivity {
                 binding.bottomNavigation.setVisibility(View.VISIBLE);
             }
         });
+        notificationViewModel = new ViewModelProvider(this).get(NotificationViewModel.class);
+        FirebaseApp.initializeApp(this);
+        registerNotificationToken();
     }
     @Override
     protected void onNewIntent(android.content.Intent intent) {
@@ -80,10 +96,17 @@ public class MainActivity extends AppCompatActivity {
                     navController.navigate(R.id.nav_favorite);
                 }
             } catch (Exception e) {
-                android.util.Log.e("Loi_Chuyen_Trang", "Lỗi ở onNewIntent: " + e.getMessage());
+                Log.e("Loi_Chuyen_Trang", "Lỗi ở onNewIntent: " + e.getMessage());
             }
             intent.removeExtra("navigate_to");
         }
+    }
+    private void registerNotificationToken() {
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) return;
+                    String token = task.getResult();
+                    notificationViewModel.registerFCMToken(token);
+                });
     }
 
 }
