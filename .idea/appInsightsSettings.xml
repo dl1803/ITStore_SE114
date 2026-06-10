@@ -9,9 +9,9 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="com.example.itstore" />
-                  <option name="mobileSdkAppId" value="1:1043784001168:android:a9be56534dca13b3e89a15" />
-                  <option name="projectId" value="pc-hardware-ecommerce-96792" />
-                  <option name="projectNumber" value="1043784001168" />
+                  <option name="mobileSdkAppId" value="1:901224661576:android:480b7a48a0d807abbf8e7d" />
+                  <option name="projectId" value="pc-hardware-e1747" />
+                  <option name="projectNumber" value="901224661576" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

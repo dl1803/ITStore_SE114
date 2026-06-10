@@ -14,6 +14,11 @@ import com.example.itstore.R;
 import com.example.itstore.model.ItemNotification;
 
 import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotiViewHolder> {
     private List<ItemNotification> notiList;
@@ -44,7 +49,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         holder.tvNotiTitle.setText(noti.getTitle());
         holder.tvNotiContent.setText(noti.getContent());
-        holder.tvNotiTime.setText(noti.getTime());
+        holder.tvNotiTime.setText(formatNotificationTime(noti.getTime()));
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onItemClick(noti);
@@ -73,7 +78,23 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     public int getItemCount() {
         return notiList == null ? 0 : notiList.size();
     }
+    private String formatNotificationTime(String rawTime) {
+        if (rawTime == null || rawTime.isEmpty()) return "";
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+            inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
+            Date date = inputFormat.parse(rawTime);
+
+            SimpleDateFormat outputFormat = new SimpleDateFormat("HH:mm - dd/MM/yyyy", Locale.getDefault());
+            outputFormat.setTimeZone(TimeZone.getTimeZone("GMT+7"));
+
+            return outputFormat.format(date);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return rawTime;
+        }
+    }
     public static class NotiViewHolder extends RecyclerView.ViewHolder {
         ConstraintLayout layoutNotiContainer;
         View viewUnreadDot;
