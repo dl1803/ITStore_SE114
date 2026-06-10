@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.MotionEvent;
 import android.util.Log;
 import android.view.View;
 
@@ -82,6 +83,88 @@ public class MainActivity extends AppCompatActivity {
         notificationViewModel = new ViewModelProvider(this).get(NotificationViewModel.class);
         FirebaseApp.initializeApp(this);
         registerNotificationToken();
+
+                // Xử lí sự kiện Click và Kéo để di chuyển Floating Button
+            binding.fabAiChat.setOnTouchListener(new View.OnTouchListener() {
+                private float dX, dY;
+                private float startX, startY;
+                private static final int DRAG_THRESHOLD = 15; // Phân biệt Click và Kéo
+
+                @Override
+                public boolean onTouch(View view, MotionEvent event) {
+                    switch (event.getActionMasked()) {
+                        case MotionEvent.ACTION_DOWN:
+                            // Khi vừa chạm vào
+                            dX = view.getX() - event.getRawX();
+                            dY = view.getY() - event.getRawY();
+                            startX = event.getRawX();
+                            startY = event.getRawY();
+                            break;
+
+                        case MotionEvent.ACTION_MOVE:
+                            // Khi kéo đi
+                            View parentView = (View) view.getParent();
+
+                            // Tính toán tọa độ dự kiến khi kéo
+                            float newX = event.getRawX() + dX;
+                            float newY = event.getRawY() + dY;
+
+                            // Kẹp tọa độ X (Không cho lọt ra viền Trái / Phải)
+                            if (newX < 0) {
+                                newX = 0;
+                            } else if (newX > parentView.getWidth() - view.getWidth()) {
+                                newX = parentView.getWidth() - view.getWidth();
+                            }
+
+                            // Kẹp tọa độ Y (Không cho lọt ra viền Trên / Dưới)
+                            if (newY < 0) {
+                                newY = 0;
+                            } else if (newY > parentView.getHeight() - view.getHeight()) {
+                                newY = parentView.getHeight() - view.getHeight();
+                            }
+
+                            // Set tọa độ an toàn cho Bong bóng chat
+                            view.animate()
+                                    .x(newX)
+                                    .y(newY)
+                                    .setDuration(0)
+                                    .start();
+                            break;
+
+                        case MotionEvent.ACTION_UP:
+                            float endX = event.getRawX();
+                            float endY = event.getRawY();
+                            if (Math.abs(endX - startX) < DRAG_THRESHOLD &&
+                                    Math.abs(endY - startY) < DRAG_THRESHOLD) {
+                                view.performClick();
+                            } else {
+                                // Auto trả về mép màn hinh
+                                View parent = (View) view.getParent();
+                                int parentWidth = parent.getWidth();
+                                float targetX;
+
+                                if (view.getX() + (view.getWidth() / 2f) < parentWidth / 2f) {
+                                    targetX = 16f;
+                                } else {
+                                    targetX = parentWidth - view.getWidth() - 16f;
+                                }
+
+                                view.animate()
+                                        .x(targetX)
+                                        .setDuration(200)
+                                        .start();
+                            }
+                            break;
+                        default:
+                            return false;
+                    }
+                    return true;
+                }
+            });
+
+            binding.fabAiChat.setOnClickListener(v -> {
+                startActivity(new Intent(MainActivity.this, AiChatBoxActivity.class));
+            });
     }
     @Override
     protected void onNewIntent(android.content.Intent intent) {

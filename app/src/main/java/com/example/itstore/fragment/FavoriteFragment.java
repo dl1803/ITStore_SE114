@@ -110,8 +110,6 @@ public class FavoriteFragment extends Fragment {
                 wishlistViewModel.clearToastMessage();
             }
         });
-
-        binding.imgBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
     }
 
     @Override
