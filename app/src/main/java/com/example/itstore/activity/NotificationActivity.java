@@ -39,6 +39,8 @@ public class NotificationActivity extends AppCompatActivity {
     private NotificationAdapter adapter;
     private NotificationViewModel viewModel;
     private Thread sseThread;
+    private okhttp3.Call activeSseCall;
+    private volatile boolean isActivityDestroyed = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +79,7 @@ public class NotificationActivity extends AppCompatActivity {
         });
     }
     private void connectToNotificationStream() {
+        if (isActivityDestroyed) return;
         String token = SharedPrefsManager.getInstance(this).getAccessToken();
         if (token == null || token.isEmpty()) return;
 
@@ -92,12 +95,13 @@ public class NotificationActivity extends AppCompatActivity {
                         .header("Authorization", "Bearer " + token)
                         .build();
 
-                okhttp3.Response response = client.newCall(request).execute();
+                activeSseCall = client.newCall(request);
+                okhttp3.Response response = activeSseCall.execute();
                 if (response.isSuccessful() && response.body() != null) {
                     BufferedReader reader = new BufferedReader(new InputStreamReader(response.body().byteStream()));
                     String line;
 
-                    while ((line = reader.readLine()) != null) {
+                    while (!isActivityDestroyed && (line = reader.readLine()) != null) {
                         if (line.startsWith("data:")) {
                             String jsonString = line.substring(5).trim();
 
@@ -114,8 +118,10 @@ public class NotificationActivity extends AppCompatActivity {
                                         String.valueOf(sn.getId()), sn.getTitle(), sn.getBody(), sn.getCreatedAt(), isRead
                                 );
                                 runOnUiThread(() -> {
-                                    viewModel.addRealtimeNotification(newNoti);
-                                    Toast.makeText(NotificationActivity.this, "Bạn có thông báo mới!", Toast.LENGTH_SHORT).show();
+                                    if (!isActivityDestroyed) {
+                                        viewModel.addRealtimeNotification(newNoti);
+                                        Toast.makeText(NotificationActivity.this, "Bạn có thông báo mới!", Toast.LENGTH_SHORT).show();
+                                    }
                                 });
                             }
                         }
@@ -123,8 +129,10 @@ public class NotificationActivity extends AppCompatActivity {
                 }
             } catch (Exception e) {
                 Log.e("SSE_ERROR", "Mất kết nối Stream, đang thử kết nối lại...", e);
-                try { Thread.sleep(5000); } catch (InterruptedException ignored) {}
-                connectToNotificationStream(); // Tự động kết nối lại sau 5 giây nếu lỗi
+                if (!isActivityDestroyed) {
+                    try { Thread.sleep(5000); } catch (InterruptedException ignored) {}
+                    connectToNotificationStream(); // Tự động kết nối lại sau 5 giây nếu lỗi
+                }
             }
         });
         sseThread.start();
@@ -140,7 +148,11 @@ public class NotificationActivity extends AppCompatActivity {
     }
     @Override
     protected void onDestroy() {
+        isActivityDestroyed = true;
         super.onDestroy();
+        if (activeSseCall != null) {
+            activeSseCall.cancel();
+        }
         if (sseThread != null && sseThread.isAlive()) {
             sseThread.interrupt();
         }
