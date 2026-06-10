@@ -15,8 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.itstore.R;
 import com.example.itstore.activity.OrderDetailActivity;
+import com.example.itstore.activity.ProductDetailActivity;
 import com.example.itstore.activity.WriteReviewActivity;
 import com.example.itstore.model.Order;
+import com.example.itstore.model.Product;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -109,7 +111,22 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
                 listener.onOrderClick(order);
             }
         });
+        View.OnClickListener openProductDetail = v -> {
+            if (order.getItems() != null && !order.getItems().isEmpty()) {
+                int productId = order.getItems().get(0).getProductId();
 
+                if (productId != -1) {
+                    Intent intent = new Intent(v.getContext(), ProductDetailActivity.class);
+                    Product dummyProduct = new Product(productId, 0, order.getProductName(), "", null, null, 0);
+                    dummyProduct.setSlug(String.valueOf(productId));
+
+                    intent.putExtra("PRODUCT_INFO", dummyProduct);
+                    v.getContext().startActivity(intent);
+                }
+            }
+        };
+        holder.imgProductOrder.setOnClickListener(openProductDetail);
+        holder.tvProductName.setOnClickListener(openProductDetail);
         holder.btnReviewOrder.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), WriteReviewActivity.class);
             v.getContext().startActivity(intent);

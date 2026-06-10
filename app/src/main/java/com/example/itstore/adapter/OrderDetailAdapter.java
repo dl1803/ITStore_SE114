@@ -13,7 +13,9 @@ import com.example.itstore.databinding.ItemProductOrderDetailBinding;
 import com.example.itstore.model.OrderItem;
 import com.example.itstore.model.Product;
 
+import java.text.Normalizer;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.ViewHolder> {
 
@@ -48,7 +50,9 @@ public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.
 
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(holder.itemView.getContext(), ProductDetailActivity.class);
-            intent.putExtra("PRODUCT_ID", item.getProductId());
+            Product dummyProduct = new Product(item.getProductId(), 0, item.getProductName(), "", null, null, 0);
+            dummyProduct.setSlug(String.valueOf(item.getProductId()));
+            intent.putExtra("PRODUCT_INFO", dummyProduct);
             holder.itemView.getContext().startActivity(intent);
         });
     }
