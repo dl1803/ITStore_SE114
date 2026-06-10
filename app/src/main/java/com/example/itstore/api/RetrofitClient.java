@@ -37,6 +37,10 @@ import com.example.itstore.model.LoginResponse;
 import com.example.itstore.model.LogoutRequest;
 import com.example.itstore.model.LogoutResponse;
 import com.example.itstore.model.CreateOrderResponse;
+import com.example.itstore.model.MarkAsReadRequest;
+import com.example.itstore.model.NotificationListResponse;
+import com.example.itstore.model.NotificationResponse;
+import com.example.itstore.model.NotificationUnreadCountResponse;
 import com.example.itstore.model.OrderHistoryResponse;
 import com.example.itstore.model.PayOsPaymentResponse;
 import com.example.itstore.model.ProductResponse;
@@ -55,6 +59,7 @@ import com.example.itstore.model.SingleBrandResponse;
 import com.example.itstore.model.SingleCategoryResponse;
 import com.example.itstore.model.SingleOrderResponse;
 import com.example.itstore.model.SingleProductResponse;
+import com.example.itstore.model.TokenRegistrationRequest;
 import com.example.itstore.model.UpdateProfileRequest;
 import com.example.itstore.model.ReturnRequestResponse;
 import okhttp3.RequestBody;
@@ -240,5 +245,19 @@ public class RetrofitClient {
 
         @DELETE("api/wishlist/{product_id}")
         Call<WishlistMessageResponse> removeFromWishlist(@Path("product_id") int productId);
+        @POST("api/notifications/token-registration")
+        Call<NotificationResponse> registerFCMToken(@Body TokenRegistrationRequest request);
+        @GET("api/notifications")
+        Call<NotificationListResponse> getNotifications(
+                @Query("page") Integer page,
+                @Query("limit") Integer limit,
+                @Query("type") String type
+        );
+        @GET("api/notifications/unread-count")
+        Call<NotificationUnreadCountResponse> getUnreadNotificationCount();
+        @POST("api/notifications/mark-as-read")
+        Call<NotificationResponse> markAsRead(@Body MarkAsReadRequest request);
+        @POST("api/notifications/mark-all-as-read")
+        Call<NotificationResponse> markAllAsRead();
     }
 }
