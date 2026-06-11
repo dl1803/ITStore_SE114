@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.example.itstore.api.RetrofitClient;
 import com.example.itstore.model.AddCartItemRequest;
+import com.example.itstore.model.BannerResponse;
 import com.example.itstore.model.CartResponse;
 import com.example.itstore.model.CategoryResponse;
 import com.example.itstore.model.ProductResponse;
@@ -42,4 +43,8 @@ public class ProductRepository {
     public void getBrands(Callback<com.example.itstore.model.BrandResponse> callback) {
         apiService.getBrands().enqueue(callback);
     }
+    public void getBanners(String sort, Boolean isActive, Callback<BannerResponse> callback) {
+        apiService.getBanners(sort, isActive).enqueue(callback);
+    }
+
 }

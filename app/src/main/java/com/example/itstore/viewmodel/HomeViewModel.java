@@ -3,6 +3,7 @@ package com.example.itstore.viewmodel;
 import android.app.Application;
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import com.example.itstore.R;
 import com.example.itstore.api.RetrofitClient;
+import com.example.itstore.model.Banner;
+import com.example.itstore.model.BannerResponse;
 import com.example.itstore.model.Brand;
 import com.example.itstore.model.BrandResponse;
 import com.example.itstore.model.Category;
@@ -32,7 +35,7 @@ public class HomeViewModel extends AndroidViewModel {
     private final ProductRepository repository;
     private final MutableLiveData<List<Category>> categoryListLiveData = new MutableLiveData<>();
     private final MutableLiveData<List<Product>> productListLiveData = new MutableLiveData<>();
-
+    private final MutableLiveData<List<Banner>> bannerListLiveData = new MutableLiveData<>();
     private List<Product> allProducts = new ArrayList<>();
     public HomeViewModel(@NonNull Application application) {
         super(application);
@@ -46,6 +49,10 @@ public class HomeViewModel extends AndroidViewModel {
     }
     public LiveData<List<Product>> getProductListLiveData() {
         return productListLiveData;
+    }
+
+    public LiveData<List<com.example.itstore.model.Banner>> getBannerListLiveData() {
+        return bannerListLiveData;
     }
 
     public void updateProduct(Product updatedProduct) {
@@ -111,6 +118,23 @@ public class HomeViewModel extends AndroidViewModel {
             @Override
             public void onFailure(Call<ProductResponse> call, Throwable t) {
                 Log.e("API_ERR", "Lỗi lấy sản phẩm Gợi ý: " + t.getMessage());
+            }
+        });
+    }
+
+    public void fetchBanners() {
+        //  sort="asc" và is_active=true -> lọc lấy các banner đang hoạt động
+        repository.getBanners("asc", true, new Callback<BannerResponse>() {
+            @Override
+            public void onResponse(Call<BannerResponse> call, Response<BannerResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    bannerListLiveData.setValue(response.body().getData());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BannerResponse> call, Throwable t) {
+                Toast.makeText(getApplication(), "Lỗi lấy danh sách Banner", Toast.LENGTH_SHORT).show();
             }
         });
     }
