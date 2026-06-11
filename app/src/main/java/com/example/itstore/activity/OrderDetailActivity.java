@@ -227,8 +227,20 @@ public class OrderDetailActivity extends AppCompatActivity {
         });
 
         binding.btnReviewDetail.setOnClickListener(v -> {
-            Intent intent = new Intent(OrderDetailActivity.this, WriteReviewActivity.class);
-            startActivity(intent);
+            if (currentOrder != null && currentOrder.getItems() != null && !currentOrder.getItems().isEmpty()) {
+                com.example.itstore.model.OrderItem firstItem = currentOrder.getItems().get(0);
+
+                Intent intent = new Intent(OrderDetailActivity.this, WriteReviewActivity.class);
+
+                intent.putExtra("ORDER_ITEM_ID", firstItem.getOrderItemId());
+                intent.putExtra("PRODUCT_NAME", firstItem.getProductName());
+                intent.putExtra("PRODUCT_IMAGE", firstItem.getImageUrl());
+                intent.putExtra("PRODUCT_VARIANT", firstItem.getProductType());
+
+                startActivity(intent);
+            } else {
+                Toast.makeText(OrderDetailActivity.this, "Không tìm thấy sản phẩm để đánh giá!", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 

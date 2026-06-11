@@ -168,6 +168,26 @@
                         android:textStyle="bold"
                         app:drawableStartCompat="@drawable/ic_check_circle"
                         app:drawableTint="@color/orange_primary" ></TextView>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:background="#F0F0F0" ></View>
+
+                    <TextView
+                        android:id="@+id/tvUnreviewed"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:drawablePadding="24dp"
+                        android:gravity="center_vertical"
+                        android:padding="16dp"
+                        android:text="Sản phẩm chờ đánh giá"
+                        android:textColor="#333"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:drawableStartCompat="@android:drawable/btn_star_big_off"
+                        app:drawableTint="@color/orange_primary"></TextView>
 
                     <View
                         android:layout_width="match_parent"
