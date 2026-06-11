@@ -69,6 +69,9 @@ import com.example.itstore.model.VerifyResetOtpResponse;
 import com.example.itstore.model.WishlistResponse;
 import com.example.itstore.model.WishlistMessageResponse;
 import com.example.itstore.model.AddWishlistRequest;
+import com.example.itstore.model.ChatRequest;
+import com.example.itstore.model.ChatResponse;
+
 
 public class RetrofitClient {
     private static final String BASE_URL = "http://10.0.2.2:3000/";
@@ -240,5 +243,8 @@ public class RetrofitClient {
 
         @DELETE("api/wishlist/{product_id}")
         Call<WishlistMessageResponse> removeFromWishlist(@Path("product_id") int productId);
+
+        @POST("api/chatbot/chat")
+        Call<ChatResponse> chat(@Body ChatRequest request);
     }
 }
