@@ -10,7 +10,10 @@ import com.example.itstore.model.OrderHistoryResponse;
 import com.example.itstore.model.PayOsPaymentResponse;
 import com.example.itstore.model.ShipmentFeeRequest;
 import com.example.itstore.model.ShipmentFeeResponse;
-
+import com.example.itstore.model.ReturnRequestResponse;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import java.util.List;
 import retrofit2.Callback;
 
 public class OrderRepository {
@@ -50,5 +53,10 @@ public class OrderRepository {
     }
     public void confirmReceived(int orderId, Callback<com.example.itstore.model.SingleOrderResponse> callback) {
         apiService.confirmReceived(orderId).enqueue(callback);
+    }
+    public void createReturnRequest(RequestBody orderId, RequestBody reason, RequestBody items,
+                                    List<MultipartBody.Part> images,
+                                    Callback<ReturnRequestResponse> callback) {
+        apiService.createReturnRequest(orderId, reason, items, images).enqueue(callback);
     }
 }

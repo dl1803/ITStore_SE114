@@ -8,33 +8,25 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.itstore.R;
 import com.example.itstore.adapter.RefundImageAdapter;
 import com.example.itstore.adapter.RefundItemAdapter;
-import com.example.itstore.api.RetrofitClient;
 import com.example.itstore.databinding.ActivityRefundRequestBinding;
 import com.example.itstore.model.Order;
 import com.example.itstore.model.OrderItem;
-import com.example.itstore.model.ReturnRequestResponse;
+import com.example.itstore.viewmodel.RefundRequestViewModel;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 public class RefundRequestActivity extends AppCompatActivity {
 
     private ActivityRefundRequestBinding binding;
+    private RefundRequestViewModel viewModel;
     private RefundItemAdapter itemAdapter;
     private RefundImageAdapter imageAdapter;
     private List<Uri> selectedImages = new ArrayList<>();
@@ -68,10 +60,12 @@ public class RefundRequestActivity extends AppCompatActivity {
         binding = ActivityRefundRequestBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        viewModel = new ViewModelProvider(this).get(RefundRequestViewModel.class);
         currentOrder = (Order) getIntent().getSerializableExtra("ORDER_DATA");
 
         setupRecyclerViews();
         setupEventListeners();
+        observeViewModel();
     }
 
     private void setupRecyclerViews() {
@@ -112,6 +106,25 @@ public class RefundRequestActivity extends AppCompatActivity {
         binding.btnSubmitRefundRequest.setOnClickListener(v -> validateAndSubmit());
     }
 
+    private void observeViewModel() {
+        viewModel.getIsLoading().observe(this, isLoading -> {
+            binding.btnSubmitRefundRequest.setEnabled(!isLoading);
+        });
+
+        viewModel.getIsSubmitSuccess().observe(this, success -> {
+            if (Boolean.TRUE.equals(success)) {
+                Toast.makeText(this, "Gửi yêu cầu hoàn tiền thành công!", Toast.LENGTH_LONG).show();
+                finish();
+            }
+        });
+
+        viewModel.getErrorMessage().observe(this, msg -> {
+            if (msg != null) {
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void validateAndSubmit() {
         Map<Integer, Integer> selectedItems = itemAdapter.getSelectedItems();
         int selectedReasonId = binding.rgCondition.getCheckedRadioButtonId();
@@ -143,69 +156,12 @@ public class RefundRequestActivity extends AppCompatActivity {
             conditionValue = "wrong_item";
         }
 
-        StringBuilder itemsJson = new StringBuilder("[");
-        boolean first = true;
-        for (Map.Entry<Integer, Integer> entry : selectedItems.entrySet()) {
-            if (!first) itemsJson.append(",");
-            itemsJson.append("{\"order_item_id\":").append(entry.getKey())
-                    .append(",\"quantity\":").append(entry.getValue())
-                    .append(",\"condition\":\"").append(conditionValue).append("\"}");
-            first = false;
-        }
-        itemsJson.append("]");
-
-        RequestBody orderIdPart = RequestBody.create(
-                currentOrder.getOrderId(), MediaType.parse("text/plain"));
-        RequestBody reasonPart = RequestBody.create(
-                detailReason, MediaType.parse("text/plain"));
-        RequestBody itemsPart = RequestBody.create(
-                itemsJson.toString(), MediaType.parse("text/plain"));
-
-        List<MultipartBody.Part> imageParts = new ArrayList<>();
-        for (Uri uri : selectedImages) {
-            try {
-                InputStream is = getContentResolver().openInputStream(uri);
-                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                byte[] temp = new byte[4096];
-                int len;
-                while ((len = is.read(temp)) != -1) {
-                    buffer.write(temp, 0, len);
-                }
-                is.close();
-                byte[] bytes = buffer.toByteArray();
-                RequestBody rb = RequestBody.create(bytes, MediaType.parse("image/jpeg"));
-                MultipartBody.Part part = MultipartBody.Part.createFormData(
-                        "images", "img_" + System.currentTimeMillis() + ".jpg", rb);
-                imageParts.add(part);
-            } catch (Exception e) {
-                Toast.makeText(this, "Lỗi đọc ảnh, vui lòng thử lại", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        }
-
-        binding.btnSubmitRefundRequest.setEnabled(false);
-
-        RetrofitClient.getApiService(this)
-                .createReturnRequest(orderIdPart, reasonPart, itemsPart, imageParts)
-                .enqueue(new Callback<ReturnRequestResponse>() {
-                    @Override
-                    public void onResponse(Call<ReturnRequestResponse> call, Response<ReturnRequestResponse> response) {
-                        binding.btnSubmitRefundRequest.setEnabled(true);
-                        if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                            Toast.makeText(RefundRequestActivity.this,
-                                    "Gửi yêu cầu hoàn tiền thành công!", Toast.LENGTH_LONG).show();
-                            finish();
-                        } else {
-                            String msg = response.body() != null ? response.body().getMessage() : "Gửi yêu cầu thất bại";
-                            Toast.makeText(RefundRequestActivity.this, msg, Toast.LENGTH_SHORT).show();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<ReturnRequestResponse> call, Throwable t) {
-                        binding.btnSubmitRefundRequest.setEnabled(true);
-                        Toast.makeText(RefundRequestActivity.this, "Lỗi mạng", Toast.LENGTH_SHORT).show();
-                    }
-                });
+        viewModel.submitRefundRequest(
+                currentOrder.getOrderId(),
+                detailReason,
+                selectedItems,
+                conditionValue,
+                selectedImages
+        );
     }
 }

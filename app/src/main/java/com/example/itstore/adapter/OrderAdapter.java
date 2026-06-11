@@ -128,8 +128,22 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         holder.imgProductOrder.setOnClickListener(openProductDetail);
         holder.tvProductName.setOnClickListener(openProductDetail);
         holder.btnReviewOrder.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), WriteReviewActivity.class);
-            v.getContext().startActivity(intent);
+            if (order.getItems() != null && !order.getItems().isEmpty()) {
+                int orderItemId = order.getItems().get(0).getOrderItemId();
+
+                Intent intent = new Intent(v.getContext(), WriteReviewActivity.class);
+                intent.putExtra("ORDER_ITEM_ID", orderItemId);
+                intent.putExtra("PRODUCT_NAME", order.getProductName());
+                intent.putExtra("PRODUCT_IMAGE", order.getImageUrl());
+                intent.putExtra("PRODUCT_VARIANT", order.getProductType());
+                v.getContext().startActivity(intent);
+            } else {
+                Intent intent = new Intent(v.getContext(), WriteReviewActivity.class);
+                intent.putExtra("PRODUCT_NAME", order.getProductName());
+                intent.putExtra("PRODUCT_IMAGE", order.getImageUrl());
+                intent.putExtra("PRODUCT_VARIANT", order.getProductType());
+                v.getContext().startActivity(intent);
+            }
         });
 
     }

@@ -3,6 +3,7 @@ package com.example.itstore.fragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,19 +24,26 @@ import com.example.itstore.activity.LoginActivity;
 import com.example.itstore.activity.NotificationActivity;
 import com.example.itstore.activity.NotificationSettingsActivity;
 import com.example.itstore.activity.OrderHistoryActivity;
+import com.example.itstore.activity.UnreviewedListActivity;
+import com.example.itstore.api.RetrofitClient;
 import com.example.itstore.databinding.FragmentProfileBinding;
+import com.example.itstore.model.NotificationUnreadCountResponse;
 import com.example.itstore.utils.SharedPrefsManager;
+import com.example.itstore.viewmodel.NotificationViewModel;
 import com.example.itstore.viewmodel.ProfileViewModel;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
+import retrofit2.Call;
+import retrofit2.Response;
+
 public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding binding;
     private ProfileViewModel profileViewModel;
-
+    private NotificationViewModel notificationViewModel;
 
     // Chọn ảnh từ thư viện
     private final ActivityResultLauncher<String> pickImgLauncher = registerForActivityResult(
@@ -61,6 +69,7 @@ public class ProfileFragment extends Fragment {
         View view = binding.getRoot();
 
         profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+        notificationViewModel = new ViewModelProvider(this).get(NotificationViewModel.class);
         setupObservers();
 
         String token = SharedPrefsManager.getInstance(requireContext()).getAccessToken();
@@ -91,7 +100,7 @@ public class ProfileFragment extends Fragment {
             binding.tvEmailUser.setText(cachedEmail);
 
             profileViewModel.fetchProfile();
-
+            notificationViewModel.fetchUnreadCount();
             binding.tvLogout.setOnClickListener(v -> {
                 profileViewModel.logout();
             });
@@ -127,7 +136,10 @@ public class ProfileFragment extends Fragment {
                 Intent intent = new Intent(requireContext(), OrderHistoryActivity.class);
                 startActivity(intent);
             });
-
+            binding.tvUnreviewed.setOnClickListener(v -> {
+                Intent intent = new Intent(requireContext(), UnreviewedListActivity.class);
+                startActivity(intent);
+            });
             binding.btnNotification.setOnClickListener(v -> {
                 Intent intent = new Intent(requireContext(), NotificationActivity.class);
                 startActivity(intent);
@@ -137,8 +149,32 @@ public class ProfileFragment extends Fragment {
 
         return view;
     }
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Check lại số lượng notifications chưa đọc mỗi khi người dùng bấm vào profile
+        String token = SharedPrefsManager.getInstance(requireContext()).getAccessToken();
+        if (token != null && !token.isEmpty()) {
+            notificationViewModel.fetchUnreadCount();
+        }
+    }
     private void setupObservers() {
+        notificationViewModel.getUnreadCountLiveData().observe(getViewLifecycleOwner(), count -> {
+            Log.d("NOTI_BADGE_DEBUG", "Số lượng tin chưa đọc Server trả về là: " + count);
+
+            if (count != null && count > 0) {
+                binding.tvNotificationBadge.setVisibility(View.VISIBLE);
+                binding.tvNotificationBadge.setText(String.valueOf(count));
+            } else {
+                binding.tvNotificationBadge.setVisibility(View.GONE);
+            }
+        });
+        notificationViewModel.getErrorLiveData().observe(getViewLifecycleOwner(), errorMsg -> {
+            if (errorMsg != null) {
+                Log.e("NOTI_BADGE_DEBUG", "API Đếm số lượng chưa đọc bị lỗi rồi: " + errorMsg);
+                Toast.makeText(requireContext(), "Lỗi đếm thông báo: " + errorMsg, Toast.LENGTH_SHORT).show();
+            }
+        });
         profileViewModel.getUserProfile().observe(getViewLifecycleOwner(), user -> {
             if (user != null) {
                 binding.tvNameUser.setText(user.getFull_name());
@@ -205,8 +241,6 @@ public class ProfileFragment extends Fragment {
             return null;
         }
     }
-
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();

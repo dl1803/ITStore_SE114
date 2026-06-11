@@ -21,6 +21,7 @@ import retrofit2.http.Query;
 import com.example.itstore.model.AddressRequest;
 import com.example.itstore.model.AddressResponse;
 import com.example.itstore.model.AuthMessageResponse;
+import com.example.itstore.model.BannerResponse;
 import com.example.itstore.model.BrandResponse;
 import com.example.itstore.model.CancelOrderRequest;
 import com.example.itstore.model.CartResponse;
@@ -37,6 +38,10 @@ import com.example.itstore.model.LoginResponse;
 import com.example.itstore.model.LogoutRequest;
 import com.example.itstore.model.LogoutResponse;
 import com.example.itstore.model.CreateOrderResponse;
+import com.example.itstore.model.MarkAsReadRequest;
+import com.example.itstore.model.NotificationListResponse;
+import com.example.itstore.model.NotificationResponse;
+import com.example.itstore.model.NotificationUnreadCountResponse;
 import com.example.itstore.model.OrderHistoryResponse;
 import com.example.itstore.model.PayOsPaymentResponse;
 import com.example.itstore.model.ProductResponse;
@@ -55,6 +60,8 @@ import com.example.itstore.model.SingleBrandResponse;
 import com.example.itstore.model.SingleCategoryResponse;
 import com.example.itstore.model.SingleOrderResponse;
 import com.example.itstore.model.SingleProductResponse;
+import com.example.itstore.model.TokenRegistrationRequest;
+import com.example.itstore.model.UnreviewedResponse;
 import com.example.itstore.model.UpdateProfileRequest;
 import com.example.itstore.model.ReturnRequestResponse;
 import okhttp3.RequestBody;
@@ -69,6 +76,9 @@ import com.example.itstore.model.VerifyResetOtpResponse;
 import com.example.itstore.model.WishlistResponse;
 import com.example.itstore.model.WishlistMessageResponse;
 import com.example.itstore.model.AddWishlistRequest;
+import com.example.itstore.model.ChatRequest;
+import com.example.itstore.model.ChatResponse;
+
 
 public class RetrofitClient {
     private static final String BASE_URL = "http://10.0.2.2:3000/";
@@ -240,5 +250,45 @@ public class RetrofitClient {
 
         @DELETE("api/wishlist/{product_id}")
         Call<WishlistMessageResponse> removeFromWishlist(@Path("product_id") int productId);
+
+        @POST("api/chatbot/chat")
+        Call<ChatResponse> chat(@Body ChatRequest request);
+        @POST("api/notifications/token-registration")
+        Call<NotificationResponse> registerFCMToken(@Body TokenRegistrationRequest request);
+        @GET("api/notifications")
+        Call<NotificationListResponse> getNotifications(
+                @Query("page") Integer page,
+                @Query("limit") Integer limit,
+                @Query("type") String type
+        );
+        @GET("api/notifications/unread-count")
+        Call<NotificationUnreadCountResponse> getUnreadNotificationCount();
+        @POST("api/notifications/mark-as-read")
+        Call<NotificationResponse> markAsRead(@Body MarkAsReadRequest request);
+        @POST("api/notifications/mark-all-as-read")
+        Call<NotificationResponse> markAllAsRead();
+
+        @GET("api/banners")
+        Call<BannerResponse> getBanners(@Query("sort") String sort,@Query("is_active") Boolean isActive);
+        @Multipart
+        @POST("api/review")
+        Call<okhttp3.ResponseBody> createReview(
+                @Part("order_item_id") RequestBody orderItemId,
+                @Part("rating") RequestBody rating,
+                @Part("comment") RequestBody comment,
+                @Part List<okhttp3.MultipartBody.Part> images
+        );
+
+        @Multipart
+        @PUT("api/review/{review_id}")
+        Call<okhttp3.ResponseBody> updateReview(
+                @Path("review_id") int reviewId,
+                @Part("rating") RequestBody rating,
+                @Part("comment") RequestBody comment,
+                @Part("deleted_images") RequestBody deletedImages,
+                @Part List<okhttp3.MultipartBody.Part> images
+        );
+        @GET("api/review/unreviewed")
+        Call<UnreviewedResponse> getUnreviewedItems();
     }
 }

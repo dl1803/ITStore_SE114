@@ -7,7 +7,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.itstore.R;
 import com.example.itstore.model.ChatMessage;
 import java.util.List;
@@ -30,14 +29,11 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     @Override
     public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
         ChatMessage message = messageList.get(position);
-
         if (message.isUser()) {
-            // Hiện tin nhắn User (màu cam bên phải), giấu tin nhắn AI
             holder.layoutUserMessage.setVisibility(View.VISIBLE);
             holder.layoutAiMessage.setVisibility(View.GONE);
             holder.tvUserText.setText(message.getText());
         } else {
-            // Hiện tin nhắn AI (màu xám bên trái), giấu tin nhắn User
             holder.layoutAiMessage.setVisibility(View.VISIBLE);
             holder.layoutUserMessage.setVisibility(View.GONE);
             holder.tvAiText.setText(message.getText());
@@ -47,6 +43,18 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     @Override
     public int getItemCount() {
         return messageList != null ? messageList.size() : 0;
+    }
+
+    public void streamToken(RecyclerView recyclerView, int position, String token, String fullText) {
+        if (position >= 0 && position < messageList.size()) {
+            messageList.set(position, new ChatMessage(fullText, false));
+        }
+        RecyclerView.ViewHolder holder = recyclerView.findViewHolderForAdapterPosition(position);
+        if (holder instanceof ChatViewHolder) {
+            ((ChatViewHolder) holder).tvAiText.append(token);
+        } else {
+            notifyItemChanged(position);
+        }
     }
 
     public static class ChatViewHolder extends RecyclerView.ViewHolder {
