@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -64,4 +65,5 @@ dependencies {
 
     // support otp pinview
     implementation("io.github.chaosleung:pinview:1.4.4")
+    implementation("com.google.firebase:firebase-messaging:24.0.0")
 }
