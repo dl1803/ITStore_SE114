@@ -22,7 +22,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tvReviewerName"
+                android:id="@+id/tvUserName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="User name"
@@ -32,7 +32,7 @@
                 android:layout_marginLeft="2dp"></TextView>
 
             <RatingBar
-                android:id="@+id/rbReviewRating"
+                android:id="@+id/rbStar"
                 style="?android:attr/ratingBarStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -70,6 +70,15 @@
         android:textSize="14sp"
         android:lineSpacingExtra="4dp"
         ></TextView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvReviewImages"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:visibility="gone" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"

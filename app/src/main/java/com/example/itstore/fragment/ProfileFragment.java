@@ -24,6 +24,7 @@ import com.example.itstore.activity.LoginActivity;
 import com.example.itstore.activity.NotificationActivity;
 import com.example.itstore.activity.NotificationSettingsActivity;
 import com.example.itstore.activity.OrderHistoryActivity;
+import com.example.itstore.activity.UnreviewedListActivity;
 import com.example.itstore.api.RetrofitClient;
 import com.example.itstore.databinding.FragmentProfileBinding;
 import com.example.itstore.model.NotificationUnreadCountResponse;
@@ -135,7 +136,10 @@ public class ProfileFragment extends Fragment {
                 Intent intent = new Intent(requireContext(), OrderHistoryActivity.class);
                 startActivity(intent);
             });
-
+            binding.tvUnreviewed.setOnClickListener(v -> {
+                Intent intent = new Intent(requireContext(), UnreviewedListActivity.class);
+                startActivity(intent);
+            });
             binding.btnNotification.setOnClickListener(v -> {
                 Intent intent = new Intent(requireContext(), NotificationActivity.class);
                 startActivity(intent);

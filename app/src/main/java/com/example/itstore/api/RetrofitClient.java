@@ -61,6 +61,7 @@ import com.example.itstore.model.SingleCategoryResponse;
 import com.example.itstore.model.SingleOrderResponse;
 import com.example.itstore.model.SingleProductResponse;
 import com.example.itstore.model.TokenRegistrationRequest;
+import com.example.itstore.model.UnreviewedResponse;
 import com.example.itstore.model.UpdateProfileRequest;
 import com.example.itstore.model.ReturnRequestResponse;
 import okhttp3.RequestBody;
@@ -269,5 +270,25 @@ public class RetrofitClient {
 
         @GET("api/banners")
         Call<BannerResponse> getBanners(@Query("sort") String sort,@Query("is_active") Boolean isActive);
+        @Multipart
+        @POST("api/review")
+        Call<okhttp3.ResponseBody> createReview(
+                @Part("order_item_id") RequestBody orderItemId,
+                @Part("rating") RequestBody rating,
+                @Part("comment") RequestBody comment,
+                @Part List<okhttp3.MultipartBody.Part> images
+        );
+
+        @Multipart
+        @PUT("api/review/{review_id}")
+        Call<okhttp3.ResponseBody> updateReview(
+                @Path("review_id") int reviewId,
+                @Part("rating") RequestBody rating,
+                @Part("comment") RequestBody comment,
+                @Part("deleted_images") RequestBody deletedImages,
+                @Part List<okhttp3.MultipartBody.Part> images
+        );
+        @GET("api/review/unreviewed")
+        Call<UnreviewedResponse> getUnreviewedItems();
     }
 }

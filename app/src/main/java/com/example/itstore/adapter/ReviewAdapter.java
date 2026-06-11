@@ -5,22 +5,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RatingBar;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.itstore.R;
 import com.example.itstore.model.Review;
-
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder> {
 
-    private List<Review> reviewList;
+    private final List<Review> reviewList;
+
     public ReviewAdapter(List<Review> reviewList) {
         this.reviewList = reviewList;
     }
-
 
     @NonNull
     @Override
@@ -30,30 +29,44 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ReviewAdapter.ReviewViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ReviewViewHolder holder, int position) {
         Review review = reviewList.get(position);
-        if (review == null)  return;
-        holder.tvReviewerName.setText(review.getUserName());
-        holder.tvReviewDate.setText(review.getDateString());
+        if (review == null) return;
+
+        holder.tvUserName.setText(review.getUserName() != null ? review.getUserName() : "Khách hàng");
+        holder.rbStar.setRating(review.getRating());
         holder.tvReviewContent.setText(review.getComment());
-        holder.rbReviewRating.setRating(review.getRating());
+        holder.tvReviewDate.setText(review.getReadableDate() != null ? review.getReadableDate() : "");
+
+        if (review.getImageUrls() != null && !review.getImageUrls().isEmpty()) {
+            holder.rvReviewImages.setVisibility(View.VISIBLE);
+            List<Object> objectImages = new ArrayList<>(review.getImageUrls());
+            ReviewImageAdapter imageAdapter = new ReviewImageAdapter(objectImages, false, null);
+
+            holder.rvReviewImages.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext(), LinearLayoutManager.HORIZONTAL, false));
+            holder.rvReviewImages.setAdapter(imageAdapter);
+        } else {
+            holder.rvReviewImages.setVisibility(View.GONE);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return reviewList != null ? reviewList.size() : 0;
+        return reviewList == null ? 0 : reviewList.size();
     }
 
     public static class ReviewViewHolder extends RecyclerView.ViewHolder {
+        TextView tvUserName, tvReviewContent, tvReviewDate;
+        RatingBar rbStar;
+        RecyclerView rvReviewImages;
 
-        TextView tvReviewerName, tvReviewDate, tvReviewContent;
-        RatingBar rbReviewRating;
         public ReviewViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvReviewerName = itemView.findViewById(R.id.tvReviewerName);
-            tvReviewDate = itemView.findViewById(R.id.tvReviewDate);
+            tvUserName = itemView.findViewById(R.id.tvUserName);
+            rbStar = itemView.findViewById(R.id.rbStar);
             tvReviewContent = itemView.findViewById(R.id.tvReviewContent);
-            rbReviewRating = itemView.findViewById(R.id.rbReviewRating);
+            tvReviewDate = itemView.findViewById(R.id.tvReviewDate);
+            rvReviewImages = itemView.findViewById(R.id.rvReviewImages);
         }
     }
 }
