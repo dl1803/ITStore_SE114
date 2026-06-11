@@ -61,6 +61,7 @@ public class HomeFragment extends Fragment {
     private Runnable runBanner;
 
     private LinearLayout layoutIndicators;
+    private View rootView;
     private final ActivityResultLauncher<Intent> detailLauncher = registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
                     result -> {
@@ -83,25 +84,51 @@ public class HomeFragment extends Fragment {
         layoutIndicators = binding.layoutIndicators;
 
         ViewPager2 viewPager2 = binding.viewPagerBanner;
-        List<Integer> listBanner = new ArrayList<>();
-        listBanner.add(R.drawable.banner1);
-        listBanner.add(R.drawable.banner2);
-        listBanner.add(R.drawable.banner3);
 
-        BannerAdapter bannerAdapter = new BannerAdapter(listBanner);
+        BannerAdapter bannerAdapter = new BannerAdapter(new ArrayList<>());
         viewPager2.setAdapter(bannerAdapter);
 
         handler = new Handler(Looper.getMainLooper());
-        runBanner = () -> {
-            int curItem = viewPager2.getCurrentItem();
-            int totalItem = listBanner.size() - 1;
-            if (curItem < totalItem) {
-                viewPager2.setCurrentItem(curItem + 1);
-            } else {
-                viewPager2.setCurrentItem(0);
-            }
-        };
 
+        homeViewModel.getBannerListLiveData().observe(getViewLifecycleOwner(), banners -> {
+            if (banners != null && !banners.isEmpty()) {
+                bannerAdapter.updateData(banners);
+
+                // Tự động sinh ra số lượng dấu chấm (dots) tương ứng với số ảnh
+                layoutIndicators.removeAllViews();
+                for (int i = 0; i < banners.size(); i++) {
+                    CardView dot = new CardView(requireContext());
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(20, 20);
+                    params.setMargins(8, 0, 8, 0);
+                    dot.setLayoutParams(params);
+                    dot.setRadius(10f);
+                    dot.setCardElevation(0f);
+
+                    if (i == 0) {
+                        dot.setCardBackgroundColor(android.graphics.Color.parseColor("#FF9800"));
+                        params.width = 60;
+                    } else {
+                        dot.setCardBackgroundColor(android.graphics.Color.parseColor("#FFFFFF"));
+                    }
+                    layoutIndicators.addView(dot);
+                }
+
+                // Cập nhật lại logic cuộn ảnh tự động
+                runBanner = () -> {
+                    int curItem = viewPager2.getCurrentItem();
+                    int totalItem = banners.size() - 1;
+                    if (curItem < totalItem) {
+                        viewPager2.setCurrentItem(curItem + 1);
+                    } else {
+                        viewPager2.setCurrentItem(0);
+                    }
+                };
+                handler.removeCallbacks(runBanner);
+                handler.postDelayed(runBanner, 3000);
+            }
+        });
+
+        // Animation đổi màu dấu chấm khi vuốt tay
         viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
@@ -125,8 +152,11 @@ public class HomeFragment extends Fragment {
                     }
                 }
 
-                handler.removeCallbacks(runBanner);
-                handler.postDelayed(runBanner, 3000);
+                if (runBanner != null) {
+                    handler.removeCallbacks(runBanner);
+                    handler.postDelayed(runBanner, 3000);
+                }
+
             }
         });
 
@@ -232,6 +262,7 @@ public class HomeFragment extends Fragment {
             androidx.navigation.Navigation.findNavController(v).navigate(R.id.nav_search);
         });
         // goi ham lay san pham tu api
+        homeViewModel.fetchBanners();
         homeViewModel.fetchCategories();
         homeViewModel.fetchSuggestedProducts();
         return view;

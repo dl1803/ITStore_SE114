@@ -21,6 +21,7 @@ import retrofit2.http.Query;
 import com.example.itstore.model.AddressRequest;
 import com.example.itstore.model.AddressResponse;
 import com.example.itstore.model.AuthMessageResponse;
+import com.example.itstore.model.BannerResponse;
 import com.example.itstore.model.BrandResponse;
 import com.example.itstore.model.CancelOrderRequest;
 import com.example.itstore.model.CartResponse;
@@ -265,5 +266,8 @@ public class RetrofitClient {
         Call<NotificationResponse> markAsRead(@Body MarkAsReadRequest request);
         @POST("api/notifications/mark-all-as-read")
         Call<NotificationResponse> markAllAsRead();
+
+        @GET("api/banners")
+        Call<BannerResponse> getBanners(@Query("sort") String sort,@Query("is_active") Boolean isActive);
     }
 }
