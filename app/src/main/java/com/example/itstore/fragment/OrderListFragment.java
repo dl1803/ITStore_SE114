@@ -88,11 +88,10 @@ public class OrderListFragment extends Fragment {
                 }
 
                 if (tabStatus.equals("Đã mua")) {
-                    SharedPreferences prefs = requireContext().getSharedPreferences("ReviewedOrders", android.content.Context.MODE_PRIVATE);
 
                     Collections.sort(filteredOrders, (o1, o2) -> {
-                        boolean isRev1 = prefs.getBoolean(o1.getOrderId(), false);
-                        boolean isRev2 = prefs.getBoolean(o2.getOrderId(), false);
+                        boolean isRev1 = (o1.getItems() != null && !o1.getItems().isEmpty()) && o1.getItems().get(0).isReviewed();
+                        boolean isRev2 = (o2.getItems() != null && !o2.getItems().isEmpty()) && o2.getItems().get(0).isReviewed();
 
                         return Boolean.compare(isRev1, isRev2);
                     });
@@ -117,5 +116,14 @@ public class OrderListFragment extends Fragment {
             intent.putExtra("ORDER_ID", Integer.parseInt(order.getOrderId()));
             launcher.launch(intent);
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // gọi lại để update trạng thái nút Đánh giá
+        if (viewModel != null) {
+            viewModel.fetchOrderHistory();
+        }
     }
 }

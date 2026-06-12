@@ -22,6 +22,9 @@ public class OrderItem implements Serializable {
     @SerializedName("variant")
     private VariantInfo variantInfo;
 
+    @SerializedName("is_reviewed")
+    private boolean isReviewed;
+
     public int getQuantity() { return quantity; }
 
     public int getOrderItemId() { return id; }
@@ -52,12 +55,17 @@ public class OrderItem implements Serializable {
         return productInfo != null ? productInfo.id : -1;
     }
 
+    public boolean isReviewed() {
+        return isReviewed;
+    }
+
     public static class ProductInfo implements Serializable {
 
         @SerializedName("id")
         private int id;
         @SerializedName("name")
         private String name;
+
     }
 
     public static class VariantInfo implements Serializable {

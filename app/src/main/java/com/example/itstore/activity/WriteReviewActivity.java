@@ -111,6 +111,7 @@ public class WriteReviewActivity extends AppCompatActivity {
                 return;
             }
 
+
             binding.btnSubmitReview.setEnabled(false);
             int ratingValue = (int) starCount;
 
@@ -188,17 +189,6 @@ public class WriteReviewActivity extends AppCompatActivity {
             if (isSuccess != null && isSuccess) {
                 String msg = isEditMode ? "Cập nhật thành công!" : "Đánh giá thành công!";
                 Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-
-                if (!isEditMode) {
-                    String orderIdFlag = getIntent().getStringExtra("ORDER_ID_FLAG");
-                    if (orderIdFlag != null) {
-                        getSharedPreferences("ReviewedOrders", MODE_PRIVATE)
-                                .edit()
-                                .putBoolean(orderIdFlag, true)
-                                .apply();
-                    }
-                }
-
                 setResult(RESULT_OK);
                 finish();
             }
