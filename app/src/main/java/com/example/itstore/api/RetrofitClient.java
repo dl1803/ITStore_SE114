@@ -168,9 +168,6 @@ public class RetrofitClient {
         @DELETE("api/cart/items/{variant_id}")
         Call<CartResponse> removeCartItem(@Path("variant_id") int variantId);
 
-        @DELETE("api/cart")
-        Call<CartResponse> clearCart();
-
         @POST("api/orders")
         Call<CreateOrderResponse> createOrder(@Body CreateOrderRequest request);
 
