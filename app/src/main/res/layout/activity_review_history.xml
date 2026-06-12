@@ -39,6 +39,24 @@
             app:layout_constraintTop_toTopOf="parent" ></TextView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <HorizontalScrollView
+        android:id="@+id/scrollVariantFilters"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:scrollbars="none"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="12dp">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupVariantFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:singleSelection="true"
+            app:singleLine="true"
+            app:chipSpacingHorizontal="8dp" />
+    </HorizontalScrollView>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvReviewHistory"
         android:layout_width="match_parent"
@@ -70,7 +88,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Bạn chưa có đánh giá nào"
+            android:text="Không có đánh giá nào cho phân loại này"
             android:textColor="#888888"
             android:textSize="16sp" ></TextView>
     </LinearLayout>

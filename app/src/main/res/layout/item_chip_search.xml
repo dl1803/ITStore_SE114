@@ -4,4 +4,10 @@
     style="@style/Widget.MaterialComponents.Chip.Choice"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    app:ensureMinTouchTargetSize="false"></com.google.android.material.chip.Chip>
+    app:ensureMinTouchTargetSize="false"
+
+    app:chipBackgroundColor="@color/chip_choice_background_selector"
+
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:textColor="#333333" />

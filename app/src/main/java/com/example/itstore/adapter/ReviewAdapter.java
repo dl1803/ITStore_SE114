@@ -9,15 +9,16 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.itstore.R;
+import com.example.itstore.model.ProductReviewsResponse;
 import com.example.itstore.model.Review;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder> {
 
-    private final List<Review> reviewList;
+    private final List<ProductReviewsResponse.ReviewDetail> reviewList;
 
-    public ReviewAdapter(List<Review> reviewList) {
+    public ReviewAdapter(List<ProductReviewsResponse.ReviewDetail> reviewList) {
         this.reviewList = reviewList;
     }
 
@@ -30,23 +31,45 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
 
     @Override
     public void onBindViewHolder(@NonNull ReviewViewHolder holder, int position) {
-        Review review = reviewList.get(position);
+        ProductReviewsResponse.ReviewDetail review = reviewList.get(position);
         if (review == null) return;
 
-        holder.tvUserName.setText(review.getUserName() != null ? review.getUserName() : "Khách hàng");
+        holder.tvUserName.setText(review.getUser() != null ? review.getUser().getFullName() : "Khách hàng");
         holder.rbStar.setRating(review.getRating());
-        holder.tvReviewContent.setText(review.getComment());
-        holder.tvReviewDate.setText(review.getReadableDate() != null ? review.getReadableDate() : "");
+        String commentText = review.getComment();
+        if (review.getVariant() != null) {
+            commentText += "\n\n" + review.getVariant().getVariantText(); // Hiển thị thêm chữ "Phân loại: Xanh - 11"
+        }
+        holder.tvReviewContent.setText(commentText);
+        holder.tvReviewDate.setText(formatIsoDate(review.getCreatedAt()));
 
-        if (review.getImageUrls() != null && !review.getImageUrls().isEmpty()) {
+        if (review.getImages() != null && !review.getImages().isEmpty()) {
             holder.rvReviewImages.setVisibility(View.VISIBLE);
-            List<Object> objectImages = new ArrayList<>(review.getImageUrls());
-            ReviewImageAdapter imageAdapter = new ReviewImageAdapter(objectImages, false, null);
+            List<Object> objectImages = new ArrayList<>();
+            for (com.example.itstore.model.ProductReviewsResponse.ImageInfo img : review.getImages()) {
+                objectImages.add(img.getImageUrl());
+            }
 
+            ReviewImageAdapter imageAdapter = new ReviewImageAdapter(objectImages, false, null);
             holder.rvReviewImages.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext(), LinearLayoutManager.HORIZONTAL, false));
             holder.rvReviewImages.setAdapter(imageAdapter);
         } else {
             holder.rvReviewImages.setVisibility(View.GONE);
+        }
+    }
+    private String formatIsoDate(String isoDate) {
+        try {
+            if (isoDate == null || isoDate.isEmpty()) return "";
+            if (isoDate.length() >= 10) {
+                String ymd = isoDate.substring(0, 10);
+                String[] parts = ymd.split("-");
+                if (parts.length == 3) {
+                    return parts[2] + "/" + parts[1] + "/" + parts[0];
+                }
+            }
+            return isoDate;
+        } catch (Exception e) {
+            return isoDate;
         }
     }
 
