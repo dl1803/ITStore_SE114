@@ -37,8 +37,14 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         holder.tvUserName.setText(review.getUser() != null ? review.getUser().getFullName() : "Khách hàng");
         holder.rbStar.setRating(review.getRating());
         String commentText = review.getComment();
+        if (commentText == null || commentText.trim().equalsIgnoreCase("null") || commentText.trim().isEmpty()) {
+            commentText = "";
+        }
         if (review.getVariant() != null) {
-            commentText += "\n\n" + review.getVariant().getVariantText(); // Hiển thị thêm chữ "Phân loại: Xanh - 11"
+            if (!commentText.isEmpty()) {
+                commentText += "\n\n";
+            }
+            commentText += review.getVariant().getVariantText();
         }
         holder.tvReviewContent.setText(commentText);
         holder.tvReviewDate.setText(formatIsoDate(review.getCreatedAt()));
