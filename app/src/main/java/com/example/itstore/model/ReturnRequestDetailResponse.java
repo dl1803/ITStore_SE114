@@ -48,6 +48,9 @@ public class ReturnRequestDetailResponse {
         public String getAdminNote() { return adminNote; }
         public double getRefundAmount() { return refundAmount; }
         public String getCreatedAt() { return createdAt; }
+        public String getCreatedAtFormatted() {
+            return com.example.itstore.utils.DateUtils.formatDateDMY(createdAt);
+        }
         public List<ReturnItem> getReturnItems() { return returnItems; }
         public List<ReturnImage> getImages() { return images; }
         public ReturnAddress getAddress() { return address; }
@@ -85,6 +88,15 @@ public class ReturnRequestDetailResponse {
             public String getCondition() { return condition; }
             public double getUnitPrice() { return unitPrice; }
             public VariantSummary getVariant() { return variant; }
+            public String getConditionVN() {
+                if (condition == null) return "";
+                switch (condition.toLowerCase()) {
+                    case "damaged": return "Hàng bị hỏng/lỗi";
+                    case "good": return "Hàng còn tốt";
+                    case "wrong_item": return "Sai sản phẩm";
+                    default: return condition;
+                }
+            }
         }
 
         public static class VariantSummary {
@@ -150,6 +162,29 @@ public class ReturnRequestDetailResponse {
             public String getDistrict() { return district; }
             public String getWard() { return ward; }
             public String getStreet() { return street; }
+        }
+        public String getStatusVN() {
+            if (status == null) return "Chờ xử lý";
+            switch (status.toLowerCase()) {
+                case "pending": return "Chờ xử lý";
+                case "approved": return "Đã chấp nhận";
+                case "rejected": return "Đã từ chối";
+                case "received": return "Đã nhận hàng trả";
+                case "complete": return "Hoàn tất";
+                default: return "Chờ xử lý";
+            }
+        }
+
+        public int getStatusColor() {
+            if (status == null) return android.graphics.Color.parseColor("#F57C00");
+            switch (status.toLowerCase()) {
+                case "pending": return android.graphics.Color.parseColor("#F57C00");
+                case "approved": return android.graphics.Color.parseColor("#2196F3");
+                case "rejected": return android.graphics.Color.parseColor("#FF3B30");
+                case "received": return android.graphics.Color.parseColor("#8E24AA");
+                case "complete": return android.graphics.Color.parseColor("#4CAF50");
+                default: return android.graphics.Color.parseColor("#F57C00");
+            }
         }
     }
 }
