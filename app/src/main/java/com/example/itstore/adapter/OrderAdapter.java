@@ -117,8 +117,10 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         if (statusVN.equalsIgnoreCase("Đã mua")) {
             holder.btnRebuyOrder.setVisibility(View.VISIBLE);
 
-            SharedPreferences prefs = holder.itemView.getContext().getSharedPreferences("ReviewedOrders", Context.MODE_PRIVATE);
-            boolean isReviewed = prefs.getBoolean(order.getOrderId(), false);
+            boolean isReviewed = false;
+            if (order.getItems() != null && !order.getItems().isEmpty()) {
+                isReviewed = order.getItems().get(0).isReviewed();
+            }
 
             if (isReviewed) {
                 // Nhánh 1: Đã đánh giá -> Ẩn nút Đánh giá, chỉ còn Mua lại
@@ -140,9 +142,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             holder.btnRebuyOrder.setVisibility(View.GONE);
         }
 
-        // ========================================================
-        // 👉 XỬ LÝ SỰ KIỆN CLICK NÚT "MUA LẠI"
-        // ========================================================
+
         holder.btnRebuyOrder.setOnClickListener(v -> {
             if (order.getItems() != null && !order.getItems().isEmpty()) {
                 int productId = order.getItems().get(0).getProductId();
@@ -176,8 +176,6 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         holder.btnReviewOrder.setOnClickListener(v -> {
             if (order.getItems() != null && !order.getItems().isEmpty()) {
                 Intent intent = new Intent(v.getContext(), WriteReviewActivity.class);
-
-                intent.putExtra("ORDER_ID_FLAG", order.getOrderId());
                 int orderItemId = order.getItems().get(0).getOrderItemId();
 
                 intent.putExtra("ORDER_ITEM_ID", orderItemId);
