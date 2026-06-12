@@ -20,6 +20,7 @@ import com.example.itstore.model.CartItem;
 import com.example.itstore.model.MockDataRepository;
 import com.example.itstore.model.Product;
 import com.example.itstore.model.ProductImage;
+import com.example.itstore.model.ProductReviewsResponse;
 import com.example.itstore.model.ProductVariant;
 import com.example.itstore.model.Review;
 import com.example.itstore.model.SingleProductResponse;
@@ -345,51 +346,57 @@ public class ProductDetailActivity extends AppCompatActivity {
             binding.btnBuyNow.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.dark_gray));
         }
     }
-    private void setupReview(){
-        List<Review> allReviews = getReviews();
+    private void setupReview() {
+        if (currentProduct == null) return;
 
-        if (allReviews == null && !allReviews.isEmpty()) {
-            binding.tvRatingCount.setText("O bài đánh giá");
-            binding.tvSeeAllReviews.setText("Xem tất cả (0) >");
-            return;
-        }
+        int productId = currentProduct.getId();
 
-        Collections.sort(allReviews, new Comparator<Review>(){
+        RetrofitClient.getApiService(this).getProductReviews(productId, 1, 3).enqueue(new Callback<ProductReviewsResponse>() {
             @Override
-            public int compare(Review o1, Review o2) {
-                return Long.compare(o2.getTimestamp(), o1.getTimestamp());
+            public void onResponse(Call<com.example.itstore.model.ProductReviewsResponse> call, Response<ProductReviewsResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ProductReviewsResponse reviewResponse = response.body();
+                    List<ProductReviewsResponse.ReviewDetail> serverReviews = reviewResponse.getData();
+
+                    int totalReviews = 0;
+                    if (reviewResponse.getSummary() != null) {
+                        totalReviews = reviewResponse.getSummary().getTotalReviews();
+                    }
+
+                    binding.tvSeeAllReviews.setText("Xem tất cả (" + totalReviews + ") >");
+                    binding.tvRatingCount.setText(totalReviews + " bài đánh giá");
+
+                    if (serverReviews != null && !serverReviews.isEmpty()) {
+                        ReviewAdapter adapter = new ReviewAdapter(serverReviews);
+                        binding.rvProductReviews.setLayoutManager(new LinearLayoutManager(ProductDetailActivity.this));
+                        binding.rvProductReviews.setAdapter(adapter);
+                    }
+                } else {
+                    binding.tvRatingCount.setText("0 bài đánh giá");
+                    binding.tvSeeAllReviews.setText("Xem tất cả (0) >");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<com.example.itstore.model.ProductReviewsResponse> call, Throwable t) {
+                Log.e("API_REVIEW_ERROR", "Lỗi tải đánh giá sản phẩm: " + t.getMessage());
+                binding.tvRatingCount.setText("Không thể tải đánh giá");
             }
         });
 
-        int totalReviews = allReviews.size();
-        binding.tvSeeAllReviews.setText("Xem tất cả (" + totalReviews + ") >");
-        binding.tvRatingCount.setText(totalReviews + " bài đánh giá");
-
-        int limit = Math.min(3, totalReviews);
-        List<Review> top3Reviews = new ArrayList<>(allReviews.subList(0,limit));
-
-        ReviewAdapter adapter = new ReviewAdapter(top3Reviews);
-        binding.rvProductReviews.setLayoutManager(new LinearLayoutManager(this));
-        binding.rvProductReviews.setAdapter(adapter);
-
-        binding.tvSeeAllReviews.setOnClickListener( v -> {
+        binding.tvSeeAllReviews.setOnClickListener(v -> {
             Intent intent = new Intent(ProductDetailActivity.this, ProductReviewsActivity.class);
-            intent.putExtra("REVIEW_LIST", (Serializable) allReviews); // ép kiểu List<Review> thành Serializable để nhấn mạnh dữ liệu có thể được đơn giản hóa qua intent , tránh lỗi
+            intent.putExtra("PRODUCT_ID", productId);
+
+            // đóng gói thêm danh sách variant đưa qua màn hình xem tất cả
+            if (fullProductData != null && fullProductData.getVariants() != null) {
+                intent.putExtra("PRODUCT_VARIANTS", (Serializable) fullProductData.getVariants());
+            }
+
             startActivity(intent);
         });
-
     }
 
-    private List<Review> getReviews() {
-        List<Review> mockReviews = new ArrayList<>();
-        long curTime = System.currentTimeMillis(); // Lấy thời gian hiện tại
-        mockReviews.add(new Review(1, "User 1", 5.0f, "Tuyệt vời", curTime, "22/02/2026"));
-        mockReviews.add(new Review(2, "User 2", 4.0f, "Khá tốt", curTime - 100000, "21/02/2026"));
-        mockReviews.add(new Review(3, "User 3", 5.0f, "Đóng gói đẹp", curTime - 200000, "20/02/2026"));
-        mockReviews.add(new Review(4, "User 4", 3.0f, "Bình thường", curTime - 300000, "19/02/2026"));
-        mockReviews.add(new Review(5, "User 5", 5.0f, "Rất ưng ý", curTime - 400000, "18/02/2026"));
-        return mockReviews;
-    }
     private void updateFavoriteIcon(boolean isFav) {
         int color = isFav ? android.graphics.Color.parseColor("#FF9800") : android.graphics.Color.parseColor("#B3B3B3");
         binding.imgFavoriteItem.setColorFilter(color);

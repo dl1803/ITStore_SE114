@@ -1,5 +1,6 @@
 package com.example.itstore.adapter;
 
+import android.app.Dialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,12 +45,31 @@ public class ReviewImageAdapter extends RecyclerView.Adapter<ReviewImageAdapter.
             }
         }
 
+        final Object finalTarget = loadTarget;
         Glide.with(holder.itemView.getContext())
                 .load(item)
                 .placeholder(android.R.drawable.ic_menu_gallery)
                 .error(android.R.drawable.ic_menu_report_image)
                 .into(holder.imgReview);
 
+        if (!showDeleteBtn) {
+            holder.imgReview.setOnClickListener(v -> {
+                Dialog dialog = new Dialog(holder.itemView.getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+
+                ImageView imageView = new ImageView(holder.itemView.getContext());
+                imageView.setBackgroundColor(android.graphics.Color.BLACK);
+                imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+
+                Glide.with(holder.itemView.getContext())
+                        .load(finalTarget)
+                        .into(imageView);
+
+                dialog.setContentView(imageView);
+                imageView.setOnClickListener(v1 -> dialog.dismiss());
+
+                dialog.show();
+            });
+        }
         if (showDeleteBtn) {
             holder.btnDelete.setVisibility(View.VISIBLE);
             holder.btnDelete.setOnClickListener(v -> {

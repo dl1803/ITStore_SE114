@@ -45,6 +45,7 @@ import com.example.itstore.model.NotificationUnreadCountResponse;
 import com.example.itstore.model.OrderHistoryResponse;
 import com.example.itstore.model.PayOsPaymentResponse;
 import com.example.itstore.model.ProductResponse;
+import com.example.itstore.model.ProductReviewsResponse;
 import com.example.itstore.model.ProfileResponse;
 import com.example.itstore.model.RefreshTokenRequest;
 import com.example.itstore.model.RefreshTokenResponse;
@@ -70,6 +71,7 @@ import com.example.itstore.model.ReturnRequestListResponse;
 import com.example.itstore.model.ReturnRequestDetailResponse;
 import com.example.itstore.model.AddCartItemRequest;
 import com.example.itstore.model.UpdateCartItemRequest;
+import com.example.itstore.model.VariantReviewsResponse;
 import com.example.itstore.model.VerifyOtpRequest;
 import com.example.itstore.model.VerifyResetOtpRequest;
 import com.example.itstore.model.VerifyResetOtpResponse;
@@ -290,5 +292,17 @@ public class RetrofitClient {
         );
         @GET("api/review/unreviewed")
         Call<UnreviewedResponse> getUnreviewedItems();
+        @GET("api/review/products/{product_id}")
+        Call<ProductReviewsResponse> getProductReviews(
+                @Path("product_id") int productId,
+                @Query("page") int page,
+                @Query("limit") int limit
+        );
+        @GET("api/review/variants/{variant_id}")
+        Call<VariantReviewsResponse> getVariantReviews(
+                @Path("variant_id") int variantId,
+                @Query("page") int page,
+                @Query("limit") int limit
+        );
     }
 }
