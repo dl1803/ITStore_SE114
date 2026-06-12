@@ -65,6 +65,9 @@ public class SearchFragment extends Fragment {
             }
         });
         viewModel.fetchBrands();
+        viewModel.getSearchHistoryLiveData().observe(getViewLifecycleOwner(), this::renderHistoryChips);
+
+        binding.tvClearHistory.setOnClickListener(v -> viewModel.clearHistory());
         productAdapter = new ProductAdapter(requireContext(), new ArrayList<>());
         productAdapter.setOnProductInteractionListener(new ProductAdapter.OnProductInteractionListener() {
             @Override
@@ -167,6 +170,10 @@ public class SearchFragment extends Fragment {
 
         // KHI BẤM NÚT TÌM KIẾM BẰNG TỪ KHÓA
         binding.ivSearch.setOnClickListener(v -> {
+            String keyword = binding.edtSearch.getText().toString().trim();
+            if (!keyword.isEmpty()) {
+                viewModel.saveKeyword(keyword);
+            }
             performCombinedSearch();
             hideKeyboard(v);
         });
@@ -229,7 +236,30 @@ public class SearchFragment extends Fragment {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
+    private void renderHistoryChips(List<String> historyList) {
+        binding.chipGroupHistory.removeAllViews();
 
+        if (historyList == null || historyList.isEmpty()) {
+            binding.layoutSearchHistory.setVisibility(View.GONE);
+            return;
+        }
+
+        binding.layoutSearchHistory.setVisibility(View.VISIBLE);
+
+        for (String keyword : historyList) {
+            Chip chip = (Chip) getLayoutInflater().inflate(R.layout.item_search_history_chip, binding.chipGroupHistory, false);
+            chip.setText(keyword);
+            chip.setOnClickListener(v -> {
+                binding.edtSearch.setText(keyword);
+                binding.edtSearch.setSelection(keyword.length());
+                viewModel.saveKeyword(keyword);
+                performCombinedSearch();
+                hideKeyboard(v);
+            });
+            chip.setOnCloseIconClickListener(v -> viewModel.removeKeyword(keyword));
+            binding.chipGroupHistory.addView(chip);
+        }
+    }
     @Override
     public void onDestroyView() {
         super.onDestroyView();

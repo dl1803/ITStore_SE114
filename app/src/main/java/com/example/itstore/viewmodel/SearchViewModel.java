@@ -25,6 +25,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import com.example.itstore.repository.SearchHistoryRepository;
 
 public class SearchViewModel extends AndroidViewModel {
     private final ProductRepository productRepository;
@@ -33,7 +34,12 @@ public class SearchViewModel extends AndroidViewModel {
     private List<Product> allProducts;
     private List<Category> allCategories;
     private MutableLiveData<List<Brand>> listBrandsLiveData = new MutableLiveData<>();
+    private final SearchHistoryRepository historyRepository;
+    private final MutableLiveData<List<String>> searchHistoryLiveData = new MutableLiveData<>();
 
+    public LiveData<List<String>> getSearchHistoryLiveData() {
+        return searchHistoryLiveData;
+    }
     public MutableLiveData<List<Brand>> getListBrandsLiveData() {
         return listBrandsLiveData;
     }
@@ -41,6 +47,8 @@ public class SearchViewModel extends AndroidViewModel {
     public SearchViewModel(@NonNull Application application) {
         super(application);
         productRepository = ProductRepository.getInstance(application);
+        historyRepository = SearchHistoryRepository.getInstance(application);
+        searchHistoryLiveData.setValue(historyRepository.getHistory());
     }
     public void searchProducts(String query, int categoryId, double minPrice, double maxPrice, List<Integer> brandIds) {
 
@@ -77,5 +85,20 @@ public class SearchViewModel extends AndroidViewModel {
                 Log.e("API_ERR", "Lỗi lấy Brand bên Search: " + t.getMessage());
             }
         });
+    }
+    public void saveKeyword(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) return;
+        historyRepository.addKeyword(keyword.trim());
+        searchHistoryLiveData.setValue(historyRepository.getHistory());
+    }
+
+    public void removeKeyword(String keyword) {
+        historyRepository.removeKeyword(keyword);
+        searchHistoryLiveData.setValue(historyRepository.getHistory());
+    }
+
+    public void clearHistory() {
+        historyRepository.clearAll();
+        searchHistoryLiveData.setValue(historyRepository.getHistory());
     }
 }
