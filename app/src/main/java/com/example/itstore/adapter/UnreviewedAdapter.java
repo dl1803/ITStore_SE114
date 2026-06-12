@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.itstore.R;
 import com.example.itstore.activity.WriteReviewActivity;
-import com.example.itstore.databinding.ItemUnreviewedBinding;
+import com.example.itstore.databinding.ItemUnreviewedProductBinding;
 import com.example.itstore.model.UnreviewedResponse.UnreviewedItem;
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class UnreviewedAdapter extends RecyclerView.Adapter<UnreviewedAdapter.Vi
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ItemUnreviewedBinding binding = ItemUnreviewedBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        ItemUnreviewedProductBinding binding = ItemUnreviewedProductBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         return new ViewHolder(binding);
     }
 
@@ -35,17 +35,17 @@ public class UnreviewedAdapter extends RecyclerView.Adapter<UnreviewedAdapter.Vi
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         UnreviewedItem item = itemList.get(position);
         if (item == null) return;
-
+        String orderCode = "Mã ĐH: #DH" + item.getOrderItemId();
+        holder.binding.tvOrderId.setText(orderCode);
+        holder.binding.tvCountdown.setText("Còn " + item.getRemainingDays() + " ngày");
         holder.binding.tvProductName.setText(item.getProductName());
-        holder.binding.tvProductType.setText("Phân loại: " + (item.getVersion() != null ? item.getVersion() : "Tiêu chuẩn"));
-        holder.binding.tvRemainingDays.setText("Còn " + item.getRemainingDays() + " ngày");
-
+        holder.binding.tvProductVariant.setText("Phân loại: " + (item.getVersion() != null ? item.getVersion() : "Tiêu chuẩn"));
         Glide.with(context).
                 load(item.getProductImage()).
                 placeholder(R.drawable.ic_search).
                 into(holder.binding.imgProduct);
 
-        holder.binding.btnGoReview.setOnClickListener(v -> {
+        holder.binding.btnWriteReview.setOnClickListener(v -> {
             Intent intent = new Intent(context, WriteReviewActivity.class);
             intent.putExtra("ORDER_ITEM_ID", item.getOrderItemId());
             intent.putExtra("PRODUCT_NAME", item.getProductName());
@@ -54,16 +54,16 @@ public class UnreviewedAdapter extends RecyclerView.Adapter<UnreviewedAdapter.Vi
             context.startActivity(intent);
         });
 
-        holder.binding.btnBuyAgain.setOnClickListener(v -> {
-            Toast.makeText(context, "Đã thêm sản phẩm vào giỏ hàng!", Toast.LENGTH_SHORT).show();
-        });
     }
 
     @Override
     public int getItemCount() { return itemList != null ? itemList.size() : 0; }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        ItemUnreviewedBinding binding;
-        public ViewHolder(ItemUnreviewedBinding binding) { super(binding.getRoot()); this.binding = binding; }
+        ItemUnreviewedProductBinding binding;
+        public ViewHolder(ItemUnreviewedProductBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
     }
 }
