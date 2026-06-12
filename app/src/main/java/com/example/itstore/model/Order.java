@@ -156,10 +156,16 @@ public class Order implements Serializable {
         if (status == null) return "Chờ xác nhận";
         switch (status.toLowerCase()) {
             case "pending": return "Chờ xác nhận";
-            case "processing":
+            case "confirmed":
+            case "preparing":
             case "shipping": return "Đang giao";
-            case "delivered":
-            case "completed": return "Đã giao";
+            case "delivered": return "Đã giao";
+            case "completed":
+            case "received": return "Đã mua";
+            case "returning":
+            case "returned":
+            case "refunding":
+            case "refunded": return "Trả hàng";
             case "cancelled": return "Đã hủy";
             default: return "Chờ xác nhận";
         }

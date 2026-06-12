@@ -149,8 +149,28 @@
             android:text="Đánh giá"
             android:textColor="@color/orange_primary"
             android:textSize="14sp"
-            android:visibility="gone" app:layout_constraintRight_toLeftOf="@id/btnOrderDetail"
-            app:layout_constraintTop_toBottomOf="@id/divider3" />
+            app:layout_constraintRight_toLeftOf="@id/btnOrderDetail"
+            app:layout_constraintTop_toBottomOf="@id/divider3"
+            android:visibility="gone"
+            />
+
+        <TextView
+            android:id="@+id/btnRebuyOrder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/btn_outline_orange"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="6dp"
+            android:text="Mua lại"
+            android:textColor="@color/orange_primary"
+            android:textSize="14sp"
+            app:layout_constraintTop_toBottomOf="@id/divider3"
+            app:layout_constraintRight_toLeftOf="@+id/btnReviewOrder"
+            android:visibility="gone"
+
+            />
 
         <TextView
             android:id="@+id/btnOrderDetail"

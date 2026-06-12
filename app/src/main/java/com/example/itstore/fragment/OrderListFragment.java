@@ -2,6 +2,7 @@ package com.example.itstore.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,7 @@ import com.example.itstore.model.Order;
 import com.example.itstore.viewmodel.OrderHistoryViewModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class OrderListFragment extends Fragment {
@@ -84,6 +86,18 @@ public class OrderListFragment extends Fragment {
                         filteredOrders.add(order);
                     }
                 }
+
+                if (tabStatus.equals("Đã mua")) {
+                    SharedPreferences prefs = requireContext().getSharedPreferences("ReviewedOrders", android.content.Context.MODE_PRIVATE);
+
+                    Collections.sort(filteredOrders, (o1, o2) -> {
+                        boolean isRev1 = prefs.getBoolean(o1.getOrderId(), false);
+                        boolean isRev2 = prefs.getBoolean(o2.getOrderId(), false);
+
+                        return Boolean.compare(isRev1, isRev2);
+                    });
+                }
+
                 adapter.setOrderList(filteredOrders);
             }
         });
