@@ -19,7 +19,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 public class OrderHistoryActivity extends AppCompatActivity {
     private ActivityOrderHistoryBinding binding;
-    private final String[] tabTitles = new String[]{"Tất cả", "Chờ xác nhận", "Đang giao", "Đã giao", "Đã hủy"};
+    private final String[] tabTitles = new String[]{"Tất cả", "Chờ xác nhận", "Đang giao", "Đã giao", "Đã mua", "Trả hàng", "Đã hủy"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -32,9 +32,9 @@ public class OrderHistoryActivity extends AppCompatActivity {
         OrderPagerAdapter pagerAdapter = new OrderPagerAdapter(this);
         binding.viewListOrders.setAdapter(pagerAdapter);
 
-        // Buộc ViewPager2 tải và giữ nguyên cả 5 tab trong bộ nhớ.
+        // Buộc ViewPager2 tải và giữ nguyên cả 7 tab trong bộ nhớ.
         // preload trước các tab gần đó, giữ Fragment trong RAM, không destroy khi vuốt
-        binding.viewListOrders.setOffscreenPageLimit(5);
+        binding.viewListOrders.setOffscreenPageLimit(7);
 
         new TabLayoutMediator(binding.tabLayoutOrderStatus, binding.viewListOrders,
                 (tab, position) -> tab.setText(tabTitles[position])

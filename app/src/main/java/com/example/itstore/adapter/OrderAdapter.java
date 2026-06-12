@@ -62,6 +62,8 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             case "Chờ xác nhận": statusColor = Color.parseColor("#F57C00"); break; // Cam
             case "Đang giao": statusColor = Color.parseColor("#2196F3"); break; // Xanh dương
             case "Đã giao": statusColor = Color.parseColor("#4CAF50"); break; // Xanh lá
+            case "Đã mua": statusColor = Color.parseColor("#8E24AA"); break; // Tím
+            case "Trả hàng": statusColor = Color.parseColor("#E91E63"); break; // Hồng
             case "Đã hủy": statusColor = Color.parseColor("#FF3B30"); break; // Đỏ
         }
         holder.tvOrderStatus.setTextColor(statusColor);
@@ -111,6 +113,50 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
                 listener.onOrderClick(order);
             }
         });
+
+        if (statusVN.equalsIgnoreCase("Đã mua")) {
+            holder.btnRebuyOrder.setVisibility(View.VISIBLE);
+
+            SharedPreferences prefs = holder.itemView.getContext().getSharedPreferences("ReviewedOrders", Context.MODE_PRIVATE);
+            boolean isReviewed = prefs.getBoolean(order.getOrderId(), false);
+
+            if (isReviewed) {
+                // Nhánh 1: Đã đánh giá -> Ẩn nút Đánh giá, chỉ còn Mua lại
+                holder.btnReviewOrder.setVisibility(View.GONE);
+            } else {
+                // Nhánh 2: Chưa đánh giá -> Hiện cả 2 nút
+                holder.btnReviewOrder.setVisibility(View.VISIBLE);
+                holder.btnReviewOrder.setText("Đánh giá");
+            }
+        }
+        else if (statusVN.equalsIgnoreCase("Đã hủy")) {
+            // Đã hủy thì khách vẫn có thể muốn Mua lại
+            holder.btnRebuyOrder.setVisibility(View.VISIBLE);
+            holder.btnReviewOrder.setVisibility(View.GONE);
+        }
+        else {
+            // Các trạng thái Đang giao, Chờ xác nhận... thì ẩn cả 2
+            holder.btnReviewOrder.setVisibility(View.GONE);
+            holder.btnRebuyOrder.setVisibility(View.GONE);
+        }
+
+        // ========================================================
+        // 👉 XỬ LÝ SỰ KIỆN CLICK NÚT "MUA LẠI"
+        // ========================================================
+        holder.btnRebuyOrder.setOnClickListener(v -> {
+            if (order.getItems() != null && !order.getItems().isEmpty()) {
+                int productId = order.getItems().get(0).getProductId();
+                if (productId != -1) {
+                    Intent intent = new Intent(v.getContext(), ProductDetailActivity.class);
+                    // Bốc tạm data đưa sang màn chi tiết
+                    Product dummyProduct = new Product(productId, 0, order.getProductName(), "", null, null, 0);
+                    dummyProduct.setSlug(String.valueOf(productId));
+                    intent.putExtra("PRODUCT_INFO", dummyProduct);
+                    v.getContext().startActivity(intent);
+                }
+            }
+        });
+
         View.OnClickListener openProductDetail = v -> {
             if (order.getItems() != null && !order.getItems().isEmpty()) {
                 int productId = order.getItems().get(0).getProductId();
@@ -129,9 +175,11 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         holder.tvProductName.setOnClickListener(openProductDetail);
         holder.btnReviewOrder.setOnClickListener(v -> {
             if (order.getItems() != null && !order.getItems().isEmpty()) {
+                Intent intent = new Intent(v.getContext(), WriteReviewActivity.class);
+
+                intent.putExtra("ORDER_ID_FLAG", order.getOrderId());
                 int orderItemId = order.getItems().get(0).getOrderItemId();
 
-                Intent intent = new Intent(v.getContext(), WriteReviewActivity.class);
                 intent.putExtra("ORDER_ITEM_ID", orderItemId);
                 intent.putExtra("PRODUCT_NAME", order.getProductName());
                 intent.putExtra("PRODUCT_IMAGE", order.getImageUrl());
@@ -156,7 +204,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
     public static class OrderViewHolder extends RecyclerView.ViewHolder {
         TextView tvOrderId, tvOrderStatus, tvProductName, tvProductType;
-        TextView tvQuantity, tvTotalItems, tvTotalPrice, btnOrderDetail, btnReviewOrder;
+        TextView tvQuantity, tvTotalItems, tvTotalPrice, btnOrderDetail, btnReviewOrder, btnRebuyOrder;
         ImageView imgProductOrder;
 
         public OrderViewHolder(@NonNull View itemView) {
@@ -171,6 +219,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             btnOrderDetail = itemView.findViewById(R.id.btnOrderDetail);
             btnReviewOrder = itemView.findViewById(R.id.btnReviewOrder);
             imgProductOrder = itemView.findViewById(R.id.imgProductOrder);
+            btnRebuyOrder = itemView.findViewById(R.id.btnRebuyOrder);
         }
     }
 }
