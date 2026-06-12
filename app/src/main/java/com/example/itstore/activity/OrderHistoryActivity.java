@@ -15,6 +15,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import com.example.itstore.R;
 import com.example.itstore.databinding.ActivityOrderHistoryBinding;
 import com.example.itstore.fragment.OrderListFragment;
+import com.example.itstore.fragment.ReturnRequestListFragment;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 public class OrderHistoryActivity extends AppCompatActivity {
@@ -57,6 +58,9 @@ public class OrderHistoryActivity extends AppCompatActivity {
         @NonNull
         @Override
         public Fragment createFragment(int position) {
+            if (tabTitles[position].equals("Trả hàng")) {
+                return new ReturnRequestListFragment();
+            }
             return OrderListFragment.newInstance(tabTitles[position]);
         }
 

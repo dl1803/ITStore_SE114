@@ -8,6 +8,8 @@ import com.example.itstore.model.CreateOrderRequest;
 import com.example.itstore.model.CreateOrderResponse;
 import com.example.itstore.model.OrderHistoryResponse;
 import com.example.itstore.model.PayOsPaymentResponse;
+import com.example.itstore.model.ReturnRequestDetailResponse;
+import com.example.itstore.model.ReturnRequestListResponse;
 import com.example.itstore.model.ShipmentFeeRequest;
 import com.example.itstore.model.ShipmentFeeResponse;
 import com.example.itstore.model.ReturnRequestResponse;
@@ -58,5 +60,12 @@ public class OrderRepository {
                                     List<MultipartBody.Part> images,
                                     Callback<ReturnRequestResponse> callback) {
         apiService.createReturnRequest(orderId, reason, items, images).enqueue(callback);
+    }
+    public void getMyReturnRequests(Callback<ReturnRequestListResponse> callback) {
+        apiService.getMyReturnRequests().enqueue(callback);
+    }
+
+    public void getMyReturnRequestDetail(int id, Callback<ReturnRequestDetailResponse> callback) {
+        apiService.getMyReturnRequestDetail(id).enqueue(callback);
     }
 }

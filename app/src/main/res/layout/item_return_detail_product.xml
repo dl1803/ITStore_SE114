@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="8dp">
+
+    <ImageView
+        android:id="@+id/imgItemProduct"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="#F5F5F5"
+        android:scaleType="centerInside"
+        android:src="@drawable/ram1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvItemProductName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:text="RTX 4070 SUPER"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/imgItemProduct"
+        app:layout_constraintTop_toTopOf="@id/imgItemProduct" />
+
+    <TextView
+        android:id="@+id/tvItemVariant"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="4dp"
+        android:text="12GB GDDR6X, Black"
+        android:textColor="#808080"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@id/imgItemProduct"
+        app:layout_constraintTop_toBottomOf="@id/tvItemProductName" />
+
+    <TextView
+        android:id="@+id/tvItemCondition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="4dp"
+        android:text="Tình trạng: Hàng bị hỏng/lỗi"
+        android:textColor="@color/orange_primary"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@id/imgItemProduct"
+        app:layout_constraintTop_toBottomOf="@id/tvItemVariant" />
+
+    <TextView
+        android:id="@+id/tvItemQuantityPrice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="4dp"
+        android:text="x1 - 25.990.000đ"
+        android:textColor="@color/black"
+        android:textSize="13sp"
+        app:layout_constraintStart_toEndOf="@id/imgItemProduct"
+        app:layout_constraintTop_toBottomOf="@id/tvItemCondition" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
