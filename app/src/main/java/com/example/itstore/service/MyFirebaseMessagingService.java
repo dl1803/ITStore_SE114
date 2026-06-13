@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
 
@@ -24,15 +25,41 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
+
         if (remoteMessage.getData().size() > 0) {
             Map<String, String> data = remoteMessage.getData();
             String title = data.get("title");
             String body = data.get("body");
-
+            String notiType = data.get("type");
             String token = SharedPrefsManager.getInstance(getApplicationContext()).getAccessToken();
             if (token == null || token.isEmpty()) {
                 Log.d("FCM_SERVICE", "User đã đăng xuất, từ chối hiển thị thông báo cũ!");
                 return;
+            }
+
+            SharedPreferences prefs = getSharedPreferences("NotificationPrefs", Context.MODE_PRIVATE);
+
+            if (notiType != null) {
+                switch (notiType.toLowerCase()) {
+                    case "order":
+                    case "payment":
+                        boolean isOrderEnabled = prefs.getBoolean("order_noti", true);
+                        if (!isOrderEnabled) {
+                            Log.d("FCM_SERVICE", "Chặn thành công thông báo ĐƠN HÀNG theo yêu cầu user!");
+                            return;
+                        }
+                        break;
+                    case "promotion":
+                        boolean isPromoEnabled = prefs.getBoolean("promo_noti", true);
+                        if (!isPromoEnabled) {
+                            Log.d("FCM_SERVICE", "Chặn thành công thông báo KHUYẾN MÃI theo yêu cầu user!");
+                            return;
+                        }
+                        break;
+
+                    case "system":
+                        break;
+                }
             }
             showNotification(title, body);
         }
